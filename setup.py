@@ -24,7 +24,7 @@ requirements = [
 
 DATA_DIRNAME = 'data'
 SCRIPTS_DIRNAME = 'bin'
-VERSION_FILE = '3DCubeGen/common/constants.py'
+VERSION_FILE = 'CubeGen/common/constants.py'
 
 all_packages = find_packages()
 packages_data = {
