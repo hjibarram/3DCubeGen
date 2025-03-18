@@ -1,6 +1,7 @@
 import numpy as np
 from astropy.wcs import WCS
 from astropy.coordinates import SkyCoord
+from scipy.interpolate import interp1d
 
 def median_a(x,lw=5,lower=10000,wave=[]):
     if len(wave) > 0:
@@ -224,3 +225,155 @@ def make_radec(xx0,yy0,ra,dec,pa):
     ra_fib = ra*3600.0 + xx/np.cos(dec*np.pi/180.) 
     dec_fib = dec*3600.0 - yy 
     return ra_fib, dec_fib    
+
+def simpson_r(f,x,i1,i2,typ=0):
+    n=(i2-i1)*1.0
+    if n % 2:
+        n=n+1.0
+        i2=i2+1
+    b=x[i2]
+    a=x[i1]
+    h=(b-a)/n
+    s= f[i1]+f[i2]
+    n=int(n)
+    dx=b-a
+    for i in range(1, n, 2):
+        s += 4 * f[i1+i]
+    for i in range(2, n-1, 2):
+        s += 2 * f[i1+i]
+    if typ == 0:
+        return s*h/3.0
+    if typ == 1:
+        return s*h/3.0/dx
+
+def get_narrwband(wave, lo=6563,dw=10.0,sig=1.0,alpha=1): 
+    y1=(1+np.exp(-((wave-(lo-dw/2))/sig)))**(-alpha)
+    y2=(1+np.exp(((wave-(lo+dw/2))/sig)))**(-alpha) 
+    y=y1*y2
+    return y
+
+def band_spectra(wave_s,pdl_flux, dir='',k=5,zt=0):
+    vel_light=299792458.0
+    ang=1e-10
+    jans=1e-23
+    wave_s=wave_s/(1+zt)
+    nt=np.where((np.isfinite(pdl_flux) == True) & (pdl_flux > 0))
+    pdl_flux=pdl_flux[nt]
+    wave_s=wave_s[nt]
+    [nw]=pdl_flux.shape
+    int_spec1=np.zeros(nw)
+    int_spec2=np.zeros(nw)
+    file=['LICK_LICK.3734_63.dat','LaSilla_DFOSCOIII_filter.dat','LICK_LICK.6563_100.dat','LICK_LICK.6710_100.dat','SLOAN_SDSS.g.dat','SLOAN_SDSS.r.dat','SLOAN_SDSS.i.dat','Palomar_POSS.Red.dat']
+    band=['OII','OIII','HI','SII','g','r','i','R']
+    zerop=[3631.0,3730.0,3730.0,3631.0,3631.0,3631.0,3631.0,3631.0]
+    f=open(dir+file[k],'r')
+    wave=[]
+    trans=[]
+    for line in f:
+        data=line.replace('/n','').split(' ')
+        data=list(filter(None,data))
+        if len(data) > 1:
+            wave.extend([float(data[0])])
+            trans.extend([float(data[1])])
+    f.close()
+    d_wave=np.zeros(len(wave))
+    for kk in range(1,len(wave)):
+        d_wave[kk]=wave[kk]-wave[kk-1]
+    d_wave[0]=d_wave[1]
+    trans=np.array(trans)
+    wave=np.array(wave)
+    if 'OII' == band[k]:
+        trans=get_narrwband(wave, lo=3728.48,dw=8)#doublet
+    if 'OIII' == band[k]:
+        trans=get_narrwband(wave, lo=5008.24,dw=5) 
+    if 'HI' == band[k]:
+        trans=get_narrwband(wave, lo=6564.61,dw=5) 
+    if 'SII' == band[k]:
+        trans=get_narrwband(wave, lo=6732.67,dw=5)    
+    spec=np.copy(pdl_flux)
+    if np.nansum(spec) != 0:
+        spec1=interp1d(wave_s, spec,kind='linear',bounds_error=False,fill_value=0.)(wave)
+        flux_t=spec1*trans*d_wave
+        f_fin=simpson_r(flux_t*wave**2.0/d_wave/vel_light*ang,wave,0,len(wave)-2,typ=1)/simpson_r(trans,wave,0,len(wave)-2,typ=1)/jans/zerop[k]
+        f_fi2=simpson_r(flux_t/d_wave,wave,0,len(wave)-2,typ=0)#/simpson_r(trans,wave,0,len(wave)-2,typ=1)
+        if f_fin <= 0:
+            photo_a=-2.5*np.log10(1e-10)#14
+        else:
+            photo_a=-2.5*np.log10(f_fin)
+        photo_c=f_fin*zerop[k]*jans
+        photo_b=f_fi2
+    else:
+        photo_a,photo_b,photo_c=[0,0,0]
+    return photo_a,photo_b,photo_c,band[k]
+
+def twoD_interpolB(x,y,x1,x2,x3,y1,y2,y3,z1,z2,z3):
+    a=(y2-y1)*(z3-z1)-(y3-y1)*(z2-z1)
+    b=(z2-z1)*(x3-x1)-(z3-z1)*(x2-x1)
+    c=(x2-x1)*(y3-y1)-(x3-x1)*(y2-y1)
+    d=-(a*x1+b*y1+c*z1)
+    z=-(a*x+b*y+d)/c
+    nt=np.where(np.isfinite(z) == False)
+    if len(nt[0]) >0:
+        z[nt]=0.0
+    return z       
+    
+def map_interpolB(cube,x,y,nxt=10,nyt=10):
+    xpos0=np.int(np.round(x))
+    ypos0=np.int(np.round(y))
+    map=cube[xpos0-nxt:xpos0+nxt,ypos0-nyt:ypos0+nyt]
+    nx,ny=map.shape
+    rp=np.zeros([nx,ny])
+    x_t=np.arange(nx)
+    y_t=np.arange(ny)
+    rp[:,:]=np.nan
+    for i in range(0, nx):
+        for j in range(0, ny):
+            rp[i,j]=np.sqrt((i+xpos0-nxt-x)**2.0+(j+ypos0-nyt-y)**2.0)
+    min_in=np.unravel_index(np.nanargmin(rp), (nx,ny))
+    x1=min_in[0]
+    y1=min_in[1]
+    rp[x1,y1]=1000.0
+    min_in=np.unravel_index(np.nanargmin(rp), (nx,ny))
+    x2=min_in[0]
+    y2=min_in[1]
+    rp[x2,y2]=1000.0
+    min_in=np.unravel_index(np.nanargmin(rp), (nx,ny))
+    x3=min_in[0]
+    y3=min_in[1]
+    rp[x3,y3]=1000.0
+    z1=map[x1,y1]
+    z2=map[x2,y2]
+    z3=map[x3,y3]
+    x1=x1+xpos0-nxt
+    y1=y1+ypos0-nyt
+    x2=x2+xpos0-nxt
+    y2=y2+ypos0-nyt
+    x3=x3+xpos0-nxt
+    y3=y3+ypos0-nyt
+    z=twoD_interpolB(x,y,x1,x2,x3,y1,y2,y3,z1,z2,z3)
+    return z   
+
+def extract_segm(hdr,l1=12,l2=12,ra='',dec='',dx=0):
+    from astropy.wcs.utils import skycoord_to_pixel
+    sky1=SkyCoord(ra+' '+dec,frame=FK5, unit=(u.hourangle,u.deg))
+    ra_deg=sky1.ra.deg
+    dec_deg=sky1.dec.deg
+    ra1=ra_deg-l1/2./3600.
+    ra2=ra_deg+l1/2./3600.
+    dec1=dec_deg-l2/2./3600.
+    dec2=dec_deg+l2/2./3600.
+    sky00=SkyCoord(ra1,dec1,frame=FK5, unit=(u.deg,u.deg))
+    sky11=SkyCoord(ra2,dec2,frame=FK5, unit=(u.deg,u.deg))
+    wcs = WCS(hdr)
+    wcs=wcs.celestial
+    ypos,xpos=skycoord_to_pixel(sky1,wcs)
+    ypos00,xpos00=skycoord_to_pixel(sky00,wcs)
+    #print(ypos,xpos,sky1) 
+    #print(ypos00,xpos00,sky00)
+    xpos00=np.int(np.round(xpos00))
+    ypos00=np.int(np.round(ypos00))
+    ypos11,xpos11=skycoord_to_pixel(sky11,wcs)
+    xpos11=np.int(np.round(xpos11))
+    ypos11=np.int(np.round(ypos11))    
+    
+    return xpos00,xpos11,ypos00-dx,ypos11-dx
