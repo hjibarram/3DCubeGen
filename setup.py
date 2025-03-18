@@ -22,7 +22,7 @@ requirements = [
 #    'seaborn>=0.9.0',
 ]
 
-DATA_DIRNAME = 'legacy'
+DATA_DIRNAME = 'data'
 SCRIPTS_DIRNAME = 'bin'
 VERSION_FILE = 'CubeGen/common/constants.py'
 
