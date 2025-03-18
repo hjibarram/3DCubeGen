@@ -3,6 +3,7 @@ from astropy.wcs import WCS
 from astropy.coordinates import SkyCoord
 from scipy.interpolate import interp1d
 import CubeGen
+import os
 
 def median_a(x,lw=5,lower=10000,wave=[]):
     if len(wave) > 0:
@@ -209,7 +210,6 @@ def extract_spec(spec,hdr,ra='',dec='',rad=1.5,pix=0.35,avgra=False):
     return wave_f,single_T,xpos,ypos
 
 def sycall(comand):
-    import os
     linp=comand
     os.system(comand)
 
