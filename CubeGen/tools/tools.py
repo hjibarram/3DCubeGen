@@ -1,5 +1,6 @@
-
-
+import numpy as np
+from astropy.wcs import WCS
+from astropy.coordinates import SkyCoord
 
 def median_a(x,lw=5,lower=10000,wave=[]):
     if len(wave) > 0:
