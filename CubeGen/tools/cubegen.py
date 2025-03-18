@@ -12,6 +12,7 @@ import CubeGen.tools.tools as tools
 from multiprocessing import Pool
 from multiprocessing import cpu_count
 from multiprocessing.pool import ThreadPool
+import numpy as np
 
 def map_ifu(expnumL,nameF=None,use_slitmap=True,errors=True,cent=False,coord_cen=[0,0],pbars=True,flu16=False,multiT=False,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=18.5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_ver='1.0.2.dev0',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmCube-NAME.fits',path_lvmcore=''):
     try:
