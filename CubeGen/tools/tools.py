@@ -2,6 +2,7 @@ import numpy as np
 from astropy.wcs import WCS
 from astropy.coordinates import SkyCoord
 from scipy.interpolate import interp1d
+import CubeGen
 
 def median_a(x,lw=5,lower=10000,wave=[]):
     if len(wave) > 0:
@@ -252,7 +253,8 @@ def get_narrwband(wave, lo=6563,dw=10.0,sig=1.0,alpha=1):
     y=y1*y2
     return y
 
-def band_spectra(wave_s,pdl_flux, dir='',k=5,zt=0):
+def band_spectra(wave_s,pdl_flux,k=5,zt=0):
+    dir=os.path.join(CubeGen.__path__[0], 'legacy')+'/'
     vel_light=299792458.0
     ang=1e-10
     jans=1e-23
