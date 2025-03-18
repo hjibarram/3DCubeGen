@@ -64,3 +64,30 @@ def get_jpgNR(namel=['name1','name2','name3'],dir1='',dir0='',valTs=[[7,15],[7,1
     pdl_00[:,:,2]=pdl_B
     im1 = im2.fromarray(pdl_00)
     im1.save(dir1+'/'+name+'.jpeg',quality=100)
+
+def get_jpg(name1,name2,name3,dir1='',dir0='',valTs=[[7,15],[7,13.5],[7,15.5]],name='image_rgb'):
+    [pdl_B,hdrt]=fits.getdata(dir0+'/'+name1, 'MAG', header=True)
+    [pdl_G,hdrt]=fits.getdata(dir0+'/'+name2, 'MAG', header=True)
+    [pdl_R,hdrt]=fits.getdata(dir0+'/'+name3, 'MAG', header=True)
+    min1=valTs[2][1]
+    min2=valTs[1][1]
+    min3=valTs[0][1]
+    max1=valTs[2][0]
+    max2=valTs[1][0]
+    max3=valTs[0][0]
+    nx,ny=pdl_B.shape
+    pdl_B=(np.flipud(pdl_B)-min1)/(max1-min1)*256
+    pdl_G=(np.flipud(pdl_G)-min2)/(max2-min2)*256
+    pdl_R=(np.flipud(pdl_R)-min3)/(max3-min3)*256
+    pdl_B[np.where(pdl_B < 0)]=0
+    pdl_G[np.where(pdl_G < 0)]=0
+    pdl_R[np.where(pdl_R < 0)]=0
+    pdl_B[np.where(pdl_B > 255)]=255
+    pdl_G[np.where(pdl_G > 255)]=255
+    pdl_R[np.where(pdl_R > 255)]=255
+    pdl_00=np.zeros([nx,ny,3],dtype="uint8")
+    pdl_00[:,:,0]=pdl_R
+    pdl_00[:,:,1]=pdl_G
+    pdl_00[:,:,2]=pdl_B
+    im1 = im2.fromarray(pdl_00)
+    im1.save(dir1+'/'+name+'.jpeg',quality=100)
