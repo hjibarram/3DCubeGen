@@ -24,28 +24,28 @@ requirements = [
 
 DATA_DIRNAME = 'data'
 SCRIPTS_DIRNAME = 'bin'
-VERSION_FILE = 'AGNdecomp/common/constants.py'
+VERSION_FILE = '3DCubeGen/common/constants.py'
 
 all_packages = find_packages()
 packages_data = {
     package: [f'{DATA_DIRNAME}/*']+[f'{os.path.join(DATA_DIRNAME, sub)}/*' for root, subs, files in os.walk(os.path.join(package, DATA_DIRNAME)) for sub in subs]
     for package in all_packages if os.path.isdir(os.path.join(package, DATA_DIRNAME))
 }
-scripts = ["bin/run_agndec"]
+scripts = ["bin/run_cubegen"]
 #    os.path.join(SCRIPTS_DIRNAME, script_name)
 #    for script_name in os.listdir(SCRIPTS_DIRNAME) if script_name.endswith('.py')
 #]
 version = version(VERSION_FILE)
 
 setup(
-    name='AGNdecomp',
+    name='3DCubeGen',
     version=version,
-    description='A Python implementation of the AGN decomposition code',
+    description='A Python implementation for a 3D RSS to cube reconstruction',
     #long_description=readme(),
     classifiers=[
         'Development Status :: 1 - Production/Stable',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.13',
         'Topic :: Scientific/Engineering :: Astronomy',
     ],
     keywords='galaxies',
