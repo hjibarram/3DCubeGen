@@ -59,7 +59,7 @@ setup(
     install_requires=requirements,
     include_package_data=True,
     package_data=packages_data,
-    scripts=scripts,
+    #scripts=scripts,
     zip_safe=False,
     test_suite='nose.collector',
     tests_require=['nose'],
