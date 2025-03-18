@@ -8,11 +8,12 @@ from astropy.wcs.utils import skycoord_to_pixel
 from astropy.wcs.utils import pixel_to_skycoord
 from scipy.interpolate import interp1d
 import os
-import CubeGen.tools.tools as tools
 from multiprocessing import Pool
 from multiprocessing import cpu_count
 from multiprocessing.pool import ThreadPool
 import numpy as np
+import CubeGen.tools.tools as tools
+import CubeGen.tools.kernel as kernel 
 
 def map_ifu(expnumL,nameF=None,use_slitmap=True,errors=True,cent=False,coord_cen=[0,0],pbars=True,flu16=False,multiT=False,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=18.5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_ver='1.0.2.dev0',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmCube-NAME.fits',path_lvmcore=''):
     try:
@@ -223,7 +224,7 @@ def map_ifu(expnumL,nameF=None,use_slitmap=True,errors=True,cent=False,coord_cen
                     args=[(spec_ifu[ntp,:],specE_ifu[ntp,:],x_ifu_V[ntp,:],y_ifu_V[ntp,:],fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nly,npros,nproc,errors) for npros in range(0, nproc)]                    
                 else:
                     args=[(spec_ifu[ntp,:],None,x_ifu_V[ntp,:],y_ifu_V[ntp,:],fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nly,npros,nproc,errors) for npros in range(0, nproc)]
-                result_l = pool.map(task_wrapper, args)
+                result_l = pool.map(kernel.task_wrapper, args)
         else:
             nproc=1
             npros=0
@@ -232,7 +233,7 @@ def map_ifu(expnumL,nameF=None,use_slitmap=True,errors=True,cent=False,coord_cen
                 args=(spec_ifu[ntp,:],specE_ifu[ntp,:],x_ifu_V[ntp,:],y_ifu_V[ntp,:],fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nly,npros,nproc,errors)
             else:
                 args=(spec_ifu[ntp,:],None,x_ifu_V[ntp,:],y_ifu_V[ntp,:],fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nly,npros,nproc,errors)
-            result_l.extend([task_wrapper(args)])
+            result_l.extend([kernel.task_wrapper(args)])
         for npros in range(0, nproc):
             result=result_l[npros]
             val=int(nly/nproc)

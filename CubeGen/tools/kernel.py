@@ -1,4 +1,4 @@
-
+import numpy as np
 
 def task_wrapper(args):
     return ifu_const(*args)
