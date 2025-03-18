@@ -1,4 +1,17 @@
 from tqdm.notebook import tqdm
+from astropy.io import fits
+from astropy.wcs import WCS
+from astropy.coordinates import SkyCoord
+from astropy.coordinates import ICRS, Galactic, FK4, FK5
+from astropy import units as u
+from astropy.wcs.utils import skycoord_to_pixel
+from astropy.wcs.utils import pixel_to_skycoord
+from scipy.interpolate import interp1d
+import os
+import CubeGen.tools.tools as tools
+from multiprocessing import Pool
+from multiprocessing import cpu_count
+from multiprocessing.pool import ThreadPool
 
 def map_ifu(expnumL,nameF=None,use_slitmap=True,errors=True,cent=False,coord_cen=[0,0],pbars=True,flu16=False,multiT=False,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=18.5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_ver='1.0.2.dev0',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
     try:
@@ -99,7 +112,7 @@ def map_ifu(expnumL,nameF=None,use_slitmap=True,errors=True,cent=False,coord_cen
                 y_ifu_pix=np.zeros([nfib0*nlt,ny0])
             for k in range(0, ny0):
                 if use_slitmap == False:
-                    ra_fib, dec_fib=make_radec(xp,yp,rac,dec,PA)
+                    ra_fib, dec_fib=tools.make_radec(xp,yp,rac,dec,PA)
                 x_ifu_V[0:nfib0,k]=ra_fib
                 y_ifu_V[0:nfib0,k]=dec_fib
                 if use_slitmap:
@@ -190,7 +203,7 @@ def map_ifu(expnumL,nameF=None,use_slitmap=True,errors=True,cent=False,coord_cen
     spec_ifu=rss_f*facto
     if errors:
         specE_ifu=rss_ef*facto 
-    from multiprocessing.pool import ThreadPool
+    
     if pbars:
         pbar=tqdm(total=nlx)
     int_spect=np.zeros(nw)
@@ -304,4 +317,4 @@ def map_ifu(expnumL,nameF=None,use_slitmap=True,errors=True,cent=False,coord_cen
         file=out_path+basenameC.replace('NAME',expn)
     out_fit=file
     hlist.writeto(out_fit,overwrite=True)
-    sycall('gzip -f '+out_fit)
+    tools.sycall('gzip -f '+out_fit)
