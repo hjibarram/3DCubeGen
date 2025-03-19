@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 #from sdeconv.data import celegans
 from sdeconv.psfs import SPSFGaussian
-from sdeconv.deconv import SRichardsonLucy
-#from astropy.io import fits
-import torch
+#from sdeconv.deconv import SRichardsonLucy
+from astropy.io import fits
+#import torch
 import numpy as np
 from skimage import color, data, restoration
 from scipy.signal import convolve2d as conv2
