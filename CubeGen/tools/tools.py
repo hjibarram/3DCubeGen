@@ -357,6 +357,44 @@ def map_interpolB(cube,x,y,nxt=10,nyt=10):
     z=twoD_interpolB(x,y,x1,x2,x3,y1,y2,y3,z1,z2,z3)
     return z   
 
+def cube_interpolB(cube,x,y):
+    nz,nx,ny=cube.shape
+    rp=np.zeros([nx,ny])
+    x_t=np.arange(nx)
+    y_t=np.arange(ny)
+    rp[:,:]=np.nan
+    for i in range(0, nx):
+        for j in range(0, ny):
+            rp[i,j]=np.sqrt((i-x)**2.0+(j-y)**2.0)
+    min_in=np.unravel_index(np.nanargmin(rp), (nx,ny))
+    x1=min_in[0]
+    y1=min_in[1]
+    rp[x1,y1]=1000.0
+    min_in=np.unravel_index(np.nanargmin(rp), (nx,ny))
+    x2=min_in[0]
+    y2=min_in[1]
+    rp[x2,y2]=1000.0
+    min_in=np.unravel_index(np.nanargmin(rp), (nx,ny))
+    x3=min_in[0]
+    y3=min_in[1]
+    rp[x3,y3]=1000.0
+    z1=cube[:,x1,y1]
+    z2=cube[:,x2,y2]
+    z3=cube[:,x3,y3]
+    z=twoD_interpolB(x,y,x1,x2,x3,y1,y2,y3,z1,z2,z3)
+    return z        
+    
+
+def cube_interpol(cube,x,y):
+    nz,nx,ny=cube.shape
+    val_out=np.zeros(nz)
+    for i in range(0, nz):
+        #print(i,nz)
+        mapt=np.copy(cube[i,:,:])
+        zt=twoD_interpol(mapt,x,y)
+        val_out[i]=zt
+    return val_out    
+
 def extract_segm(hdr,l1=12,l2=12,ra='',dec='',dx=0):
     sky1=SkyCoord(ra+' '+dec,frame=FK5, unit=(u.hourangle,u.deg))
     ra_deg=sky1.ra.deg
