@@ -11,7 +11,7 @@ from tqdm.notebook import tqdm
 import CubeGen.tools.tools as tools
 
 
-def psfG(psf_x=1.33,psf_y=1.33,nx=35,ny=35)
+def psfG(psf_x=1.33,psf_y=1.33,nx=35,ny=35):
     #psf_s=1.33*1.5
     # Generate a 2D PSF
     psf_generator = SPSFGaussian((psf_x, psf_y), (nx, ny))
