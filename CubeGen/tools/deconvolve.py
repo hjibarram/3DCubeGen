@@ -20,9 +20,9 @@ def psfG(psf_x=1.33,psf_y=1.33,nx=35,ny=35):
     return psf
 
 def deconvolve_2dmap(image,psf_x=1.33,psf_y=1.33,nxpsf=35,nypsf=35,niter=10):
-	psf=psfG(psf_x=psf_x,psf_y=psf_y,nx=nxpsf,ny=nypsf)
-	imageT=np.copy(image)
-	imageT=imageT/np.nanmax(imageT)
+    psf=psfG(psf_x=psf_x,psf_y=psf_y,nx=nxpsf,ny=nypsf)
+    imageT=np.copy(image)
+    imageT=imageT/np.nanmax(imageT)
     deconvolved_RL = restoration.richardson_lucy(imageT, psf, num_iter=niter)
     fac=np.nanmean(image)/np.nanmean(deconvolved_RL)
     deconvolved_RL=deconvolved_RL*fac
