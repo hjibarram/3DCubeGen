@@ -16,7 +16,7 @@ def psfG(psf_x=1.33,psf_y=1.33,nx=35,ny=35):
     # Generate a 2D PSF
     psf_generator = SPSFGaussian((psf_x, psf_y), (nx, ny))
     psf = psf_generator()
-    psf.numpy()
+    psf = psf.numpy()
     return psf
 
 def deconvolve_2dmap(image,psf_x=1.33,psf_y=1.33,nxpsf=35,nypsf=35,niter=10):
