@@ -29,23 +29,23 @@ def deconvolve_2dmap(image,psf_x=1.33,psf_y=1.33,nxpsf=35,nypsf=35,niter=10):
     return deconvolved_RL
 
 def deconvolve_3dcube(name='name',path='',psf_x=1.33,psf_y=1.33,nxpsf=35,nypsf=35,niter=10,pbars=True,basenameC='lvmCube-NAME.fits'):
-	file=path+basenameC.replace('NAME',name)
-	try:
+    file=path+basenameC.replace('NAME',name)
+    try:
         [cube,hdr1]=fits.getdata(file, 0, header=True)
     except:
-    	file=file+'.gz'
-    	[cube,hdr1]=fits.getdata(file, 0, header=True)
-	try:
-		[cubeE,hdr2]=fits.getdata(file, 1, header=True)
-		error=True
-	except:
-		error=False
-	nz,nx,ny=cube.shape
-	cubeT=np.copy(cube)
-	if pbars:    
+        file=file+'.gz'
+        [cube,hdr1]=fits.getdata(file, 0, header=True)
+    try:
+        [cubeE,hdr2]=fits.getdata(file, 1, header=True)
+        error=True
+    except:
+        error=False
+    nz,nx,ny=cube.shape
+    cubeT=np.copy(cube)
+    if pbars:    
         pbar=tqdm(total=nz) 
-	for i in range(0, nz):
-		image=cube[i,:,:]
+    for i in range(0, nz):
+        image=cube[i,:,:]
         imageT=deconvolve_2dmap(image,psf_x=psf_x,psf_y=psf_y,nxpsf=nxpsf,nypsf=nypsf,niter=niter)
         cubeT[i,:,:]=imageT
         if pbars:
@@ -59,7 +59,7 @@ def deconvolve_3dcube(name='name',path='',psf_x=1.33,psf_y=1.33,nxpsf=35,nypsf=3
         h2=fits.ImageHDU(cubeE,header=hdr2)
         hlist=fits.HDUList([h1,h2])
     else:
-    	hlist=fits.HDUList([h1])
+        hlist=fits.HDUList([h1])
     hlist.update_extend()
     hlist.writeto(outfile1,overwrite=True)
     tools.sycall('gzip -f '+outfile1)
@@ -72,13 +72,13 @@ def deconvolve_2dfile(name='name',path='',psf_x=1.33,psf_y=1.33,nxpsf=35,nypsf=3
     except:
         file=file+'.gz'
         [mapt,hdr1]=fits.getdata(file, 0, header=True)
-	try:
+    try:
         [maptM,hdr2]=fits.getdata(file, 1, header=True)
         magt=True
-	except:
+    except:
         magt=False
     if magt:
-    	try:
+        try:
             [maptE,hdr3]=fits.getdata(file, 2, header=True)
             error=True
         except:
