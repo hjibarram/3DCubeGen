@@ -6,6 +6,7 @@ from scipy.interpolate import interp1d
 from astropy.convolution import convolve,Gaussian2DKernel
 import CubeGen
 import os
+import yaml
 
 def median_a(x,lw=5,lower=10000,wave=[]):
     if len(wave) > 0:
@@ -34,8 +35,8 @@ def median_a(x,lw=5,lower=10000,wave=[]):
     return x_n
 
 
-def read_explist(fname='Orion'):
-    ft=open(fname,'r')
+def read_explist(fname='Orion',path=''):
+    ft=open(path+fname,'r')
     tileid=[]
     tilegp=[]
     mjd=[]
@@ -316,10 +317,15 @@ def twoD_interpolB(x,y,x1,x2,x3,y1,y2,y3,z1,z2,z3):
     c=(x2-x1)*(y3-y1)-(x3-x1)*(y2-y1)
     d=-(a*x1+b*y1+c*z1)
     z=-(a*x+b*y+d)/c
-    nt=np.where(np.isfinite(z) == False)
-    if len(nt[0]) >0:
-        z[nt]=0.0
-    return z       
+    if np.isscalar(z) == False:
+        #nt=np.where(np.isfinite(z) == False)
+        nt = np.where(~np.isfinite(z))
+        if nt[0].size > 0:
+            z[nt]=0.0
+    else:
+        if np.isfinite(z) == False:
+            z=0.0
+    return z        
     
 def map_interpolB(cube,x,y,nxt=10,nyt=10):
     xpos0=np.int(np.round(x))
@@ -444,3 +450,15 @@ def interpolate_matrix(matrix_input,nt=4,ne=2,verbose=False,smoth=True):
         PSF=Gaussian2DKernel(x_stddev=nt/2,y_stddev=nt/2)#4
         matrix_new=convolve(matrix_new, PSF)
     return matrix_new
+
+def read_config_file(file):
+    try:
+        with open(file, 'r') as stream:
+            try:
+                data = yaml.safe_load(stream)
+            except yaml.YAMLError as exc:
+                print(exc)
+        return data
+    except:
+        print('Config File not found')
+        return None
