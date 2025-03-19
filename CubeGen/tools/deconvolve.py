@@ -99,7 +99,7 @@ def deconvolve_2dfile(name='name',path='',psf_x=1.33,psf_y=1.33,nxpsf=35,nypsf=3
   
     outfile1=path+basenameC.replace('NAME',name+'_decv') 
     h1=fits.PrimaryHDU(maptT,header=hdr1)
-    if mag:
+    if magt:
         h2=fits.ImageHDU(maptMT,header=hdr2)
         if error:
             h3=fits.ImageHDU(maptE,header=hdr3)
