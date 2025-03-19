@@ -90,7 +90,7 @@ def deconvolve_2dfile(name='name',path='',psf_x=1.33,psf_y=1.33,nxpsf=35,nypsf=3
         except:
             error=False
     maptT=deconvolve_2dmap(mapt,psf_x=psf_x,psf_y=psf_y,nxpsf=nxpsf,nypsf=nypsf,niter=niter)
-    if magt_
+    if magt:
         maptMT=deconvolve_2dmap(maptM,psf_x=psf_x,psf_y=psf_y,nxpsf=nxpsf,nypsf=nypsf,niter=niter)
   
     outfile1=path+basenameC.replace('NAME',name+'_decv') 
