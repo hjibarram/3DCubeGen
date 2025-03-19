@@ -1,7 +1,9 @@
 import numpy as np
 from astropy.wcs import WCS
+from astropy.wcs.utils import skycoord_to_pixel
 from astropy.coordinates import SkyCoord
 from scipy.interpolate import interp1d
+from astropy.convolution import convolve,Gaussian2DKernel
 import CubeGen
 import os
 
@@ -356,7 +358,6 @@ def map_interpolB(cube,x,y,nxt=10,nyt=10):
     return z   
 
 def extract_segm(hdr,l1=12,l2=12,ra='',dec='',dx=0):
-    from astropy.wcs.utils import skycoord_to_pixel
     sky1=SkyCoord(ra+' '+dec,frame=FK5, unit=(u.hourangle,u.deg))
     ra_deg=sky1.ra.deg
     dec_deg=sky1.dec.deg
@@ -379,3 +380,29 @@ def extract_segm(hdr,l1=12,l2=12,ra='',dec='',dx=0):
     ypos11=np.int(np.round(ypos11))    
     
     return xpos00,xpos11,ypos00-dx,ypos11-dx
+
+def interpolate_matrix(matrix_input,nt=4,ne=2,verbose=False,smoth=True):
+    nx,ny=matrix_input.shape
+    nx1=int(nx*nt)
+    ny1=int(ny*nt)
+    matrix_new=np.zeros([nx1,ny1])
+    if verbose:
+        pbar=tqdm(total=ny1)
+    dxt=(nx-ne*2)/float(nx1)
+    dyt=(ny-ne*2)/float(ny1)
+    xpos=ne
+    for i in range(0, nx1):
+        xpos=xpos+dxt
+        ypos=ne
+        for j in range(0, ny1):
+            ypos=ypos+dyt
+            val=map_interpolB(matrix_input,xpos,ypos,nxt=ne,nyt=ne)
+            matrix_new[i,j]=val 
+        if verbose:
+            pbar.update(1)
+    if verbose:
+        pbar.close()   
+    if smoth:    
+        PSF=Gaussian2DKernel(x_stddev=nt/2,y_stddev=nt/2)#4
+        matrix_new=convolve(matrix_new, PSF)
+    return matrix_new
