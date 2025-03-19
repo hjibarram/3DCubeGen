@@ -15,7 +15,7 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def gen_map(expnumL,nameF='MapLVM',use_slitmap=True,pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
+def gen_map(expnumL,nameF='MapLVM',use_slitmap=True,pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmMap-NAME_TRA.fits',path_lvmcore=''):
     #file=path_lvmcore+'/metrology/lvm_fiducial_fibermap.yaml'
     #f=open(file,'r')
     #fiber_map = yaml.safe_load(f)
@@ -313,7 +313,7 @@ def gen_map(expnumL,nameF='MapLVM',use_slitmap=True,pbars=True,fac_sizeX=1.1,fac
     ht["BUNIT"]='ABmag/arcsec'
     hlist=fits.HDUList(head_list)
     hlist.update_extend()
-    basenameC='lvmMap-NAME_'+nam+'.fits'
+    basenameC=basenameC.replace('TRA',nam)
     file=out_path+basenameC.replace('NAME',nameF)
     out_fit=file
     print(out_fit)
