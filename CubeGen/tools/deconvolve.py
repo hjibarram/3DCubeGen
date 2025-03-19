@@ -22,6 +22,7 @@ def psfG(psf_x=1.33,psf_y=1.33,nx=35,ny=35):
 def deconvolve_2dmap(image,psf_x=1.33,psf_y=1.33,nxpsf=35,nypsf=35,niter=10):
     psf=psfG(psf_x=psf_x,psf_y=psf_y,nx=nxpsf,ny=nypsf)
     imageT=np.copy(image)
+    imageT=imageT/1e-14
     imageT[np.where(np.isfinite(imageT) == False)]=0.0
     imageT[np.where(np.isnan(imageT))]=0.0
     imageT[np.where(imageT <= 0.01)]=0.0
