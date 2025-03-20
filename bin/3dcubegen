@@ -30,7 +30,7 @@ def cli():
 @click.option('-n', '--nameF', type=str, help='output root name of the data cube')
 @click.option('-m', '--use_slitmap', is_flag=True, default=True,help='use the astrometry saved in the slitmap header')
 @click.option('-b', '--pbars', is_flag=True, default=True,help='activate or deactivate the progress bar')
-@click.option('-g', '--spec_range', type=float, default=(None,None), help='optional, spectral range for the output cube')
+@click.option('-g', '--spec_range', type=tuple, default=(None,None), help='optional, spectral range for the output cube')
 @click.option('-t', '--path_sas', type=str, default='', help='path to the local SDSS SAS directory, will be used this value if SAS_BASE_DIR is not defined in the environment')
 @click.option('-y', '--basename', type=str, default='lvmSFrame-NAME.fits', help='base name of the RSS file')
 @click.option('-e', '--errors', is_flag=True, default=True,help='activate or deactivate the error estimation')
