@@ -11,6 +11,7 @@ from CubeGen.tools.mapgen import gen_map
 from CubeGen.tools.images import get_jpg
 import CubeGen.tools.tools as tools
 import os.path as ptt
+import os
 
 @click.group('3dcubegen', short_help='CLI for the 3dcubegen tools')
 def cli():
@@ -20,17 +21,17 @@ def cli():
 @cloup.command(short_help='Run the cubegen')
 @click.option('-c', '--config_file', type=str, default='', help='name of the config file')
 @click.option('-o', '--out_path', type=str, default='out_cubes/', help='path of the output cube files')
-@click.option('-v', '--redux_ver', type=str, default='test', help='the DRP reduction version of the lvmCFrame')
-@click.option('-r', '--redux_dir', type=str, default='', help='path of the redux dir, default path_sas/sdsswork/lvm/spectro/redux')
-@click.option('-s', '--sigm_s', type=float, default=32.2, help='somth kernel size used to reconstruct the cube')
-@click.option('-p', '--pix_s', type=float, default=0.0, help='spaxel size used to reconstruct the cube, default 0.75*sigm_s')
+@click.option('-v', '--redux_ver', type=str, default='1.1.1.dev0', help='the DRP reduction version of the lvmCFrame')
+@click.option('-r', '--redux_dir', type=str, default='', help='path of the redux dir, default set to " " to set to path_sas/sdsswork/lvm/spectro/redux')
+@click.option('-s', '--sigm_s', type=float, default=32.2, help='smoth kernel size used to reconstruct the cube')
+@click.option('-p', '--pix_s', type=float, default=0.0, help='spaxel size used to reconstruct the cube, default set to 0 to fix it to 0.75*sigm_s')
 @click.option('-a', '--alph_s', type=float, default=2.0, help='kernel "shape" factor, a value equal of 2 returns a Gaussian kerner, larger than 2 returns a sharper kernel')
 @click.option('-f', '--flu16', is_flag=True, default=True,help='keyword to return a cube with units of 10^{-16} erg/s/cm2/A, if False, the units are erg/s/cm2/A')
 @click.option('-n', '--nameF', type=str, help='output root name of the data cube')
 @click.option('-m', '--use_slitmap', is_flag=True, default=True,help='use the astrometry saved in the slitmap header')
 @click.option('-b', '--pbars', is_flag=True, default=True,help='activate or deactivate the progress bar')
 @click.option('-g', '--spec_range', type=float, default=(None,None), help='optional, spectral range for the output cube')
-@click.option('-t', '--path_sas', type=str, default='', help='path to the sas directory')
+@click.option('-t', '--path_sas', type=str, default='', help='path to the local SDSS SAS directory, will be used this value if SAS_BASE_DIR is not defined in the environment')
 @click.option('-y', '--basename', type=str, default='lvmSFrame-NAME.fits', help='base name of the RSS file')
 @click.option('-e', '--errors', is_flag=True, default=True,help='activate or deactivate the error estimation')
 @click.option('-u', '--fac_sizeY', type=float, default=1.1, help='factor of the FoV in Y')
@@ -39,39 +40,53 @@ def cli():
 @click.option('-i', '--coord_cen', type=float, default=[0,0], help='central coordinates ra, dec in degrees')
 @click.option('-h', '--pathF', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
 
-def run_cube(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,nameF,use_slitmap,pbars,spec_range,path_sas,basename,errors,fac_sizeY,fac_sizeX,cent,coord_cen,pathF):
+def sincube(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,nameF,use_slitmap,pbars,spec_range,path_sas,basename,errors,fac_sizeY,fac_sizeX,cent,coord_cen,pathF):
     
 
     data=tools.read_config_file(config_file)
     if data:
-        typeF=data['files'][0]['survey_type']
+        typeF=data['sincube'][0]['survey_type']
         if 'LVM' in typeF:
-            out_path=data['files'][0]['out_path']
-            redux_ver=data['files'][0]['redux_ver']
-            redux_dir=data['files'][0]['redux_dir']
-            sigm_s=data['files'][0]['sigm_s']
-            pix_s=data['files'][0]['pix_s']
-            alph_s=data['files'][0]['alph_s']
-            flu16=data['files'][0]['flu16']
-            nameF=data['files'][0]['nameF']
-            use_slitmap=data['files'][0]['use_slitmap']
-            pbars=data['files'][0]['pbars']
-            spec_range=data['files'][0]['spec_range']
-            path_sas=data['files'][0]['path_sas']
-            basename=data['files'][0]['path_sas']
-            errors=data['files'][0]['errors']
-            fac_sizeY=data['files'][0]['fac_sizeY']
-            fac_sizeX=data['files'][0]['fac_sizeX']
-            cent=data['files'][0]['cent']
-            coord_cen=data['files'][0]['coord_cen']
-            pathF=data['files'][0]['pathF']
+            out_path=data['sincube'][0]['out_path']
+            redux_ver=data['sincube'][0]['redux_ver']
+            redux_dir=data['sincube'][0]['redux_dir']
+            sigm_s=data['sincube'][0]['sigm_s']
+            pix_s=data['sincube'][0]['pix_s']
+            alph_s=data['sincube'][0]['alph_s']
+            flu16=data['sincube'][0]['flu16']
+            nameF=data['sincube'][0]['nameF']
+            use_slitmap=data['sincube'][0]['use_slitmap']
+            pbars=data['sincube'][0]['pbars']
+            spec_range=data['sincube'][0]['spec_range']
+            path_sas=data['sincube'][0]['path_sas']
+            basename=data['sincube'][0]['basename']
+            errors=data['sincube'][0]['errors']
+            fac_sizeY=data['sincube'][0]['fac_sizeY']
+            fac_sizeX=data['sincube'][0]['fac_sizeX']
+            cent=data['sincube'][0]['cent']
+            coord_cen=data['sincube'][0]['coord_cen']
+            pathF=data['sincube'][0]['pathF']
+            if sepc_range[0] == 0 and spec_range[1] == 0:
+                spec_range=(None,None)
+            else:
+                spec_range=(spec_range[0]spec_range[1])
         else:
             print('Error: The config file is not for LVM data')
             return
+    try:
+        path_sas=os.environ['SAS_BASE_DIR']+'/'
+    except:
+        path_sas=path_sas+'/'
+
+    if pix_s == 0:
+        pix_s=0.75*sigm_s
+    if redux_dir == '':
+        redux_dir=path_sas+'sdsswork/lvm/spectro/redux'
+
     explist,mjd,tilelist,tileglist=tools.read_explist(fname=nameF,path=pathF)        
     map_ifu(explist,nameF=nameF,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizeX,fac_sizeY=fac_sizeY,
         spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,path_lvmcore=path_lvmcore,sigm_s=sigm_s,
-        pix_s=pix_s,alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
+        pix_s=pix_s,alph_s=alph_s,agcam_dir=path_sas+'sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
         tileglist=tileglist,mjd=mjd,basename=basename)
     
     
