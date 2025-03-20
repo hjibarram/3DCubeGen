@@ -109,7 +109,7 @@ cli.add_command(sincube)
 @click.option('-u', '--fac_sizey', type=float, default=1.1, help='factor of the FoV in Y')
 @click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
 @click.option('-k', '--cent', is_flag=True, default=False,help='activate the centering of the FoV')
-@click.option('-i', '--coord_cenl', type=list, default=[0,0], help='list of central coordinates ra, dec in degrees')
+@click.option('-i', '--coord_cenl', type=list, default=[[0,0]], help='list of central coordinates ra, dec in degrees')
 @click.option('-h', '--pathf', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
 
 def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitmap,pbars,path_sas,basename,errors,fac_sizey,fac_sizex,cent,coord_cenl,pathf):
