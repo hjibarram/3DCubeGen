@@ -31,7 +31,7 @@ packages_data = {
     package: [f'{DATA_DIRNAME}/*']+[f'{os.path.join(DATA_DIRNAME, sub)}/*' for root, subs, files in os.walk(os.path.join(package, DATA_DIRNAME)) for sub in subs]
     for package in all_packages if os.path.isdir(os.path.join(package, DATA_DIRNAME))
 }
-scripts = ["bin/run_cubegen"]
+scripts = ["bin/3dcubegen"]
 #    os.path.join(SCRIPTS_DIRNAME, script_name)
 #    for script_name in os.listdir(SCRIPTS_DIRNAME) if script_name.endswith('.py')
 #]
@@ -59,7 +59,7 @@ setup(
     install_requires=requirements,
     include_package_data=True,
     package_data=packages_data,
-    #scripts=scripts,
+    scripts=scripts,
     zip_safe=False,
     test_suite='nose.collector',
     tests_require=['nose'],
