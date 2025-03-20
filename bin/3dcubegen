@@ -85,8 +85,8 @@ def sincube(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,n
 
     explist,mjd,tilelist,tileglist=tools.read_explist(fname=namef,path=pathf)        
     map_ifu(explist,nameF=namef,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizex,
-        spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,path_lvmcore=path_lvmcore,sigm_s=sigm_s,
-        pix_s=pix_s,alph_s=alph_s,agcam_dir=path_sas+'sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
+        spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
+        alph_s=alph_s,agcam_dir=path_sas+'sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
         tileglist=tileglist,mjd=mjd,basename=basename)
     
     
