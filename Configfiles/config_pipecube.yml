@@ -1,25 +1,22 @@
 --- 
-# Input Output Info
-sincube:
-  # Single cube generation
+# config file to rune a MC and LV pipe cube generator
+pipecube:
+  # Pipe cube generation
   - survey_type: LVM #Cube Survey Type
     out_path: out_cubes/ #path of the output cube files
     redux_ver: 1.1.1.dev0 #the DRP reduction version of the lvmCFrame
     redux_dir: '' #path of the redux dir, default set to '' to set to path_sas/sdsswork/lvm/spectro/redux
-    sigm_s: 32.2 #smoth kernel size used to reconstruct the cube
-    pix_s: 0.0 #spaxel size used to reconstruct the cube, default set to 0 to fix it to 0.75*sigm_s
-    alph_s: 2 #kernel "shape" factor, a value equal of 2 returns a Gaussian kerner, larger than 2 returns a sharper kernel
+    type: 'c' #id for the kernel selection: 16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i, default c
     flu16: True #keyword to return a cube with units of 10^{-16} erg/s/cm2/A, if False, the units are erg/s/cm2/A
-    nameF: NAME #output root name of the data cube and list file with the tiles, mjds and expnumbers
+    nameL: [NAME1,NAME2] #output root name of the list of targets names for the files with the tiles, mjds and expnumbers
     use_slitmap: True #flag to use the astrometry saved in the slitmap header
     pbars: True #flag to activate or deactivate the progress bar
-    spec_range: [0,0] #optional, spectral range for the output cube, set to [0,0] to use the full spectral range
     path_sas: '' #path to the local SDSS SAS directory, will be used this value if SAS_BASE_DIR is not defined in the environment
     basename: lvmSFrame-NAME.fits #base name of the RSS file
     errors: True #activate or deactivate the error estimation
     fac_sizeY: 1.1 #factor of the FoV in Y
     fac_sizeX: 1.1 #factor of the FoV in X
     cent: True #activate the centering of the FoV
-    coord_cen: [0,0] #central coordinates ra, dec in degrees 
+    coord_cenL: [[0,0],[0,0]] #central coordinates ra, dec in degrees 
     pathF: '' #path of the list of mjd, explist and tiles of the targets
 ...

@@ -124,7 +124,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             redux_dir=data['pipecube'][0]['redux_dir']
             type=data['pipecube'][0]['type']
             flu16=data['pipecube'][0]['flu16']
-            namel=data['pipecube'][0]['namel']
+            namel=data['pipecube'][0]['nameL']
             use_slitmap=data['pipecube'][0]['use_slitmap']
             pbars=data['pipecube'][0]['pbars']
             path_sas=data['pipecube'][0]['path_sas']
@@ -133,7 +133,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             fac_sizey=data['pipecube'][0]['fac_sizeY']
             fac_sizex=data['pipecube'][0]['fac_sizeX']
             cent=data['pipecube'][0]['cent']
-            coord_cenl=data['pipecube'][0]['coord_cenl']
+            coord_cenl=data['pipecube'][0]['coord_cenL']
             pathf=data['pipecube'][0]['pathF']
         else:
             print('Error: The config file is not for LVM data')
@@ -149,7 +149,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
     if redux_dir == '':
         redux_dir=path_sas+'sdsswork/lvm/spectro/redux'
     notebook=False
-    print(namel)
+
     for it in range(0, len(namel)):
         nameF1=namel[it]
         coord_cen=coord_cenl[it]
