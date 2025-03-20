@@ -114,7 +114,7 @@ cli.add_command(sincube)
 
 def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitmap,pbars,path_sas,basename,errors,fac_sizey,fac_sizex,cent,coord_cenl,pathf):
     
-
+    namel = namel.split(",")
     data=tools.read_config_file(config_file)
     if data:
         typeF=data['pipecube'][0]['survey_type']
