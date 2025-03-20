@@ -98,7 +98,7 @@ cli.add_command(sincube)
 @click.option('-o', '--out_path', type=str, default='out_cubes/', help='path of the output cube files')
 @click.option('-v', '--redux_ver', type=str, default='1.1.1.dev0', help='the DRP reduction version of the lvmCFrame')
 @click.option('-r', '--redux_dir', type=str, default='', help='path of the redux dir, default set to " " to set to path_sas/sdsswork/lvm/spectro/redux')
-@click.option('-s', '--type', type=str, default='c', help='id for the kernel selection: 16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i')
+@click.option('-s', '--type', type=str, default='c', help='id for the kernel selection: 16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i, default c')
 @click.option('-f', '--flu16', is_flag=True, default=True,help='keyword to return a cube with units of 10^{-16} erg/s/cm2/A, if False, the units are erg/s/cm2/A')
 @click.option('-n', '--namel', type=list, help='list of targets for the data cube')
 @click.option('-m', '--use_slitmap', is_flag=True, default=True,help='use the astrometry saved in the slitmap header')
@@ -143,7 +143,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
     except:
         path_sas=path_sas+'/'
 
-    sigm_s,pix_s=kernel_pipe(type=type)
+    sigm_s,pix_s=tools.kernel_pipe(type=type)
     alph_s=2.0
     
     if redux_dir == '':
