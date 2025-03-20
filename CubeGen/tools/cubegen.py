@@ -1,4 +1,5 @@
 from tqdm.notebook import tqdm
+from tqdm import tqdm as tqdmT
 from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.coordinates import SkyCoord
@@ -16,13 +17,16 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def map_ifu(expnumL,nameF=None,use_slitmap=True,errors=True,cent=False,coord_cen=[0,0],pbars=True,flu16=False,multiT=False,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=18.5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_ver='1.0.2.dev0',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmCube-NAME.fits',path_lvmcore=''):
+def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=False,coord_cen=[0,0],pbars=True,flu16=False,multiT=False,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=18.5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_ver='1.0.2.dev0',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmCube-NAME.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
         nlt=1
-    if pbars:    
-        pbar=tqdm(total=nlt)     
+    if pbars: 
+        if notebook:
+            pbar=tqdm(total=nlt)
+        else:
+            pbar=tqdmT(total=nlt)     
     for i in range(0, nlt):
         if nlt == 1:
             expnum=expnumL[i]
@@ -211,7 +215,10 @@ def map_ifu(expnumL,nameF=None,use_slitmap=True,errors=True,cent=False,coord_cen
         specE_ifu=rss_ef*facto 
     
     if pbars:
-        pbar=tqdm(total=nlx)
+        if notebook:
+            pbar=tqdm(total=nlx)
+        else:     
+            pbar=tqdmT(total=nlx)
     int_spect=np.zeros(nw)
     for i in range(0, nlx):
         xi=xf
