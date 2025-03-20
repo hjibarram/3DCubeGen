@@ -90,7 +90,7 @@ def sincube(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,n
         tileglist=tileglist,mjd=mjd,basename=basename)
     
     
-cli.add_command(run)
+cli.add_command(sincube)
 
 @cli.command('runoned', short_help='obtain the spectra model')
 @click.option('-g', '--config_file', type=str, default='', help='name of the config file')
