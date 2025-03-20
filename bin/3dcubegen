@@ -109,10 +109,10 @@ cli.add_command(sincube)
 @click.option('-u', '--fac_sizey', type=float, default=1.1, help='factor of the FoV in Y')
 @click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
 @click.option('-k', '--cent', is_flag=True, default=False,help='activate the centering of the FoV')
-@click.option('-i', '--coord_cen', type=list, default=[0,0], help='central coordinates ra, dec in degrees')
+@click.option('-i', '--coord_cenl', type=list, default=[0,0], help='list of central coordinates ra, dec in degrees')
 @click.option('-h', '--pathf', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
 
-def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitmap,pbars,path_sas,basename,errors,fac_sizey,fac_sizex,cent,coord_cen,pathf):
+def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitmap,pbars,path_sas,basename,errors,fac_sizey,fac_sizex,cent,coord_cenl,pathf):
     
 
     data=tools.read_config_file(config_file)
@@ -133,7 +133,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             fac_sizey=data['pipecube'][0]['fac_sizeY']
             fac_sizex=data['pipecube'][0]['fac_sizeX']
             cent=data['pipecube'][0]['cent']
-            coord_cen=data['pipecube'][0]['coord_cen']
+            coord_cenl=data['pipecube'][0]['coord_cenl']
             pathf=data['pipecube'][0]['pathF']
         else:
             print('Error: The config file is not for LVM data')
@@ -152,7 +152,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
     
     for it in range(0, len(namel)):
         nameF1=namel[it]
-        coord_cen=coord_cenL[it]
+        coord_cen=coord_cenl[it]
         explist,mjd,tilelist,tileglist=tools.read_explist(fname=nameF1,path=pathf)
         dit=len(explist)
         if dit <= 160:
