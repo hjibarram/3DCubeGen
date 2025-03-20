@@ -149,7 +149,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
     if redux_dir == '':
         redux_dir=path_sas+'sdsswork/lvm/spectro/redux'
     notebook=False
-    
+    print(namel)
     for it in range(0, len(namel)):
         nameF1=namel[it]
         coord_cen=coord_cenl[it]
