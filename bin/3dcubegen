@@ -9,6 +9,7 @@ import numpy as np
 from CubeGen.tools.cubegen import map_ifu
 from CubeGen.tools.mapgen import gen_map
 from CubeGen.tools.images import get_jpg
+from CubeGen.tools.merge_cube import coadd_cube
 import CubeGen.tools.tools as tools
 import os.path as ptt
 import os
@@ -111,8 +112,9 @@ cli.add_command(sincube)
 @click.option('-k', '--cent', is_flag=True, default=False,help='activate the centering of the FoV')
 @click.option('-i', '--coord_cenl', type=list, default=[[0,0]], help='list of central coordinates ra, dec in degrees')
 @click.option('-h', '--pathf', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
+@click.option('-l', '--mergecube', is_flag=True, default=False,help='activate the cube merge script')
 
-def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitmap,pbars,path_sas,basename,errors,fac_sizey,fac_sizex,cent,coord_cenl,pathf):
+def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitmap,pbars,path_sas,basename,errors,fac_sizey,fac_sizex,cent,coord_cenl,pathf,mergecube):
     
     try:
         namel = namel.split(",")
@@ -138,6 +140,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             cent=data['pipecube'][0]['cent']
             coord_cenl=data['pipecube'][0]['coord_cenL']
             pathf=data['pipecube'][0]['pathF']
+            mergecube==data['pipecube'][0]['mergecube']
         else:
             print('Error: The config file is not for LVM data')
             return
@@ -173,19 +176,25 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
         else:
             if dit <= 500:
                 spec_range_l=[(3000,4000),(4000,5000),(5000,6000),(6000,7000),(7000,8000),(8000,9000),(9000,10000)]
+
             elif dit <= 1000:
                 spec_range_l=[(3000,4000),(4000,4500),(4500,5000),(5000,5500),(5500,6000),(6000,6500),(6500,7000),(7000,7500),(7500,8000),(8000,8500),(8500,9000),(9000,9500),(9500,10000)]
             else:
                 spec_range_l=[(3000,4000),(4000,4250),(4250,4500),(4500,4750),(4750,5000),(5000,5250),(5250,5500),(5500,5750),(5750,6000),(6000,6250),(6250,6500),(6500,6750),(6750,7000),(7000,7250),(7250,7500),(7500,7750),(7750,8000),(8000,8250),(8250,8500),(8500,8750),(8750,9000),(9000,9250),(9250,9500),(9500,9750),(9750,10000)]
+            id_l=[]
             for i in range(0, len(spec_range_l)):
                 nameF=nameF1+type+'_'+"{:0>2}".format(str(int(i)))
+                id_l.extend(["{:0>2}".format(str(int(i)))])
                 spec_range=spec_range_l[i]
                 map_ifu(explist,nameF=nameF,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
                     spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
                     alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
                     tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook)
 
-
+            if mergecube:
+                nameR='lvmCube-NAME_id.fits.gz'.replace('NAME',nameF1+type)
+                nameT='lvmCube-NAME.fits.gz'.replace('NAME',nameF1)
+                coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors)
 
 if __name__ == "__main__":
     cli()

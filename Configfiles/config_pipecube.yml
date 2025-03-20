@@ -19,4 +19,5 @@ pipecube:
     cent: True #activate the centering of the FoV
     coord_cenL: [[0,0],[0,0]] #central coordinates ra, dec in degrees 
     pathF: '' #path of the list of mjd, explist and tiles of the targets
+    mergecube: False #activate the cube merge script
 ...
