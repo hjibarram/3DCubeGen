@@ -37,7 +37,7 @@ def cli():
 @click.option('-u', '--fac_sizeY', type=float, default=1.1, help='factor of the FoV in Y')
 @click.option('-i', '--fac_sizeX', type=float, default=1.1, help='factor of the FoV in X')
 @click.option('-k', '--cent', is_flag=True, default=False,help='activate the centering of the FoV')
-@click.option('-i', '--coord_cen', type=float, default=[0,0], help='central coordinates ra, dec in degrees')
+@click.option('-i', '--coord_cen', type=list, default=[0,0], help='central coordinates ra, dec in degrees')
 @click.option('-h', '--pathF', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
 
 def sincube(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,nameF,use_slitmap,pbars,spec_range,path_sas,basename,errors,fac_sizeY,fac_sizeX,cent,coord_cen,pathF):
