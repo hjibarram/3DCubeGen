@@ -85,7 +85,7 @@ def sincube(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,n
     notebook=False
 
     explist,mjd,tilelist,tileglist=tools.read_explist(fname=namef,path=pathf)        
-    map_ifu(explist,nameF=namef,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizex,
+    map_ifu(explist,nameF=namef,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
         spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
         alph_s=alph_s,agcam_dir=path_sas+'sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
         tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook)
@@ -93,139 +93,91 @@ def sincube(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,n
     
 cli.add_command(sincube)
 
-@cli.command('runoned', short_help='obtain the spectra model')
-@click.option('-g', '--config_file', type=str, default='', help='name of the config file')
-@click.option('-n', '--name', type=str, help='name of the spectra file')
-@click.option('-o', '--name_out', type=str, default='None', help='name of the output files')
-@click.option('-p', '--path',     type=str, default='', help='path to the data cubes')
-@click.option('-y', '--path_out', type=str, default='outputs/', help='path of the output files')
-@click.option('-c', '--ncpus', type=int, default=10, help='number of CPUs')
-@click.option('-d', '--double', is_flag=True, default=False,help='flag to run double peak mode')
-@click.option('-k', '--kskew', is_flag=True, default=False,help='flag to run skew line profile mode')
-@click.option('-u', '--outflow', is_flag=True, default=False,help='flag to run outflow line profile mode')
-@click.option('-e', '--error', is_flag=True, default=False,help='flag to run autocalculate the error vector')
-@click.option('-z', '--zt', type=float, default=0, help='redshift of the object')
-@click.option('-r', '--rvel', type=float, default=500.0, help='velocity shift range')
-@click.option('-b', '--bcont', is_flag=True, default=False,help='flag to run deactivate autosubstract continum')
-@click.option('-h', '--hbet', is_flag=True, default=False,help='fit the hb region')
-@click.option('-a', '--abroad', is_flag=True, default=False,help='deactivate the broad component')
-@click.option('-f', '--fluxf', type=float, default=1.0, help='flux factor')
-@click.option('-l', '--lorentz', is_flag=True, default=False,help='activate the lorenztiant broad profile')
-@click.option('-i', '--input_format', type=str, default='CSV', help='input of the spectra file')
-@click.option('-q', '--line_config', type=str, default='line_prop.yml', help='line model configuration file')
-@click.option('-w', '--line_config_path', type=str, default='', help='path to the line model configuration file')
+@cli.command('pipecube', short_help='pipeline to obtain the MC and LV cubes')
+@click.option('-c', '--config_file', type=str, default='', help='name of the config file')
+@click.option('-o', '--out_path', type=str, default='out_cubes/', help='path of the output cube files')
+@click.option('-v', '--redux_ver', type=str, default='1.1.1.dev0', help='the DRP reduction version of the lvmCFrame')
+@click.option('-r', '--redux_dir', type=str, default='', help='path of the redux dir, default set to " " to set to path_sas/sdsswork/lvm/spectro/redux')
+@click.option('-s', '--type', type=str, default='c', help='id for the kernel selection: 16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i')
+@click.option('-f', '--flu16', is_flag=True, default=True,help='keyword to return a cube with units of 10^{-16} erg/s/cm2/A, if False, the units are erg/s/cm2/A')
+@click.option('-n', '--namel', type=list, help='list of targets for the data cube')
+@click.option('-m', '--use_slitmap', is_flag=True, default=True,help='use the astrometry saved in the slitmap header')
+@click.option('-b', '--pbars', is_flag=True, default=True,help='activate or deactivate the progress bar')
+@click.option('-t', '--path_sas', type=str, default='', help='path to the local SDSS SAS directory, will be used this value if SAS_BASE_DIR is not defined in the environment')
+@click.option('-y', '--basename', type=str, default='lvmSFrame-NAME.fits', help='base name of the RSS file')
+@click.option('-e', '--errors', is_flag=True, default=True,help='activate or deactivate the error estimation')
+@click.option('-u', '--fac_sizey', type=float, default=1.1, help='factor of the FoV in Y')
+@click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
+@click.option('-k', '--cent', is_flag=True, default=False,help='activate the centering of the FoV')
+@click.option('-i', '--coord_cen', type=list, default=[0,0], help='central coordinates ra, dec in degrees')
+@click.option('-h', '--pathf', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
 
-def runoned(config_file,name,path,path_out,zt,rvel,ncpus,error,double,bcont,hbet,name_out,kskew,outflow,abroad,fluxf,lorentz,input_format,line_config,line_config_path):
- 
-    lA1hb=4700.0
-    lA2hb=5050.0
-    lA1ha=6350.0
-    lA2hab=6850.0
-    lA2ha=6650.0    
-    wave_AB=False
+def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitmap,pbars,path_sas,basename,errors,fac_sizey,fac_sizex,cent,coord_cen,pathf):
+    
 
-    data=tol.read_config_file(config_file)
+    data=tools.read_config_file(config_file)
     if data:
-        typeF=data['files'][0]['object_type']
-        if 'OneD' in typeF:
-            name=data['files'][0]['object_name']
-            name_out=data['files'][0]['name_out']
-            path=data['files'][0]['path']
-            path_out=data['files'][0]['path_out']
-            ncpus=data['files'][0]['ncpus']
-            double=data['files'][0]['double']
-            kskew=data['files'][0]['kskew']
-            error=data['files'][0]['error']
-            zt=data['files'][0]['zt']
-            #rvel=data['files'][0]['rvel']
-            bcont=data['files'][0]['bcont']
-            waveR=data['files'][0]['wave_range']
-            if 'Hbeta' in waveR:
-                hbet=True
-            elif 'Halfa' in waveR:
-                hbet=False
-            else:
-                hbet=False
-            wave_ini=data['files'][0]['wave_ini']
-            wave_fin=data['files'][0]['wave_fin']
-            if not 'None' in str(wave_ini) and wave_ini > 0:
-                if not 'None' in str(wave_fin) and wave_fin > 0:
-                    wave_AB=True
-            abroad=data['files'][0]['abroad']
-            fluxf=data['files'][0]['fluxf']
-            lorentz=data['files'][0]['lorentz']
-            input_format=data['files'][0]['input_format']
-            line_config=data['files'][0]['line_config']
-            line_config_path=data['files'][0]['line_config_path']
+        typeF=data['pipecube'][0]['survey_type']
+        if 'LVM' in typeF:
+            out_path=data['pipecube'][0]['out_path']
+            redux_ver=data['pipecube'][0]['redux_ver']
+            redux_dir=data['pipecube'][0]['redux_dir']
+            type=data['pipecube'][0]['type']
+            flu16=data['pipecube'][0]['flu16']
+            namel=data['pipecube'][0]['namel']
+            use_slitmap=data['pipecube'][0]['use_slitmap']
+            pbars=data['pipecube'][0]['pbars']
+            path_sas=data['pipecube'][0]['path_sas']
+            basename=data['pipecube'][0]['basename']
+            errors=data['pipecube'][0]['errors']
+            fac_sizey=data['pipecube'][0]['fac_sizeY']
+            fac_sizex=data['pipecube'][0]['fac_sizeX']
+            cent=data['pipecube'][0]['cent']
+            coord_cen=data['pipecube'][0]['coord_cen']
+            pathf=data['pipecube'][0]['pathF']
         else:
-            print('Error: The config file is not for 1D spectra')
+            print('Error: The config file is not for LVM data')
             return
+    try:
+        path_sas=os.environ['SAS_BASE_DIR']+'/'
+    except:
+        path_sas=path_sas+'/'
 
-    if name_out == 'None':
-        name_out=name
-    if bcont:
-        cont=False
-    else:
-        cont=True
-    if double:
-        lab='_double'
-        single=False
-    else:
-        lab='_single'
-        single=True
-    if error:
-        error_c=False
-    else:
-        error_c=True
-    if abroad:
-        broad=False
-        br=''
-    else:
-        broad=True    
-        br='_broad'
-    if hbet:
-        lA1=lA1hb
-        lA2=lA2hb
-        lbh='_hb'
-        hbfit=True
-    else:
-        lA1=lA1ha
-        if broad:
-            lA2=lA2hab
+    sigm_s,pix_s=kernel_pipe(type=type)
+    alph_s=2.0
+    
+    if redux_dir == '':
+        redux_dir=path_sas+'sdsswork/lvm/spectro/redux'
+    notebook=False
+    
+    for it in range(0, len(namel)):
+        nameF1=namel[it]
+        coord_cen=coord_cenL[it]
+        explist,mjd,tilelist,tileglist=tools.read_explist(fname=nameF1,path=pathf)
+        dit=len(explist)
+        if dit <= 160:
+            spec_range=(None,None)
+            if dit < 3:
+                sigm_s=17.6/2*32*1/8
+                pix_s=17.6/2*0.75*32*1/8
+            map_ifu(explist,nameF=nameF1,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
+                spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
+                alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
+                tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook)
         else:
-            lA2=lA2ha   
-        lbh='_ha' 
-        hbfit=False
-    if kskew:
-        skew=True
-        skl='_skew'
-    else:
-        skew=False
-        skl=''
-    if wave_AB:
-        lA1=wave_ini
-        lA2=wave_fin  
-    flux_f=fluxf        
-    dirt=path
-    dir_out=path_out
-    if input_format == 'CSV':
-        file1=dirt+'NAME.csv'.replace('NAME',name)
-    elif input_format == 'ASCII':
-        file1=dirt+'NAME.txt'.replace('NAME',name)
-    elif input_format == 'IrafFits' or input_format == 'TableFits' or input_format == 'SDSS':
-        file1=dirt+'NAME.fits'.replace('NAME',name)           
-    else:
-        file1=dirt+'NAME'
-    if ptt.exists(dir_out) == False:
-        tol.sycall('mkdir -p '+dir_out)
-
-    file_out=dir_out+'NAME_modelsV2'.replace('NAME',name_out)+lab+lbh+skl
-    file_out2=dir_out+'NAME_paramV2'.replace('NAME',name_out)+lab+lbh+skl
-    name_out2=name_out+lab+lbh+skl+br
-    config_lines=line_config_path+line_config
-    line_fit_single(file1,file_out,file_out2,name_out2,input_format=input_format,z=zt,lA1=lA1,lA2=lA2,ncpu=ncpus,lorentz=lorentz,
-         single=single,skew=skew,flux_f=flux_f,erft=0.75,dv1t=rvel,sim=True,cont=cont,hbfit=hbfit,error_c=error_c,broad=broad,
-         config_lines=config_lines)
+            if dit <= 500:
+                spec_range_l=[(3000,4000),(4000,5000),(5000,6000),(6000,7000),(7000,8000),(8000,9000),(9000,10000)]
+            elif dit <= 1000:
+                spec_range_l=[(3000,4000),(4000,4500),(4500,5000),(5000,5500),(5500,6000),(6000,6500),(6500,7000),(7000,7500),(7500,8000),(8000,8500),(8500,9000),(9000,9500),(9500,10000)]
+            else:
+                spec_range_l=[(3000,4000),(4000,4250),(4250,4500),(4500,4750),(4750,5000),(5000,5250),(5250,5500),(5500,5750),(5750,6000),(6000,6250),(6250,6500),(6500,6750),(6750,7000),(7000,7250),(7250,7500),(7500,7750),(7750,8000),(8000,8250),(8250,8500),(8500,8750),(8750,9000),(9000,9250),(9250,9500),(9500,9750),(9750,10000)]
+            for i in range(0, len(spec_range_l)):
+                nameF=nameF1+type+'_'+"{:0>2}".format(str(int(i)))
+                spec_range=spec_range_l[i]
+                map_ifu(explist,nameF=nameF,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
+                    spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
+                    alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
+                    tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook)
 
 
 

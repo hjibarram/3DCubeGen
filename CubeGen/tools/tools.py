@@ -462,3 +462,30 @@ def read_config_file(file):
     except:
         print('Config File not found')
         return None
+
+def kernel_pipe(type='b'):
+    type='f'
+    #16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i
+    if type == 'a':
+        valt=16
+    if type == 'b':
+        valt=8
+    if type == 'c':
+        valt=4
+    if type == 'd':
+        valt=2
+    if type == 'e':
+        valt=1
+    if type == 'f':
+        valt=1/2
+    if type == 'g':
+        valt=1/4
+    if type == 'h':
+        valt=1/8
+    if type == 'i':
+        valt=1/16
+    if type == 'j':
+        valt=1/32
+    sigm_s=17.6/2*32*valt
+    pix_s=17.6/2*0.75*32*valt
+    return sigm_s,pix_s
