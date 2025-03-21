@@ -21,7 +21,7 @@ requirements = [
     'scipy',
     'sdeconv',
     'tqdm',
-    'yaml',
+    'pyyaml',
     'click',
     'cloup',
     'skimage',
