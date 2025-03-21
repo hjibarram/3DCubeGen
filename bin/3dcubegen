@@ -10,6 +10,7 @@ from CubeGen.tools.cubegen import map_ifu
 from CubeGen.tools.mapgen import gen_map
 from CubeGen.tools.images import get_jpg
 from CubeGen.tools.merge_cube import coadd_cube
+from CubeGen.tools.deconvolve import deconvolve_2dfile
 import CubeGen.tools.tools as tools
 import os.path as ptt
 import os
@@ -195,6 +196,116 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
                 nameR='lvmCube-NAME_id.fits.gz'.replace('NAME',nameF1+type)
                 nameT='lvmCube-NAME.fits.gz'.replace('NAME',nameF1)
                 coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors)
+
+
+ 
+@cli.command('sinmap', short_help='Run the narrow map generator')
+@click.option('-c', '--config_file', type=str, default='', help='name of the config file')
+@click.option('-o', '--out_path', type=str, default='out_maps/', help='path of the output cube files')
+@click.option('-v', '--redux_ver', type=str, default='1.1.1.dev0', help='the DRP reduction version of the lvmCFrame')
+@click.option('-r', '--redux_dir', type=str, default='', help='path of the redux dir, default set to " " to set to path_sas/sdsswork/lvm/spectro/redux')
+@click.option('-s', '--sigm_s', type=float, default=32.2, help='smoth kernel size used to reconstruct the cube')
+@click.option('-p', '--pix_s', type=float, default=0.0, help='spaxel size used to reconstruct the cube, default set to 0 to fix it to 0.75*sigm_s')
+@click.option('-a', '--alph_s', type=float, default=2.0, help='kernel "shape" factor, a value equal of 2 returns a Gaussian kerner, larger than 2 returns a sharper kernel')
+@click.option('-n', '--namef', type=str, help='output root name of the data cube')
+@click.option('-m', '--use_slitmap', is_flag=True, default=True,help='use the astrometry saved in the slitmap header')
+@click.option('-b', '--pbars', is_flag=True, default=True,help='activate or deactivate the progress bar')
+@click.option('-t', '--path_sas', type=str, default='', help='path to the local SDSS SAS directory, will be used this value if SAS_BASE_DIR is not defined in the environment')
+@click.option('-y', '--basename', type=str, default='lvmSFrame-NAME.fits', help='base name of the RSS file')
+@click.option('-u', '--fac_sizey', type=float, default=1.1, help='factor of the FoV in Y')
+@click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
+@click.option('-k', '--cent', is_flag=True, default=False,help='activate the centering of the FoV')
+@click.option('-i', '--coord_cen', type=list, default=[0,0], help='central coordinates ra, dec in degrees')
+@click.option('-h', '--pathf', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
+@click.option('-z', '--redshift', type=float, default=0.0, help='redshift of the target')
+@click.option('-q', '--photoband', type=str, default='2',help='list (comma separated) of photometric id of the band to generate: 0-OII,1-OIII,2-Halpha,3-SII,4-g,5-r,6-i. Default 2')
+@click.option('-g', '--deconv', is_flag=True, default=False,help='activate the deconvolution of the map')
+@click.option('-j', '--psfdecv', type=float, default=0.0, help='psf in sigma for the deconvolution, if 0 it will set to sqrt(fib^2+kernel^2)')
+
+def sinmap(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,namef,use_slitmap,pbars,path_sas,basename,fac_sizey,fac_sizex,cent,coord_cen,pathf,redshift,photoband,deconv,psfdecv):
+
+    
+    try:
+        photoband = photoband.split(",")
+        for i in range(0, len(photoband)):
+            photoband[i] = int(photoband[i])
+    except:
+        photoband = [2]
+
+    data=tools.read_config_file(config_file)
+    if data:
+        typeF=data['sinmap'][0]['survey_type']
+        if 'LVM' in typeF:
+            out_path=data['sinmap'][0]['out_path']
+            redux_ver=data['sinmap'][0]['redux_ver']
+            redux_dir=data['sinmap'][0]['redux_dir']
+            sigm_s=data['sinmap'][0]['sigm_s']
+            pix_s=data['sinmap'][0]['pix_s']
+            alph_s=data['sinmap'][0]['alph_s']
+            namef=data['sinmap'][0]['nameF']
+            use_slitmap=data['sinmap'][0]['use_slitmap']
+            pbars=data['sinmap'][0]['pbars']
+            path_sas=data['sinmap'][0]['path_sas']
+            basename=data['sinmap'][0]['basename']
+            fac_sizey=data['sinmap'][0]['fac_sizeY']
+            fac_sizex=data['sinmap'][0]['fac_sizeX']
+            cent=data['sinmap'][0]['cent']
+            coord_cen=data['sinmap'][0]['coord_cen']
+            pathf=data['sinmap'][0]['pathF']
+            redshift=data['sinmap'][0]['redshift']
+            photoband=data['sinmap'][0]['photoband']
+            deconv=data['sinmap'][0]['deconv']
+            psfdecv=data['sinmap'][0]['psfdecv']
+        else:
+            print('Error: The config file is not for LVM data')
+            return
+    try:
+        path_sas=os.environ['SAS_BASE_DIR']+'/'
+    except:
+        path_sas=path_sas+'/'
+
+    if pix_s == 0:
+        pix_s=0.75*sigm_s
+    if redux_dir == '':
+        redux_dir=path_sas+'sdsswork/lvm/spectro/redux'
+    notebook=False
+
+    explist,mjd,tilelist,tileglist=tools.read_explist(fname=namef,path=pathf) 
+
+
+    zt=redshift
+    for i in range(0, len(photoband)):
+        if photoband[i] == 0:    
+            print('Generating the OII narrow band')
+            tyl='OII'
+        elif photoband[i] == 1:
+            print('Generating the OIII narrow band')
+            tyl='OIII'
+        elif photoband[i] == 2:
+            print('Generating the Halpha narrow band')
+            tyl='HI'
+        elif photoband[i] == 3:
+            print('Generating the SII narrow band')
+            tyl='SII'
+        elif photoband[i] == 4:
+            print('Generating the g broad band')
+            tyl='g'
+        elif photoband[i] == 5:
+            print('Generating the r broad band')
+            tyl='r'
+        elif photoband[i] == 6:
+            print('Generating the i broad band')
+            tyl='i'
+        ki=photoband[i]
+        gen_map(explist,multiT=True,nameF=namef,cent=cent,coord_cen=coord_cen,out_path=out_path,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
+            use_slitmap=use_slitmap,pbars=pbars,tilelist=tilelist,tileglist=tileglist,zt=zt,ki=ki,sigm_s=sigm_s,pix_s=pix_s,alph_s=alph_s,
+            agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,mjd=mjd,redux_ver=redux_ver,basename=basename,notebook=notebook)       
+        if deconv:
+            if psfdecv == 0:
+                psf=np.sqrt(35.3**2+sigm_s**2)/pix_s
+            else:
+                psf=psfdecv/pix_s
+            deconvolve_2dfile(path=out_path,name=namef+'_'+tyl,psf_x=psf,psf_y=psf)
 
 if __name__ == "__main__":
     cli()

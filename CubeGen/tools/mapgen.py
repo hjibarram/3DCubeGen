@@ -15,27 +15,16 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def gen_map(expnumL,nameF='MapLVM',use_slitmap=True,pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmMap-NAME_TRA.fits',path_lvmcore=''):
-    #file=path_lvmcore+'/metrology/lvm_fiducial_fibermap.yaml'
-    #f=open(file,'r')
-    #fiber_map = yaml.safe_load(f)
-    #fiber_map=fiber_map['fibers']
-    #xp=[]
-    #yp=[]
-    #Std_id=[]
-    #for i in range(0, len(fiber_map)):
-    #    if 'science' in fiber_map[i][4]:
-    #        xp.extend([float(fiber_map[i][8])*scp])
-    #        yp.extend([float(fiber_map[i][9])*scp])
-    #        Std_id.extend([int(fiber_map[i][0])-1])
-    #xp=np.array(xp)
-    #yp=np.array(yp)
+def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coord_cen=[0,0],pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmMap-NAME_TRA.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
         nlt=1
     if pbars:    
-        pbar=tqdm(total=nlt)    
+        if notebook:
+            pbar=tqdm(total=nlt)
+        else:
+            pbar=tqdmT(total=nlt)    
     for i in range(0, nlt):
         if nlt == 1:
             expnum=expnumL[i]
@@ -51,6 +40,7 @@ def gen_map(expnumL,nameF='MapLVM',use_slitmap=True,pbars=True,fac_sizeX=1.1,fac
         cdelt=hdr0["CDELT1"]
         crval=hdr0["CRVAL1"]
         expT=float(hdr1['EXPTIME'])
+        helio=float(hdr1['HIERARCH WAVE HELIORV_SCI'])
         
         hdu_list = fits.open(file)
         table_hdu = hdu_list['SLITMAP']
@@ -97,7 +87,8 @@ def gen_map(expnumL,nameF='MapLVM',use_slitmap=True,pbars=True,fac_sizeX=1.1,fac
                 dec0=dec
             nx0,ny0=rss.shape
             wave0=crval+cdelt*(np.arange(ny0)+1-crpix)
-            wave0=wave0#*1e10
+            wave0=wave0/(1+helio/299792.458)
+            #crval0=crval/(1+helio/299792.458)
             nfib0=len(Std_id)  
             rss_f=np.zeros([nfib0*nlt])
             rss_ef=np.zeros([nfib0*nlt])
@@ -127,7 +118,7 @@ def gen_map(expnumL,nameF='MapLVM',use_slitmap=True,pbars=True,fac_sizeX=1.1,fac
         else:
             nx,ny=rss.shape  
             wave=crval+cdelt*(np.arange(ny)+1-crpix)
-            wave=wave
+            wave=wave/(1+helio/299792.458)
             for j in range(0, nfib0):
                 val1,val2,val3,nam=tools.band_spectra(wave,rss[Std_id[j],:],k=ki,zt=zt)
                 rss_f[nfib0*i+j]=val2
@@ -151,8 +142,19 @@ def gen_map(expnumL,nameF='MapLVM',use_slitmap=True,pbars=True,fac_sizeX=1.1,fac
     if use_slitmap:
         y_ifu_V=y_ifu_pix*pix_s
         x_ifu_V=x_ifu_pix*pix_s
-    yot=(np.amax(y_ifu_V)+np.amin(y_ifu_V))/2.0
-    xot=(np.amax(x_ifu_V)+np.amin(x_ifu_V))/2.0
+    if cent:
+        ra_cen,dec_cen=coord_cen
+        if ra_cen == 0:
+            yot=(np.amax(y_ifu_V)+np.amin(y_ifu_V))/2.0
+            xot=(np.amax(x_ifu_V)+np.amin(x_ifu_V))/2.0
+        else:
+            sky_coord = SkyCoord(ra=ra_cen, dec=dec_cen, frame="icrs", unit="deg")
+            xot, yot = skycoord_to_pixel(sky_coord, wt1)
+            xot=xot*pix_s
+            yot=yot*pix_s
+    else:    
+        yot=(np.amax(y_ifu_V)+np.amin(y_ifu_V))/2.0
+        xot=(np.amax(x_ifu_V)+np.amin(x_ifu_V))/2.0
     skycor = pixel_to_skycoord(xot/pix_s,yot/pix_s,wt1)
     xat=skycor.ra.value
     yat=skycor.dec.value
@@ -160,23 +162,27 @@ def gen_map(expnumL,nameF='MapLVM',use_slitmap=True,pbars=True,fac_sizeX=1.1,fac
     y_ifu_V=y_ifu_V-yot
     nw=len(wave0)
     ns=len(x_ifu_V)
-    #pix_s=18.5#/2.
     fibA=35.3
     thet=0.0
 
     
-    
-    #nl=int(round((np.amax([np.amax(x_ifu_V),-np.amin(x_ifu_V),np.amax(y_ifu_V),-np.amin(y_ifu_V)])+1)*2/pix_s))
-    nlx=int(round((np.amax([np.amax(x_ifu_V),-np.amin(x_ifu_V)])+1)*2/pix_s))
-    nly=int(round((np.amax([np.amax(y_ifu_V),-np.amin(y_ifu_V)])+1)*2/pix_s))
+    if cent:
+        nlx=int(round((np.amax(x_ifu_V)-np.amin(x_ifu_V)+1)/pix_s))
+        nly=int(round((np.amax(y_ifu_V)-np.amin(y_ifu_V)+1)/pix_s))
+    else:
+        nlx=int(round((np.amax([np.amax(x_ifu_V),-np.amin(x_ifu_V)])+1)*2/pix_s))
+        nly=int(round((np.amax([np.amax(y_ifu_V),-np.amin(y_ifu_V)])+1)*2/pix_s))
     nlx=int(nlx*fac_sizeX)
     nly=int(nly*fac_sizeY)
+    if nlx== 0:
+        nlx=1
+    if nly== 0:
+        nly=1
     
     wt = WCS(naxis=2)
     wt.wcs.crpix = [nlx/2+1, nly/2+0]
     #wt.wcs.cdelt = np.array([-np.cos(thet*np.pi/180.0)*pix_s/3600.0*np.cos(yot/3600.0*np.pi/180.), np.cos(thet*np.pi/180.0)*pix_s/3600.0])
     wt.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
-    #wt.wcs.crval = [xot/3600.0,yot/3600.0]
     wt.wcs.crval = [xat,yat]
     wt.wcs.ctype = ["RA---TAN", "DEC--TAN"]
 
@@ -199,14 +205,15 @@ def gen_map(expnumL,nameF='MapLVM',use_slitmap=True,pbars=True,fac_sizeX=1.1,fac
     specE_ifu=rss_ef*facto 
     specM_ifu=rss_fm-2.5*np.log10(facto)+5.0*np.log10(pix_s)
     specEM_ifu=rss_efm-2.5*np.log10(facto)+5.0*np.log10(pix_s)
-    from multiprocessing.pool import ThreadPool
     if pbars:
-        pbar=tqdm(total=nlx)
+        if notebook:
+            pbar=tqdm(total=nlx)
+        else:     
+            pbar=tqdmT(total=nlx)
     for i in range(0, nlx):
         xi=xf
         xf=xf+pix_s
         Rsp=np.sqrt((x_ifu_V-(xf+xi)/2.0)**2.0)
-        #ntp=np.where(Rsp <= (fibA*3.5*2/2.0))[0]
         if sigm_s > fibA*3.5*2:
             ntp=np.where(Rsp <= (sigm_s/2.0))[0]
         else:    
@@ -256,7 +263,7 @@ def gen_map(expnumL,nameF='MapLVM',use_slitmap=True,pbars=True,fac_sizeX=1.1,fac
     h4=fits.ImageHDU(ifuM_e)
     head_list=[h1,h2,h3,h4]
 
-    dx=1
+    dx=0
     dy=0
     h=h1.header
     keys=list(hdr0.keys())
