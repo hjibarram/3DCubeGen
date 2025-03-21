@@ -3,7 +3,7 @@
 pipemap:
   # Pipe cube generation
   - survey_type: LVM #Cube Survey Type
-    out_path: out_cubes/ #path of the output cube files
+    out_path: out_maps/ #path of the output cube files
     redux_ver: 1.1.1.dev0 #the DRP reduction version of the lvmCFrame
     redux_dir: '' #path of the redux dir, default set to '' to set to path_sas/sdsswork/lvm/spectro/redux
     type: c #id for the kernel selection: 16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i, default c
