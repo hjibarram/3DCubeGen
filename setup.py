@@ -15,11 +15,16 @@ def version(fn):
 #       return f.read()
 
 requirements = [
-#    'astropy>=3.2.1',
-#    'matplotlib>=3.1.1',
-#    'numpy>=1.17.2',
-#    'scipy>=1.3.0',
-#    'seaborn>=0.9.0',
+    'astropy',
+    'matplotlib',
+    'numpy',
+    'scipy',
+    'sdeconv',
+    'tqdm',
+    'yaml',
+    'click',
+    'cloup',
+    'skimage',
 ]
 
 DATA_DIRNAME = 'legacy'
