@@ -17,7 +17,6 @@ pipemap:
     cent: True #activate the centering of the FoV
     coord_cenL: [[0,0],[0,0]] #central coordinates ra, dec in degrees 
     pathF: '' #path of the list of mjd, explist and tiles of the targets
-    mergecube: False #activate the cube merge script
     redshift: 0.0 #redshift of the target
     deconv: False #flag to activate or deactivate the deconvolution of the map
     psfdecv: 0.0 #psf in sigma for the deconvolution (in arcsec), if 0 it will set to sqrt(fib^2+kernel^2)

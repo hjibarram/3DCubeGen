@@ -389,7 +389,7 @@ def pipemap(config_file,out_path,redux_ver,redux_dir,type,namel,use_slitmap,pbar
             pix_s=17.6/2*0.75*32*1/8
             type='h'
         zt=redshift
-        for i in range(0, rane(0, len(labt))):
+        for i in range(0, range(0, len(labt))):
             print('Generating the '+labt[i])
             tyl=tyll[i]
             ki=i
