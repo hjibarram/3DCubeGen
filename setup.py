@@ -24,7 +24,7 @@ requirements = [
     'pyyaml',
     'click',
     'cloup',
-    'skimage',
+#    'scikit-image',
 ]
 
 DATA_DIRNAME = 'legacy'
