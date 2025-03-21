@@ -257,8 +257,7 @@ def sinmap(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,namef,us
             photoband=data['sinmap'][0]['photoband']
             deconv=data['sinmap'][0]['deconv']
             psfdecv=data['sinmap'][0]['psfdecv']
-            if len(photoband) == 1:
-                photoband=[photoband]
+            photoband=np.array(photoband, ndmin=1)
         else:
             print('Error: The config file is not for LVM data')
             return
