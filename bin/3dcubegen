@@ -220,7 +220,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
 @click.option('-z', '--redshift', type=float, default=0.0, help='redshift of the target')
 @click.option('-q', '--photoband', type=str, default='2',help='list (comma separated) of photometric id of the band to generate: 0-OII,1-OIII,2-Halpha,3-SII,4-g,5-r,6-i. Default 2')
 @click.option('-g', '--deconv', is_flag=True, default=False,help='activate the deconvolution of the map')
-@click.option('-j', '--psfdecv', type=float, default=0.0, help='psf in sigma for the deconvolution, if 0 it will set to sqrt(fib^2+kernel^2)')
+@click.option('-j', '--psfdecv', type=float, default=0.0, help='psf in sigma for the deconvolution (in arcsec), if 0 it will set to sqrt(fib^2+kernel^2)')
 
 def sinmap(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,namef,use_slitmap,pbars,path_sas,basename,fac_sizey,fac_sizex,cent,coord_cen,pathf,redshift,photoband,deconv,psfdecv):
 

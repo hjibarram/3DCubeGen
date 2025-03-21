@@ -1,0 +1,27 @@
+--- 
+# config file to create a single map from narrow filters
+sinmap:
+  # Single cube generation
+  - survey_type: LVM #Cube Survey Type
+    out_path: out_maps/ #path of the output map files
+    redux_ver: 1.1.1.dev0 #the DRP reduction version of the lvmCFrame
+    redux_dir: '' #path of the redux dir, default set to '' to set to path_sas/sdsswork/lvm/spectro/redux
+    sigm_s: 32.2 #smoth kernel size used to reconstruct the cube
+    pix_s: 0.0 #spaxel size used to reconstruct the cube, default set to 0 to fix it to 0.75*sigm_s
+    alph_s: 2 #kernel "shape" factor, a value equal of 2 returns a Gaussian kerner, larger than 2 returns a sharper kernel
+    nameF: NAME #output root name of the data cube and list file with the tiles, mjds and expnumbers
+    use_slitmap: True #flag to use the astrometry saved in the slitmap header
+    pbars: True #flag to activate or deactivate the progress bar
+    path_sas: '' #path to the local SDSS SAS directory, will be used this value if SAS_BASE_DIR is not defined in the environment
+    basename: lvmSFrame-NAME.fits #base name of the RSS file
+    errors: True #activate or deactivate the error estimation
+    fac_sizeY: 1.1 #factor of the FoV in Y
+    fac_sizeX: 1.1 #factor of the FoV in X
+    cent: True #activate the centering of the FoV
+    coord_cen: [0,0] #central coordinates ra, dec in degrees 
+    pathF: '' #path of the list of mjd, explist and tiles of the targets
+    redshift: 0.0 #redshift of the target
+    photoband: 2 #list (comma separated) of photometric id of the band to generate: 0-OII,1-OIII,2-Halpha,3-SII,4-g,5-r,6-i. Default 2
+    deconv: False #flag to activate or deactivate the deconvolution of the map
+    psfdecv: 0.0 #psf in sigma for the deconvolution (in arcsec), if 0 it will set to sqrt(fib^2+kernel^2)
+...
