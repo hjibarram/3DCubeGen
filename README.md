@@ -8,6 +8,9 @@ graph TD
     A --> E[bin/]
     A --> F[README.md]
     A --> G[setup.py]
-    C --> C1[cubegen]
-    C1 --> C2[map_ifu]
+    C --> C1[tools]
+    C1 --> C2[cubegen]
+    C1 --> C3[mapgen]
+    C2 --> C4[map_ifu]
+    C3 --> C5[gen_map]
 ```
