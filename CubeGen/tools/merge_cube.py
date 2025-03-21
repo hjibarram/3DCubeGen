@@ -12,8 +12,6 @@ from scipy.interpolate import interp1d
 import CubeGen.tools.tools as tools
 
 def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0]):
-
-
     n_slides=len(id_l)
     cube_list=[]
     hdr_list=[]
