@@ -8,7 +8,7 @@ import numpy as np
 #warnings.filterwarnings("ignore")
 from CubeGen.tools.cubegen import map_ifu
 from CubeGen.tools.mapgen import gen_map
-from CubeGen.tools.images import get_jpg
+from CubeGen.tools.images import get_jpg,get_jpgNR
 from CubeGen.tools.merge_cube import coadd_cube
 from CubeGen.tools.deconvolve import deconvolve_2dfile
 import CubeGen.tools.tools as tools
@@ -170,6 +170,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             if dit < 3:
                 sigm_s=17.6/2*32*1/8
                 pix_s=17.6/2*0.75*32*1/8
+                type='h'
             map_ifu(explist,nameF=nameF1+type,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
                 spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
                 alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
@@ -306,6 +307,196 @@ def sinmap(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,namef,us
             else:
                 psf=psfdecv/pix_s
             deconvolve_2dfile(path=out_path,name=namef+'_'+tyl,psf_x=psf,psf_y=psf)
+
+
+@cli.command('pipemap', short_help='pipeline to obtain the MC and LV style maps')
+@click.option('-c', '--config_file', type=str, default='', help='name of the config file')
+@click.option('-o', '--out_path', type=str, default='out_cubes/', help='path of the output cube files')
+@click.option('-v', '--redux_ver', type=str, default='1.1.1.dev0', help='the DRP reduction version of the lvmCFrame')
+@click.option('-r', '--redux_dir', type=str, default='', help='path of the redux dir, default set to " " to set to path_sas/sdsswork/lvm/spectro/redux')
+@click.option('-s', '--type', type=str, default='c', help='id for the kernel selection: 16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i, default c')
+@click.option('-n', '--namel', type=str, help='list of targets for the targets, comma separated')
+@click.option('-m', '--use_slitmap', is_flag=True, default=True,help='use the astrometry saved in the slitmap header')
+@click.option('-b', '--pbars', is_flag=True, default=True,help='activate or deactivate the progress bar')
+@click.option('-t', '--path_sas', type=str, default='', help='path to the local SDSS SAS directory, will be used this value if SAS_BASE_DIR is not defined in the environment')
+@click.option('-y', '--basename', type=str, default='lvmSFrame-NAME.fits', help='base name of the RSS file')
+@click.option('-u', '--fac_sizey', type=float, default=1.1, help='factor of the FoV in Y')
+@click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
+@click.option('-k', '--cent', is_flag=True, default=False,help='activate the centering of the FoV')
+@click.option('-i', '--coord_cenl', type=list, default=[[0,0]], help='list of central coordinates ra, dec in degrees')
+@click.option('-h', '--pathf', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
+@click.option('-z', '--redshift', type=float, default=0.0, help='redshift of the target')
+@click.option('-g', '--deconv', is_flag=True, default=False,help='activate the deconvolution of the map')
+@click.option('-j', '--psfdecv', type=float, default=0.0, help='psf in sigma for the deconvolution (in arcsec), if 0 it will set to sqrt(fib^2+kernel^2)')
+
+
+def pipemap(config_file,out_path,redux_ver,redux_dir,type,namel,use_slitmap,pbars,path_sas,basename,fac_sizey,fac_sizex,cent,coord_cenl,pathf,redshift,deconv,psfdecv):
+    
+    try:
+        namel = namel.split(",")
+    except:
+        namel = ''
+    data=tools.read_config_file(config_file)
+    if data:
+        typeF=data['pipemap'][0]['survey_type']
+        if 'LVM' in typeF:
+            out_path=data['pipemap'][0]['out_path']
+            redux_ver=data['pipemap'][0]['redux_ver']
+            redux_dir=data['pipemap'][0]['redux_dir']
+            type=data['pipemap'][0]['type']
+            namel=data['pipemap'][0]['nameL']
+            use_slitmap=data['pipemap'][0]['use_slitmap']
+            pbars=data['pipemap'][0]['pbars']
+            path_sas=data['pipemap'][0]['path_sas']
+            basename=data['pipemap'][0]['basename']
+            fac_sizey=data['pipemap'][0]['fac_sizeY']
+            fac_sizex=data['pipemap'][0]['fac_sizeX']
+            cent=data['pipemap'][0]['cent']
+            coord_cenl=data['pipemap'][0]['coord_cenL']
+            pathf=data['pipemap'][0]['pathF']
+            redshift=data['pipemap'][0]['redshift']
+            deconv=data['pipemap'][0]['deconv']
+            psfdecv=data['pipemap'][0]['psfdecv']
+        else:
+            print('Error: The config file is not for LVM data')
+            return
+    try:
+        path_sas=os.environ['SAS_BASE_DIR']+'/'
+    except:
+        path_sas=path_sas+'/'
+
+    sigm_s,pix_s=tools.kernel_pipe(type=type)
+    alph_s=2.0
+    
+    if redux_dir == '':
+        redux_dir=path_sas+'sdsswork/lvm/spectro/redux'
+    notebook=False
+    labt=['OII narrow band','OIII narrow band','Halpha narrow band','SII narrow band','g broad band','r broad band','i broad band']
+    tyll=['OII','OIII','HI','SII','g','r','i']
+
+    for it in range(0, len(namel)):
+        nameF1=namel[it]
+        try:
+            coord_cen=coord_cenl[it]
+        except:
+            coord_cen=[0,0]
+        explist,mjd,tilelist,tileglist=tools.read_explist(fname=nameF1,path=pathf)
+        dit=len(explist)
+        spec_range=(None,None)
+        if dit < 3:
+            sigm_s=17.6/2*32*1/8
+            pix_s=17.6/2*0.75*32*1/8
+            type='h'
+        zt=redshift
+        for i in range(0, rane(0, len(labt))):
+            print('Generating the '+labt[i])
+            tyl=tyll[i]
+            ki=i
+            gen_map(explist,multiT=True,nameF=nameF1+type,cent=cent,coord_cen=coord_cen,out_path=out_path,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
+                use_slitmap=use_slitmap,pbars=pbars,tilelist=tilelist,tileglist=tileglist,zt=zt,ki=ki,sigm_s=sigm_s,pix_s=pix_s,alph_s=alph_s,
+                agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,mjd=mjd,redux_ver=redux_ver,basename=basename,notebook=notebook)       
+            if deconv:
+                if psfdecv == 0:
+                    psf=np.sqrt(35.3**2+sigm_s**2)/pix_s
+                else:
+                    psf=psfdecv/pix_s
+                deconvolve_2dfile(path=out_path,name=nameF1+type+'_'+tyl,psf_x=psf,psf_y=psf)
+
+        # Generating the OHS image
+        name1='lvmMap-NAME_OIII.fits.gz'.replace('NAME',nameF1+type)
+        name2='lvmMap-NAME_HI.fits.gz'.replace('NAME',nameF1+type)
+        name3='lvmMap-NAME_SII.fits.gz'.replace('NAME',nameF1+type)
+        nameT='lvmMap-NAME_OHS'.replace('NAME',nameF1+type)
+        Rmax=18.5 #Magnitudes AB RED Chanel
+        Rmin=24.5 #Magnitudes AB RED Chanel
+        Gmax=18.5 #Magnitudes AB GREEN Chanel
+        Gmin=24.1 #Magnitudes AB GREEN Chanel
+        Bmax=18.5 #Magnitudes AB BLUE Chanel
+        Bmin=24.6 #Magnitudes AB BLUE Chanel
+        valTs=[[Rmax,Rmin],[Gmax,Gmin],[Bmax,Bmin]]
+        get_jpg(name1,name2,name3,dir1=out_path,dir0=out_path,valTs=valTs,name=nameT)        
+        if deconv:
+            name1='lvmMap-NAME_OIII_decv.fits.gz'.replace('NAME',nameF1+type)
+            name2='lvmMap-NAME_HI_decv.fits.gz'.replace('NAME',nameF1+type)
+            name3='lvmMap-NAME_SII_decv.fits.gz'.replace('NAME',nameF1+type)
+            nameT='lvmMap-NAME_OHS_decv'.replace('NAME',nameF1+type)
+            get_jpg(name1,name2,name3,dir1=out_path,dir0=out_path,valTs=valTs,name=nameT)
+
+        # Generating the OOH image
+        name1='lvmMap-NAME_OII.fits.gz'.replace('NAME',nameF1+type)
+        name2='lvmMap-NAME_OIII.fits.gz'.replace('NAME',nameF1+type)
+        name3='lvmMap-NAME_HI.fits.gz'.replace('NAME',nameF1+type)
+        nameT='lvmMap-NAME_OOH'.replace('NAME',nameF1+type)
+        Rmax=18.5 #Magnitudes AB RED Chanel
+        Rmin=24.1 #Magnitudes AB RED Chanel
+        Gmax=18.5 #Magnitudes AB GREEN Chanel
+        Gmin=24.6 #Magnitudes AB GREEN Chanel
+        Bmax=18.5 #Magnitudes AB BLUE Chanel
+        Bmin=24.9 #Magnitudes AB BLUE Chanel
+        valTs=[[Rmax,Rmin],[Gmax,Gmin],[Bmax,Bmin]]
+        get_jpg(name1,name2,name3,dir1=out_path,dir0=out_path,valTs=valTs,name=nameT)        
+        if deconv:
+            name1='lvmMap-NAME_OII_decv.fits.gz'.replace('NAME',nameF1+type)
+            name2='lvmMap-NAME_OIII_decv.fits.gz'.replace('NAME',nameF1+type)
+            name3='lvmMap-NAME_HI_decv.fits.gz'.replace('NAME',nameF1+type)
+            nameT='lvmMap-NAME_OOH_decv'.replace('NAME',nameF1+type)
+            get_jpg(name1,name2,name3,dir1=out_path,dir0=out_path,valTs=valTs,name=nameT)
+
+
+        # Generating the gri image
+        name1='lvmMap-NAME_g.fits.gz'.replace('NAME',nameF1+type)
+        name2='lvmMap-NAME_r.fits.gz'.replace('NAME',nameF1+type)
+        name3='lvmMap-NAME_i.fits.gz'.replace('NAME',nameF1+type)
+        nameT='lvmMap-NAME_gri'.replace('NAME',nameF1+type)
+        Rmax=18.5 #Magnitudes AB RED Chanel
+        Rmin=23.8 #Magnitudes AB RED Chanel
+        Gmax=18.5 #Magnitudes AB GREEN Chanel
+        Gmin=24.2 #Magnitudes AB GREEN Chanel
+        Bmax=18.5 #Magnitudes AB BLUE Chanel
+        Bmin=24.5 #Magnitudes AB BLUE Chanel
+        valTs=[[Rmax,Rmin],[Gmax,Gmin],[Bmax,Bmin]]
+        get_jpg(name1,name2,name3,dir1=out_path,dir0=out_path,valTs=valTs,name=nameT)        
+        if deconv:
+            name1='lvmMap-NAME_g_decv.fits.gz'.replace('NAME',nameF1+type)
+            name2='lvmMap-NAME_r_decv.fits.gz'.replace('NAME',nameF1+type)
+            name3='lvmMap-NAME_i_decv.fits.gz'.replace('NAME',nameF1+type)
+            nameT='lvmMap-NAME_gri_decv'.replace('NAME',nameF1+type)
+            get_jpg(name1,name2,name3,dir1=out_path,dir0=out_path,valTs=valTs,name=nameT)
+
+
+        # Generating the griOOH image
+        name1='lvmMap-NAME_g.fits.gz'.replace('NAME',nameF1+type)
+        name2='lvmMap-NAME_r.fits.gz'.replace('NAME',nameF1+type)
+        name3='lvmMap-NAME_i.fits.gz'.replace('NAME',nameF1+type)
+        name4='lvmMap-NAME_OII.fits.gz'.replace('NAME',nameF1+type)
+        name5='lvmMap-NAME_OIII.fits.gz'.replace('NAME',nameF1+type)
+        name6='lvmMap-NAME_HI.fits.gz'.replace('NAME',nameF1+type)
+        nameT='lvmMap-NAME_griOOH'.replace('NAME',nameF1+type)
+        Rmax=18.5 #Magnitudes AB RED Chanel
+        Rmin=23.8 #Magnitudes AB RED Chanel
+        Gmax=18.5 #Magnitudes AB GREEN Chanel
+        Gmin=24.1 #Magnitudes AB GREEN Chanel
+        Bmax=18.5 #Magnitudes AB BLUE Chanel
+        Bmin=24.5 #Magnitudes AB BLUE Chanel
+        RmaxN=18.5 #Magnitudes AB Narrow Ha RED Chanel 
+        RminN=24.1 #Magnitudes AB Narrow Ha RED Chanel
+        GmaxN=18.5 #Magnitudes AB Narrow OIII GREEN Chanel
+        GminN=24.6 #Magnitudes AB Narrow OIII GREEN Chanel
+        BmaxN=18.5 #Magnitudes AB Narrow OII BLUE Chanel
+        BminN=24.9 #Magnitudes AB Narrow OII BLUE Chanel
+        valTs=[[Rmax,Rmin],[Gmax,Gmin],[Bmax,Bmin],[RmaxN,RminN],[GmaxN,GminN],[BmaxN,BminN]]
+        namey=[name3,name2,name1,name6,name5,name4]
+        wgt=[1.0,1.0,1.0,1.5,1.5,1.5]
+        get_jpgNR(namel=namey,dir1=out_path,dir0=out_path,valTs=valTs,name=nameT,wgt=wgt)       
+        if deconv:
+            name1='lvmMap-NAME_g_decv.fits.gz'.replace('NAME',nameF1+type)
+            name2='lvmMap-NAME_r_decv.fits.gz'.replace('NAME',nameF1+type)
+            name3='lvmMap-NAME_i_decv.fits.gz'.replace('NAME',nameF1+type)
+            name4='lvmMap-NAME_OII_decv.fits.gz'.replace('NAME',nameF1+type)
+            name5='lvmMap-NAME_OIII_decv.fits.gz'.replace('NAME',nameF1+type)
+            name6='lvmMap-NAME_HI.fits_decv.gz'.replace('NAME',nameF1+type)
+            nameT='lvmMap-NAME_griOOH_decv'.replace('NAME',nameF1+type)
+            get_jpgNR(namel=namey,dir1=out_path,dir0=out_path,valTs=valTs,name=nameT,wgt=wgt)
 
 if __name__ == "__main__":
     cli()
