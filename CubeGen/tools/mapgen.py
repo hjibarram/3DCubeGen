@@ -324,6 +324,6 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     basenameC=basenameC.replace('TRA',nam)
     file=out_path+basenameC.replace('NAME',nameF)
     out_fit=file
-    print(out_fit)
+    #print(out_fit)
     hlist.writeto(out_fit,overwrite=True)
     tools.sycall('gzip -f '+out_fit)

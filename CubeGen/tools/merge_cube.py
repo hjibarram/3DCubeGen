@@ -283,4 +283,4 @@ def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0]
     hlist.writeto(path+'/'+nameF.replace('.fits.gz','')+'.fits', overwrite=True)
     tools.sycall('gzip -f '+path+'/'+nameF.replace('.fits.gz','')+'.fits') 
                   
-    return
+    #return
