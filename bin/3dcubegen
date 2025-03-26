@@ -114,8 +114,11 @@ cli.add_command(sincube)
 @click.option('-i', '--coord_cenl', type=list, default=[[0,0]], help='list of central coordinates ra, dec in degrees')
 @click.option('-h', '--pathf', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
 @click.option('-l', '--mergecube', is_flag=True, default=False,help='activate the cube merge script')
+@click.option('-p', '--nsp', type=int, default=0, help='number of spatial slides in nxn for the merged cube, set nsp to 0 or 1 to deactivate')
+@click.option('-z', '--cube2rss', is_flag=True, default=False,help='activate the cube to rss script')
+@click.option('-x', '--out_pathrss', type=str, default='out_rss/', help='path of the output rss files')
 
-def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitmap,pbars,path_sas,basename,errors,fac_sizey,fac_sizex,cent,coord_cenl,pathf,mergecube):
+def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitmap,pbars,path_sas,basename,errors,fac_sizey,fac_sizex,cent,coord_cenl,pathf,mergecube,nsp,cube2rss,out_pathrss):
     
     try:
         namel = namel.split(",")
@@ -142,6 +145,9 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             coord_cenl=data['pipecube'][0]['coord_cenL']
             pathf=data['pipecube'][0]['pathF']
             mergecube==data['pipecube'][0]['mergecube']
+            nsp==data['pipecube'][0]['nsp']
+            cube2rss==data['pipecube'][0]['cube2rss']
+            out_pathrss==data['pipecube'][0]['out_pathrss']
         else:
             print('Error: The config file is not for LVM data')
             return
@@ -195,8 +201,20 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
 
             if mergecube:
                 nameR='lvmCube-NAME_id.fits.gz'.replace('NAME',nameF1+type)
-                nameT='lvmCube-NAME.fits.gz'.replace('NAME',nameF1)
-                coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors)
+                nameT='lvmCube-NAME.fits.gz'.replace('NAME',nameF1+type)
+                if nsp > 1:
+                    for ii in range(0, nsp):
+                        for jj in range(0, nsp): 
+                            coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,nsplit=nsp,spt=[ii,jj])
+                    if cube2rss:
+                        for ii in range(0, nsp):
+                            for jj in range(0, nsp):
+                                namet=nameF1+type+'_p'+str(ii)+str(jj)
+                                rssp_extract(namet,path=out_path,path_out=out_pathrss)
+                else:
+                    coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors)
+                    if cube2rss:
+                        rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss)
 
 
  
