@@ -5,26 +5,29 @@ from astropy import units as u
 from astropy.wcs.utils import skycoord_to_pixel
 from astropy.wcs.utils import pixel_to_skycoord
 from tqdm.notebook import tqdm
+from tqdm import tqdm as tqdmT
 import os.path as ptt
 import numpy as np
 from astropy.io import fits
 from scipy.interpolate import interp1d
 import CubeGen.tools.tools as tools
 
-def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0]):
+def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0],notebook=True):
     n_slides=len(id_l)
     cube_list=[]
     hdr_list=[]
     size_list=[]
     if error:
         cubeE_list=[]    
-    pbar=tqdm(total=n_slides)  
+    if notebook:
+        pbar=tqdm(total=n_slides)
+    else:
+        pbar=tqdmT(total=n_slides)
     for i in range(0, n_slides):
         cube_file=path+'/'+nameR.replace('id',id_l[i])
         [cube, hdr]=fits.getdata(cube_file, 0, header=True)
         if i == 0:
             nzo,nxo,nyo=cube.shape
-            #print(nzo,nxo,nyo)
             if nsplit > 1:
                 nx_list=[]
                 ny_list=[]
@@ -46,16 +49,13 @@ def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0]
                 nx1o=0
                 ny1o=0
                 labf=''
-            #print(nx2o,nx1o,nxo)
         nz,nx,ny=cube.shape        
-       # cube=cube[:,nx1o:nx2o,ny1o:ny2o]
         cubeT=np.copy(cube[:,nx1o:nx2o,ny1o:ny2o])
         del cube
         cube=np.copy(cubeT)
         del cubeT
         if error:
             cubeE=fits.getdata(cube_file, 1, header=False)
-          #  cubeE=cubeE[:,nx1o:nx2o,ny1o:ny2o]
             cubeT=np.copy(cubeE[:,nx1o:nx2o,ny1o:ny2o])
             del cubeE
             cubeE=np.copy(cubeT)
@@ -114,15 +114,15 @@ def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0]
     crval=min_wave
     crpix=1
     waveF=crval+cdelt0*(np.arange(n_pix)+1-crpix)
-    #IFU_coadd=np.zeros([n_pix,nx0,ny0])
-    #IFU_coaddE=np.zeros([n_pix,nx0,ny0])
-    #IFU_coaddB=np.zeros([n_pix,nx0,ny0],dtype=int)
     IFU_coadd=np.zeros([n_pix,nx2o-nx1o,ny2o-ny1o])
     IFU_coaddE=np.zeros([n_pix,nx2o-nx1o,ny2o-ny1o])
     IFU_coaddB=np.zeros([n_pix,nx2o-nx1o,ny2o-ny1o],dtype=int)
     
     cdelt_a=np.nanmax(np.array(cdelt_list))
-    pbar=tqdm(total=(nx2o-nx1o))#(nx0))#  
+    if notebook:
+        pbar=tqdm(total=(nx2o-nx1o))
+    else:
+        pbar=tqdmT(total=(nx2o-nx1o))#(nx0))#  
     for i in range(nx1o, nx2o):#0, nx0):#
         for j in range(ny1o, ny2o):#0, ny0):#
             temp_spec=np.copy(IFU_coadd[:,i-nx1o,j-ny1o])
@@ -208,20 +208,7 @@ def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0]
                 IFU_coaddE[:,i-nx1o,j-ny1o]=temp_specE 
         pbar.update(1)
     pbar.close()
-            #nt_z=np.where(temp_spec != 0)
-            #if len(nt_z[0]) > 0:
-            #    temp_specM=conv(temp_spec,ke=5)
-            #    temp_specE=np.abs(temp_spec-temp_specM)
-            #    temp_specE=np.sqrt(conv(temp_specE**2.0,ke=50))
-            #    IFU_coaddE[:,i,j]=temp_specE*0.1
-            #    ntp=np.where(temp_spec == 0)
-            #    if len(ntp[0]) > 0:
-            #        IFU_coaddE[ntp,i,j]=0.002
-            #else:
-            #    IFU_coaddE[:,i,j]=1.0
-            #nt_z=np.where(temp_spec == 0)    
-            #if len(nt_z[0]) > 0:
-            #    IFU_coaddB[nt_z,i,j]=1
+
                 
     hdr0=hdr_list[0]            
     h1=fits.PrimaryHDU(IFU_coadd)
@@ -282,5 +269,3 @@ def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0]
     nameF=nameF+labf
     hlist.writeto(path+'/'+nameF.replace('.fits.gz','')+'.fits', overwrite=True)
     tools.sycall('gzip -f '+path+'/'+nameF.replace('.fits.gz','')+'.fits') 
-                  
-    #return
