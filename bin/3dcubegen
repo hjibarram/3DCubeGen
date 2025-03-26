@@ -205,14 +205,14 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
                 if nsp > 1:
                     for ii in range(0, nsp):
                         for jj in range(0, nsp): 
-                            coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,nsplit=nsp,spt=[ii,jj])
+                            coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,nsplit=nsp,spt=[ii,jj],notebook=notebook)
                     if cube2rss:
                         for ii in range(0, nsp):
                             for jj in range(0, nsp):
                                 namet=nameF1+type+'_p'+str(ii)+str(jj)
                                 rssp_extract(namet,path=out_path,path_out=out_pathrss,notebook=notebook)
                 else:
-                    coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors)
+                    coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,notebook=notebook)
                     if cube2rss:
                         rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook)
 

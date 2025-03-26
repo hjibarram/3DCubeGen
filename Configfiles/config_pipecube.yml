@@ -21,4 +21,6 @@ pipecube:
     pathF: '' #path of the list of mjd, explist and tiles of the targets
     mergecube: False #activate the cube merge script
     nsp: 0 #number of spatial slides in nxn for the merged cube, set nsp to 0 or 1 to deactivate
+    cube2rss: True #activate the cube to rss script
+    out_pathrss: out_rss/ #path of the output rss files  
 ...
