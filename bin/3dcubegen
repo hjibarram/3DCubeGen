@@ -9,7 +9,7 @@ from CubeGen.tools.mapgen import gen_map
 from CubeGen.tools.images import get_jpg,get_jpgNR
 from CubeGen.tools.merge_cube import coadd_cube
 from CubeGen.tools.deconvolve import deconvolve_2dfile
-from CubeGen.daptools.dap_fluxelines import rssp_extract
+from CubeGen.daptools.rss_gen import rssp_extract
 import CubeGen.tools.tools as tools
 import os.path as ptt
 import os
