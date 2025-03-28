@@ -12,11 +12,11 @@ def rssp_extract(name,path='./',path_out='./',basename_in='lvmCube-NAME.fits.gz'
     if flu16:
         flux=flux*fluxu
     try:
-    	if lvm:
+        if lvm:
             hdrO=fits.getheader(cube_file, 3)
             orhd=True
         else:
-        	orhd=False
+            orhd=False
     except:
         orhd=False
 
