@@ -180,6 +180,8 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
                 spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
                 alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
                 tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook)
+            if cube2rss:
+                rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook)
         else:
             if dit <= 500:
                 spec_range_l=[(3000,4000),(4000,5000),(5000,6000),(6000,7000),(7000,8000),(8000,9000),(9000,10000)]
