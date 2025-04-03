@@ -316,6 +316,7 @@ def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=F
     h["CTYPE3"]=('WAVE    ','Air wavelength (linear) ')
     h["RADESYS"]='FK5     '
     h["OBJSYS"]='ICRS    '
+    
     h["EQUINOX"]=2000.00
     h["IFUCON"]=(str(int(ns))+' ','NFibers')
     if flu16:
