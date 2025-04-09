@@ -170,7 +170,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             coord_cen=[0,0]
         explist,mjd,tilelist,tileglist=tools.read_explist(fname=nameF1,path=pathf)
         dit=len(explist)
-        if dit <= 160:
+        if dit <= 100:
             spec_range=(None,None)
             if dit < 3:
                 sigm_s=17.6/2*32*1/8

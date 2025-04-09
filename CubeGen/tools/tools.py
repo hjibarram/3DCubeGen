@@ -464,7 +464,7 @@ def read_config_file(file):
         return None
 
 def kernel_pipe(type='b'):
-    #16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i
+    #16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i,1/32-i
     if type == 'a':
         valt=16
     if type == 'b':

@@ -6,7 +6,7 @@ pipecube:
     out_path: out_cubes/ #path of the output cube files
     redux_ver: 1.1.1.dev0 #the DRP reduction version of the lvmCFrame
     redux_dir: '' #path of the redux dir, default set to '' to set to path_sas/sdsswork/lvm/spectro/redux
-    type: c #id for the kernel selection: 16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i, default c
+    type: c #id for the kernel selection: 16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i,1/32-i, default c
     flu16: True #keyword to return a cube with units of 10^{-16} erg/s/cm2/A, if False, the units are erg/s/cm2/A
     nameL: [NAME1,NAME2] #output root name of the list of targets names for the files with the tiles, mjds and expnumbers
     use_slitmap: True #flag to use the astrometry saved in the slitmap header
