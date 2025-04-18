@@ -49,14 +49,14 @@ def ifu_const(spec_ifu,specE_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yo,xi,
                     Wg[ntp]=np.exp(-(Rsp[ntp]/sigm_s)**alph_s/2.0)
                     spt_new[ntp]=spec_ifut[k,ntp]*Wg[ntp]+spt_new[ntp]
                     if erroF:
-                        sptE_new[ntp]=(specE_ifut[k,ntp]**2.0)*Wg[ntp]+sptE_new[ntp]
+                        sptE_new[ntp]=(specE_ifut[k,ntp]**2.0)*Wg[ntp]**2.0+sptE_new[ntp]
                 Wgt=Wgt+Wg
             ntp=np.where(Wgt == 0)
             if len(ntp[0]) > 0:
                 Wgt[ntp]=1
             spec_fint.extend([spt_new/Wgt])
             if erroF:
-                specE_fint.extend([np.sqrt(sptE_new/Wgt)])
+                specE_fint.extend([np.sqrt(sptE_new)/Wgt])
     else:
         for j in range(a1, a2):
             #skycor = pixel_to_skycoord(it,j,wcs)
@@ -81,14 +81,14 @@ def ifu_const(spec_ifu,specE_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yo,xi,
                         spax_new=spec_ifu[k]*Wg+spax_new
                         Wgt1=Wgt1+Wg
                     if np.isfinite(specE_ifu[k]):     
-                        spaxE_new=(specE_ifu[k]**2.0)*Wg+spaxE_new
+                        spaxE_new=(specE_ifu[k]**2.0)*Wg**2.0+spaxE_new
                         Wgt2=Wgt2+Wg
             if Wgt1 == 0:
                 Wgt1=1
             if Wgt2 == 0:
                 Wgt2=1    
             spec_fint.extend([spax_new/Wgt1])
-            specE_fint.extend([np.sqrt(spaxE_new/Wgt2)])
+            specE_fint.extend([np.sqrt(spaxE_new)/Wgt2])
     return ([spec_fint,specE_fint])
 
 def task_wrappermap(args):
@@ -138,22 +138,22 @@ def map_const(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pix_s
             for k in range(0, len(x_ifu_Vt[:,0])):
                 Rsp=np.sqrt((x_ifu_Vt[k,:]-(xf+xi)/2.0)**2.0+(y_ifu_Vt[k,:]-(yf+yi)/2.0)**2.0)
                 #Rsp=np.sqrt((x_ifu_Vt[k,:]-xat)**2.0+(y_ifu_Vt[k,:]-yat)**2.0)
-                ntp=np.where(Rsp <= (radiT))
+                ntp=np.where((Rsp <= (radiT)) & np.isfinite(spec_ifut[k,:]) & (spec_ifut[k,:] > 0))
                 Wg=np.zeros(nw)
                 if len(ntp[0]) > 0:   
                     Wg[ntp]=np.exp(-(Rsp[ntp]/sigm_s)**alph_s/2.0)
                     spt_new[ntp]=spec_ifut[k,ntp]*Wg[ntp]+spt_new[ntp]
-                    sptE_new[ntp]=specE_ifut[k,ntp]*Wg[ntp]+sptE_new[ntp]
+                    sptE_new[ntp]=(specE_ifut[k,ntp]*Wg[ntp])**2.0+sptE_new[ntp]
                     sptM_new[ntp]=specM_ifut[k,ntp]*Wg[ntp]+sptM_new[ntp]
-                    sptEM_new[ntp]=specEM_ifut[k,ntp]*Wg[ntp]+sptEM_new[ntp]
+                    sptEM_new[ntp]=(specEM_ifut[k,ntp]*Wg[ntp])**2.0+sptEM_new[ntp]
                 Wgt=Wgt+Wg
             ntp=np.where(Wgt == 0)
             if len(ntp[0]) > 0:
                 Wgt[ntp]=1
             spec_fint.extend([spt_new/Wgt])
-            specE_fint.extend([sptE_new/Wgt])
+            specE_fint.extend([np.sqrt(sptE_new)/Wgt])
             specM_fint.extend([sptM_new/Wgt])
-            specEM_fint.extend([sptEM_new/Wgt])
+            specEM_fint.extend([np.sqrt(sptEM_new)/Wgt])
     else:
         for j in range(a1, a2):
             #skycor = pixel_to_skycoord(it,j,wcs)
@@ -182,13 +182,13 @@ def map_const(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pix_s
                         spax_new=spec_ifu[k]*Wg+spax_new
                         Wgt1=Wgt1+Wg
                     if np.isfinite(specE_ifu[k]):
-                        spaxE_new=specE_ifu[k]*Wg+spaxE_new
+                        spaxE_new=(specE_ifu[k]*Wg)**2.0+spaxE_new
                         Wgt2=Wgt2+Wg
                     if np.isfinite(specM_ifu[k]):    
                         spaxM_new=specM_ifu[k]*Wg+spaxM_new
                         Wgt3=Wgt3+Wg
                     if np.isfinite(specEM_ifu[k]):    
-                        spaxEM_new=specEM_ifu[k]*Wg+spaxEM_new
+                        spaxEM_new=(specEM_ifu[k]*Wg)**2.0+spaxEM_new
                         Wgt4=Wgt4+Wg
             if Wgt1 == 0:
                 Wgt1=1
@@ -199,9 +199,9 @@ def map_const(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pix_s
             if Wgt4 == 0:
                 Wgt4=1    
             spec_fint.extend([spax_new/Wgt1])
-            specE_fint.extend([spaxE_new/Wgt2])
+            specE_fint.extend([np.sqrt(spaxE_new)/Wgt2])
             specM_fint.extend([spaxM_new/Wgt3])
-            specEM_fint.extend([spaxEM_new/Wgt4])
+            specEM_fint.extend([np.sqrt(spaxEM_new)/Wgt4])
     return ([spec_fint,specE_fint,specM_fint,specEM_fint])
 
 def task_wrappermatrix(args):
@@ -252,22 +252,22 @@ def matrix_const(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pi
             for k in range(0, len(x_ifu_Vt[:,0])):
                 Rsp=np.sqrt((x_ifu_Vt[k,:]-(xf+xi)/2.0)**2.0+(y_ifu_Vt[k,:]-(yf+yi)/2.0)**2.0)
                 #Rsp=np.sqrt((x_ifu_Vt[k,:]-xat)**2.0+(y_ifu_Vt[k,:]-yat)**2.0)
-                ntp=np.where(Rsp <= (radiT))
+                ntp=np.where((Rsp <= (radiT)) & np.isfinite(spec_ifut[k,:]) & (spec_ifut[k,:] > 0))
                 Wg=np.zeros(nw)
                 if len(ntp[0]) > 0:   
                     Wg[ntp]=np.exp(-(Rsp[ntp]/sigm_s)**alph_s/2.0)
                     spt_new[ntp]=spec_ifut[k,ntp]*Wg[ntp]+spt_new[ntp]
-                    sptE_new[ntp]=specE_ifut[k,ntp]*Wg[ntp]+sptE_new[ntp]
+                    sptE_new[ntp]=(specE_ifut[k,ntp]*Wg[ntp])**2.0+sptE_new[ntp]
                     sptM_new[ntp]=specM_ifut[k,ntp]*Wg[ntp]+sptM_new[ntp]
-                    sptEM_new[ntp]=specEM_ifut[k,ntp]*Wg[ntp]+sptEM_new[ntp]
+                    sptEM_new[ntp]=(specEM_ifut[k,ntp]*Wg[ntp])**2.0+sptEM_new[ntp]
                 Wgt=Wgt+Wg
             ntp=np.where(Wgt == 0)
             if len(ntp[0]) > 0:
                 Wgt[ntp]=1
             spec_fint.extend([spt_new/Wgt])
-            specE_fint.extend([sptE_new/Wgt])
+            specE_fint.extend([np.sqrt(sptE_new)/Wgt])
             specM_fint.extend([sptM_new/Wgt])
-            specEM_fint.extend([sptEM_new/Wgt])
+            specEM_fint.extend([np.sqrt(sptEM_new)/Wgt])
     else:
         for j in range(a1, a2):
             #skycor = pixel_to_skycoord(it,j,wcs)
@@ -296,13 +296,13 @@ def matrix_const(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pi
                         spax_new=spec_ifu[k]*Wg+spax_new
                         Wgt1=Wgt1+Wg
                     if np.isfinite(specE_ifu[k]):
-                        spaxE_new=specE_ifu[k]*Wg+spaxE_new
+                        spaxE_new=(specE_ifu[k]*Wg)**2.0+spaxE_new
                         Wgt2=Wgt2+Wg
                     if np.isfinite(specM_ifu[k]):    
                         spaxM_new=specM_ifu[k]*Wg+spaxM_new
                         Wgt3=Wgt3+Wg
                     if np.isfinite(specEM_ifu[k]):    
-                        spaxEM_new=specEM_ifu[k]*Wg+spaxEM_new
+                        spaxEM_new=(specEM_ifu[k]*Wg)**2.0+spaxEM_new
                         Wgt4=Wgt4+Wg
             if Wgt1 == 0:
                 Wgt1=1
@@ -313,7 +313,7 @@ def matrix_const(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pi
             if Wgt4 == 0:
                 Wgt4=1    
             spec_fint.extend([spax_new/Wgt1])
-            specE_fint.extend([spaxE_new/Wgt2])
+            specE_fint.extend([np.sqrt(spaxE_new)/Wgt2])
             specM_fint.extend([spaxM_new/Wgt3])
-            specEM_fint.extend([spaxEM_new/Wgt4])
+            specEM_fint.extend([np.sqrt(spaxEM_new)/Wgt4])
     return ([spec_fint,specE_fint,specM_fint,specEM_fint])
