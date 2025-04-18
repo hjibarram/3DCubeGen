@@ -15,7 +15,7 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph_s=2.0,verbose=True,agcam_dir='',redux_dir='',mjd=['0000'],redux_ver='1.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
+def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph_s=2.0,verbose=True,agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='1.1.1.dev0/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
