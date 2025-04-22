@@ -527,17 +527,19 @@ def weighterror1(St,Wt,multiT=True,nprocf=6):
         out[:,a1:a2,:]=result[0]
     return out
 
-def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True):
+def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True,matf=True):
     #This function will propagate all the error and generate the full covariance matrix 
     #St is the error matrix frim all the fibres
     #Wt are the weigths for the 2d image interpolation
+    #if matf eq False the output shape will be [nx,ny,nx,ny], if True the shape will be [nx*ny,nx*ny] 
     out=weighterror1(St,Wt,multiT=multiT,nprocf=nprocf)
-
     nly,nlx,ns=Wt.shape
-    #out2=np.zeros([nly,nlx,nly,nlx])
-    outf=np.zeros([nly*nlx,nly*nlx])
-    #distF=np.zeros([nly,nlx,nly,nlx])
-    dist=np.zeros([nly*nlx,nly*nlx])
+    if matf:
+        outf=np.zeros([nly*nlx,nly*nlx])
+        dist=np.zeros([nly*nlx,nly*nlx])
+    else:
+        outf=np.zeros([nly,nlx,nly,nlx])
+        dist=np.zeros([nly,nlx,nly,nlx]) 
     indexT=np.array([(k,0) for k in range(nly)])
     Dq=pdist(indexT, metric='euclidean')
     if verbose:
@@ -572,17 +574,19 @@ def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True):
                 a2=val*(npros+1)
             else:
                 a2=nlx
-            #out2[:,i,:,a1:a2]=result[0]
-            #distF[:,i,:,a1:a2]=result[1]
-            b1=i*nly
-            b2=(i+1)*nly
-            for j in range(a1,a2):
-                c1=j*nly
-                c2=(j+1)*nly
-                outf[b1:b2,c1:c2]=result[0][a1-j]
-                dist[b1:b2,c1:c2]=result[1][a1-j]
+            if matf:
+                b1=i*nly
+                b2=(i+1)*nly
+                for j in range(a1,a2):
+                    c1=j*nly
+                    c2=(j+1)*nly
+                    outf[b1:b2,c1:c2]=result[0][a1-j]
+                    dist[b1:b2,c1:c2]=result[1][a1-j]
+            else:
+                outf[:,i,:,a1:a2]=result[0]
+                dist[:,i,:,a1:a2]=result[1]
         if verbose:        
             pbar.update(1)
     if verbose:
         pbar.close()    
-    return out2,distF
+    return outf,dist
