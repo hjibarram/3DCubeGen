@@ -15,7 +15,7 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph_s=2.0,verbose=True,agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='1.1.1.dev0/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
+def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,fac_sizeX=1.1,fac_sizeY=1.1,ki=5,sigm_s=18.5,alph_s=2.0,verbose=True,agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='1.1.1.dev0/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
@@ -122,8 +122,7 @@ def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph
     fibA=35.3
     thet=0.0
 
-    fac_sizeX=1.1
-    fac_sizeY=1.1
+
     nlx=int(round((np.amax([np.amax(x_ifu_V),-np.amin(x_ifu_V)])+1)*2/pix_s))
     nly=int(round((np.amax([np.amax(y_ifu_V),-np.amin(y_ifu_V)])+1)*2/pix_s))
     nlx=int(nlx*fac_sizeX)
@@ -150,6 +149,10 @@ def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph
     specE_ifu=rss_ef*facto 
     specM_ifu=rss_fm-2.5*np.log10(facto)+5.0*np.log10(pix_s)
     specEM_ifu=rss_efm-2.5*np.log10(facto)+5.0*np.log10(pix_s)
+
+    St=np.zeros([ns,ns])
+    for i in range(0,ns):
+        St[i,i]=rss_ef[i]
     
     if verbose:
         pbar=tqdm(total=nlx)
@@ -230,4 +233,7 @@ def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph
     h["EQUINOX"]=2000.00
     h["IFUCON"]=(str(int(ns))+' ','NFibers')
     h["BUNIT"]='erg/s/cm^2'
+
+    out=np.zeros([nly,nlx,ns])
+    
     return h,ifu,ifu_e,ifuM,ifuM_e
