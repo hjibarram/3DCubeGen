@@ -534,8 +534,10 @@ def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True):
     out=weighterror1(St,Wt,multiT=multiT,nprocf=nprocf)
 
     nly,nlx,ns=Wt.shape
-    out2=np.zeros([nly,nlx,nly,nlx])
-    distF=np.zeros([nly,nlx,nly,nlx])
+    #out2=np.zeros([nly,nlx,nly,nlx])
+    outf=np.zeros([nly*nlx,nly*nlx])
+    #distF=np.zeros([nly,nlx,nly,nlx])
+    dist=np.zeros([nly*nlx,nly*nlx])
     indexT=np.array([(k,0) for k in range(nly)])
     Dq=pdist(indexT, metric='euclidean')
     if verbose:
@@ -570,8 +572,15 @@ def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True):
                 a2=val*(npros+1)
             else:
                 a2=nlx
-            out2[:,i,:,a1:a2]=result[0]
-            distF[:,i,:,a1:a2]=result[1]
+            #out2[:,i,:,a1:a2]=result[0]
+            #distF[:,i,:,a1:a2]=result[1]
+            b1=i*nly
+            b2=(i+1)*nly
+            for j in range(a1,a2):
+                c1=j*nly
+                c2=(j+1)*nly
+                outf[b1:b2,c1:c2]=result[0][a1-j]
+                dist[b1:b2,c1:c2]=result[1][a1-j]
         if verbose:        
             pbar.update(1)
     if verbose:
