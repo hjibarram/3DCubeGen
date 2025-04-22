@@ -281,13 +281,13 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,nprocf=6,pix_s=18.5
                         a2=nlx
                     Wgt=Wt[:,a1:a2,:]     
                     args.extend([(St,Wgt,nly,ns,a1,a2)])                    
-                result_l = pool.map(task_wrappercov1, args)
+                result_l = pool.map(kernel.task_wrappercov1, args)
         else:
             nproc=1
             npros=0
             result_l=[]
             args=(St,Wt,nly,ns,0,nlx)
-            result_l.extend([task_wrappercov1(args)])
+            result_l.extend([kernel.task_wrappercov1(args)])
         for npros in range(0, nproc):
             result=result_l[npros]
             val=int(nlx/nproc)
@@ -321,13 +321,13 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,nprocf=6,pix_s=18.5
                             a2=nlx
                         outt=out[:,a1:a2,:] 
                         args.extend([(St,Wgt,outt,Dq,nly,i,a1,a2)])                   
-                    result_l = pool.map(task_wrappercov2, args)
+                    result_l = pool.map(kernel.task_wrappercov2, args)
             else:
                 nproc=1
                 npros=0
                 result_l=[]
                 args=(St,Wgt,out,Dq,nly,i,0,nlx)
-                result_l.extend([task_wrappercov2(args)])
+                result_l.extend([kernel.task_wrappercov2(args)])
             for npros in range(0, nproc):
                 result=result_l[npros]
                 val=int(nlx/nproc)
