@@ -279,14 +279,14 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,nprocf=6,pix_s=18.5
                         a2=val*(npros+1)
                     else:
                         a2=nlx
-                    Wgt=Wg[:,a1:a2,:]     
+                    Wgt=Wt[:,a1:a2,:]     
                     args.extend([(St,Wgt,nly,ns,a1,a2)])                    
                 result_l = pool.map(task_wrappercov1, args)
         else:
             nproc=1
             npros=0
             result_l=[]
-            args=(St,Wg,nly,ns,0,nlx)
+            args=(St,Wt,nly,ns,0,nlx)
             result_l.extend([task_wrappercov1(args)])
         for npros in range(0, nproc):
             result=result_l[npros]
@@ -307,7 +307,7 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,nprocf=6,pix_s=18.5
         if verbose:
             pbar=tqdm(total=nlx)
         for i in range(0, nlx):
-            Wgt=Wg[:,i,:]
+            Wgt=Wt[:,i,:]
             if multiT:
                 nproc=nprocf
                 with ThreadPool(nproc) as pool:
