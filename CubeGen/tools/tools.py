@@ -5,6 +5,7 @@ from astropy.coordinates import SkyCoord
 from scipy.interpolate import interp1d
 from astropy.convolution import convolve,Gaussian2DKernel
 import CubeGen
+import CubeGen.tools.kernel as kernel 
 import os
 import yaml
 from multiprocessing.pool import ThreadPool
