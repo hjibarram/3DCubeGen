@@ -14,7 +14,7 @@ import numpy as np
 import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
-from scipy.spatial.distance import pdist
+
 
 def gen_matrix(expnumL,multiT=False,errors=True,covana=False,nprocf=6,pix_s=18.5,fac_sizeX=1.1,fac_sizeY=1.1,ki=5,sigm_s=18.5,alph_s=2.0,verbose=True,agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='1.1.1.dev0/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
     try:
@@ -262,89 +262,8 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,nprocf=6,pix_s=18.5
     h["EQUINOX"]=2000.00
     h["IFUCON"]=(str(int(ns))+' ','NFibers')
     h["BUNIT"]='erg/s/cm^2'
-
-    
-
-
     if covana:
-        out=np.zeros([nly,nlx,ns])
-        if multiT:
-            nproc=nprocf
-            with ThreadPool(nproc) as pool:
-                args=[]
-                for npros in range(0, nproc):
-                    val=int(nlx/nproc)
-                    a1=val*npros
-                    if npros < nproc-1:
-                        a2=val*(npros+1)
-                    else:
-                        a2=nlx
-                    Wgt=Wt[:,a1:a2,:]     
-                    args.extend([(St,Wgt,nly,ns,a1,a2)])                    
-                result_l = pool.map(kernel.task_wrappercov1, args)
-        else:
-            nproc=1
-            npros=0
-            result_l=[]
-            args=(St,Wt,nly,ns,0,nlx)
-            result_l.extend([kernel.task_wrappercov1(args)])
-        for npros in range(0, nproc):
-            result=result_l[npros]
-            val=int(nlx/nproc)
-            a1=val*npros
-            if npros < nproc-1:
-                a2=val*(npros+1)
-            else:
-                a2=nlx
-            out[:,a1:a2,:]=result[0]
-        
-        out2=np.zeros([nly,nlx,nly,nlx])
-        distF=np.zeros([nly,nlx,nly,nlx])#nx
-        #verbose=True
-        indexT=np.array([(k,0) for k in range(nly)])
-        Dq=pdist(indexT, metric='euclidean')
-        #start = time()
-        if verbose:
-            pbar=tqdm(total=nlx)
-        for i in range(0, nlx):
-            Wgt=Wt[:,i,:]
-            if multiT:
-                nproc=nprocf
-                with ThreadPool(nproc) as pool:
-                    args=[]
-                    for npros in range(0, nproc):
-                        val=int(nlx/nproc)
-                        a1=val*npros
-                        if npros < nproc-1:
-                            a2=val*(npros+1)
-                        else:
-                            a2=nlx
-                        outt=out[:,a1:a2,:] 
-                        args.extend([(St,Wgt,outt,Dq,nly,i,a1,a2)])                   
-                    result_l = pool.map(kernel.task_wrappercov2, args)
-            else:
-                nproc=1
-                npros=0
-                result_l=[]
-                args=(St,Wgt,out,Dq,nly,i,0,nlx)
-                result_l.extend([kernel.task_wrappercov2(args)])
-            for npros in range(0, nproc):
-                result=result_l[npros]
-                val=int(nlx/nproc)
-                a1=val*npros
-                if npros < nproc-1:
-                    a2=val*(npros+1)
-                else:
-                    a2=nlx
-                out2[:,i,:,a1:a2]=result[0]
-                distF[:,i,:,a1:a2]=result[1]
-            if verbose:        
-                pbar.update(1)
-        if verbose:
-            pbar.close()
-
-    
-    if covana:
+        out2,distF=tools.weighterror2(St,Wt,multiT=multiT,nprocf=nprocf,verbose=verbose)
         return h,ifu,ifu_e,ifuM,ifuM_e,Wt,St,out2,distF
     else:
         return h,ifu,ifu_e,ifuM,ifuM_e

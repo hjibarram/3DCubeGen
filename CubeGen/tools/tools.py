@@ -7,6 +7,8 @@ from astropy.convolution import convolve,Gaussian2DKernel
 import CubeGen
 import os
 import yaml
+from multiprocessing.pool import ThreadPool
+from scipy.spatial.distance import pdist
 
 def median_a(x,lw=5,lower=10000,wave=[]):
     if len(wave) > 0:
@@ -488,3 +490,85 @@ def kernel_pipe(type='b'):
     sigm_s=17.6/2*32*valt
     pix_s=17.6/2*0.75*32*valt
     return sigm_s,pix_s
+
+def weighterror1(St,Wt,multiT=True,nprocf=6):
+    nly,nlx,ns=Wt.shape
+    out=np.zeros([nly,nlx,ns])
+    if multiT:
+        nproc=nprocf
+        with ThreadPool(nproc) as pool:
+            args=[]
+            for npros in range(0, nproc):
+                val=int(nlx/nproc)
+                a1=val*npros
+                if npros < nproc-1:
+                    a2=val*(npros+1)
+                else:
+                    a2=nlx
+                Wgt=Wt[:,a1:a2,:]     
+                args.extend([(St,Wgt,nly,ns,a1,a2)])                    
+            result_l = pool.map(kernel.task_wrappercov1, args)
+    else:
+        nproc=1
+        npros=0
+        result_l=[]
+        args=(St,Wt,nly,ns,0,nlx)
+        result_l.extend([kernel.task_wrappercov1(args)])
+    for npros in range(0, nproc):
+        result=result_l[npros]
+        val=int(nlx/nproc)
+        a1=val*npros
+        if npros < nproc-1:
+            a2=val*(npros+1)
+        else:
+            a2=nlx
+        out[:,a1:a2,:]=result[0]
+    return out
+
+def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True)
+    out=weighterror1(St,Wt,multiT=multiT,nprocf=nprocf)
+
+    nly,nlx,ns=Wt.shape
+    out2=np.zeros([nly,nlx,nly,nlx])
+    distF=np.zeros([nly,nlx,nly,nlx])
+    indexT=np.array([(k,0) for k in range(nly)])
+    Dq=pdist(indexT, metric='euclidean')
+    if verbose:
+        pbar=tqdm(total=nlx)
+    for i in range(0, nlx):
+        Wgt=Wt[:,i,:]
+        if multiT:
+            nproc=nprocf
+            with ThreadPool(nproc) as pool:
+                args=[]
+                for npros in range(0, nproc):
+                    val=int(nlx/nproc)
+                    a1=val*npros
+                    if npros < nproc-1:
+                        a2=val*(npros+1)
+                    else:
+                        a2=nlx
+                    outt=out[:,a1:a2,:] 
+                    args.extend([(St,Wgt,outt,Dq,nly,i,a1,a2)])                   
+                result_l = pool.map(kernel.task_wrappercov2, args)
+        else:
+            nproc=1
+            npros=0
+            result_l=[]
+            args=(St,Wgt,out,Dq,nly,i,0,nlx)
+            result_l.extend([kernel.task_wrappercov2(args)])
+        for npros in range(0, nproc):
+            result=result_l[npros]
+            val=int(nlx/nproc)
+            a1=val*npros
+            if npros < nproc-1:
+                a2=val*(npros+1)
+            else:
+                a2=nlx
+            out2[:,i,:,a1:a2]=result[0]
+            distF[:,i,:,a1:a2]=result[1]
+        if verbose:        
+            pbar.update(1)
+    if verbose:
+        pbar.close()    
+    return out2,distF
