@@ -319,31 +319,31 @@ def matrix_const(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pi
     return ([spec_fint,specE_fint,specM_fint,specEM_fint])
 
 
-    def task_wrappercov1(args):
-        return covdotone(*args)
+def task_wrappercov1(args):
+    return covdotone(*args)
 
-    def covdotone(St,Wg,nx,ns,a1,a2):
-        dy=a2-a1
-        outt=np.zeros([nx,dy,ns])
-        ct=0
-        for i in range(a1, a2):
-            t=np.dot(St**2, Wg[:,ct,:].transpose(1,0))
-            outt[:,ct,:]=t.transpose(1,0)
-            ct=ct+1
-        return ([outt])
+def covdotone(St,Wg,nx,ns,a1,a2):
+    dy=a2-a1
+    outt=np.zeros([nx,dy,ns])
+    ct=0
+    for i in range(a1, a2):
+        t=np.dot(St**2, Wg[:,ct,:].transpose(1,0))
+        outt[:,ct,:]=t.transpose(1,0)
+        ct=ct+1
+    return ([outt])
 
-    def task_wrappercov2(args):
-        return covdottwo(*args)
+def task_wrappercov2(args):
+    return covdottwo(*args)
 
-    def covdottwo(St,Wg,out,Dq,nx,i,a1,a2):
-        dy=a2-a1
-        outt2=np.zeros([nx,nx,dy])
-        distF=np.zeros([nx,nx,dy])
-        ct=0
-        for j in range(a1, a2):
-            dt=np.sqrt(squareform(Dq)**2+(i-j)**2)
-            t=np.dot(Wg,out[:,ct,:].transpose(1,0))
-            outt2[:,:,ct]=t.transpose(1,0)
-            distF[:,:,ct]=dt
-            ct=ct+1
-        return ([outt2,distF])
+def covdottwo(St,Wg,out,Dq,nx,i,a1,a2):
+    dy=a2-a1
+    outt2=np.zeros([nx,nx,dy])
+    distF=np.zeros([nx,nx,dy])
+    ct=0
+    for j in range(a1, a2):
+        dt=np.sqrt(squareform(Dq)**2+(i-j)**2)
+        t=np.dot(Wg,out[:,ct,:].transpose(1,0))
+        outt2[:,:,ct]=t.transpose(1,0)
+        distF[:,:,ct]=dt
+        ct=ct+1
+    return ([outt2,distF])
