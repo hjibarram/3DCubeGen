@@ -526,7 +526,7 @@ def weighterror1(St,Wt,multiT=True,nprocf=6):
         out[:,a1:a2,:]=result[0]
     return out
 
-def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True)
+def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True):
     #This function will propagate all the error and generate the full covariance matrix 
     #St is the error matrix frim all the fibres
     #Wt are the weigths for the 2d image interpolation
