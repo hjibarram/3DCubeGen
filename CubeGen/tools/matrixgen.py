@@ -16,7 +16,7 @@ import CubeGen.tools.kernel as kernel
 import os.path as ptt
 
 
-def gen_matrix(expnumL,multiT=False,errors=True,covana=False,nprocf=6,pix_s=18.5,fac_sizeX=1.1,fac_sizeY=1.1,ki=5,sigm_s=18.5,alph_s=2.0,verbose=True,agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='1.1.1.dev0/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
+def gen_matrix(expnumL,multiT=False,errors=True,covana=False,fcovmat=False,nprocf=6,pix_s=18.5,fac_sizeX=1.1,fac_sizeY=1.1,ki=5,sigm_s=18.5,alph_s=2.0,verbose=True,agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='1.1.1.dev0/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
@@ -239,8 +239,6 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,nprocf=6,pix_s=18.5
         if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
             h[keys[i]]=hdr0[keys[i]]
             h.comments[keys[i]]=hdr0.comments[keys[i]]
-    #del h["CDELT1"]
-    #del h["WCSAXES"]
     h["EXTNAME"]='FLUX'
     h["NAXIS"]=2 
     h["NAXIS1"]=nlx
@@ -263,7 +261,10 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,nprocf=6,pix_s=18.5
     h["IFUCON"]=(str(int(ns))+' ','NFibers')
     h["BUNIT"]='erg/s/cm^2'
     if covana:
-        out2,distF=tools.weighterror2(St,Wt,multiT=multiT,nprocf=nprocf,verbose=verbose)
-        return h,ifu,ifu_e,ifuM,ifuM_e,Wt,St,out2,distF
+        if fcovmat:
+            out2,distF=tools.weighterror2(St,Wt,multiT=multiT,nprocf=nprocf,verbose=verbose)
+            return h,ifu,ifu_e,ifuM,ifuM_e,Wt,St,out2,distF
+        else:
+            return h,ifu,ifu_e,ifuM,ifuM_e,Wt,St
     else:
         return h,ifu,ifu_e,ifuM,ifuM_e
