@@ -580,7 +580,7 @@ def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True,matf=True):
                 for j in range(a1,a2):
                     c1=j*nly
                     c2=(j+1)*nly
-                    print(result[0][a1-j].shape,a1,a2)
+                    print(result[0].shape,a1,a2)
                     outf[b1:b2,c1:c2]=result[0][a1-j]
                     dist[b1:b2,c1:c2]=result[1][a1-j]
             else:
