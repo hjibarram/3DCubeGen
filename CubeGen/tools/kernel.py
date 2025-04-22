@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.distance import squareform
 
 def task_wrapper(args):
     return ifu_const(*args)

@@ -14,7 +14,7 @@ import numpy as np
 import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
-from scipy.spatial.distance import pdist, squareform
+from scipy.spatial.distance import pdist
 
 def gen_matrix(expnumL,multiT=False,errors=True,covana=False,nprocf=6,pix_s=18.5,fac_sizeX=1.1,fac_sizeY=1.1,ki=5,sigm_s=18.5,alph_s=2.0,verbose=True,agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='1.1.1.dev0/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
     try:
