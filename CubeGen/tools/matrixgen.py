@@ -345,6 +345,6 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,nprocf=6,pix_s=18.5
 
     
     if covana:
-        return h,ifu,ifu_e,ifuM,ifuM_e,Wt,St
+        return h,ifu,ifu_e,ifuM,ifuM_e,Wt,St,out2,distF
     else:
         return h,ifu,ifu_e,ifuM,ifuM_e
