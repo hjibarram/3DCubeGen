@@ -596,7 +596,7 @@ def correlation_matrix(out,verbose=False):
     errf0=np.ones([nx])
     outf0=np.zeros([nx,nx])
     if verbose:
-        pbar=tqdm(total=nlx)
+        pbar=tqdm(total=nx)
     for i in range(0, nx):
         if out[i,i] > 0:
                 errf0[i]=out[i,i]
