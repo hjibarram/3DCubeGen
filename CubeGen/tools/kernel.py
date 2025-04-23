@@ -221,8 +221,8 @@ def matrix_const(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pi
     specE_fint=[]
     specM_fint=[]
     specEM_fint=[]
-    if sigm_s > fibA*3.5*2:
-        radiT=sigm_s/2.0
+    if sigm_s > fibA*3.5:#*2:
+        radiT=sigm_s#/2.0
     else:
         radiT=fibA*3.5*2/2.0
     if len(x_ifu_V.shape) > 1:
