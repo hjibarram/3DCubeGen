@@ -591,16 +591,22 @@ def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True,matf=True):
         pbar.close()    
     return outf,dist
 
-def correlation_matrix(out):
+def correlation_matrix(out,verbose=False):
     nx,ny=out.shape
     errf0=np.ones([nx])
     outf0=np.zeros([nx,nx])
+    if verbose:
+        pbar=tqdm(total=nlx)
     for i in range(0, nx):
         if out[i,i] > 0:
                 errf0[i]=out[i,i]
     for i in range(0, nx):
         for j in range(0, nx):
             outf0[i,j]=out[i,j]/np.sqrt(errf0[i]*errf0[j])
+        if verbose:        
+            pbar.update(1)
+    if verbose:
+        pbar.close() 
     return outf0   
 
 def get_error(out,Wg1):
@@ -612,3 +618,18 @@ def get_error(out,Wg1):
         for k in range(b1,b2):
             errt[k-b1,i]=out[(k+0) % (nx*ny),(k+0) % (nx*ny)]
     return errt
+
+def twocorrf(covm,dist,pix_s=1.0,nb=12,aver=True):
+    rad=np.ravel(dist)
+    vals=np.ravel(covm)
+    bins=np.arange(nb+1)
+    nt=np.where(rad < nb)
+    val1=np.histogram(rad[nt], bins=bins, weights=vals[nt])
+    if aver:
+        val0=np.histogram(rad[nt], bins=bins)
+        yp0=val0[0]
+    else:
+        yp0=1.0
+    yp=val1[0]/yp0
+    xp=val1[1][0:nb]*pix_s
+    return xp,yp
