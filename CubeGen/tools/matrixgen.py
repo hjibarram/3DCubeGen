@@ -192,7 +192,7 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,fcovmat=False,nproc
                     if Rsp <= (radiT): 
                         Wg=np.exp(-(Rsp/sigm_s)**alph_s/2.0)/Wgt1
                         ifi=ntp[ntpt][k]
-                        Wt[j,nlx-(i+1),ifi]=Wg
+                        Wt[j,nlx-(i+1),ifi]=Wg*facto
 
         if multiT:
             nproc=nprocf#3#cpu_count()
