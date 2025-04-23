@@ -590,3 +590,25 @@ def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True,matf=True):
     if verbose:
         pbar.close()    
     return outf,dist
+
+def correlation_matrix(out):
+    nx,ny=out.shape
+    errf0=np.ones([nx])
+    outf0=np.zeros([nx,nx])
+    for i in range(0, nx):
+        if out[i,i] > 0:
+                errf0[i]=out[i,i]
+    for i in range(0, nx):
+        for j in range(0, nx):
+            outf0[i,j]=out[i,j]/np.sqrt(errf0[i]*errf0[j])
+    return outf0   
+
+def get_error(out,Wg1):
+    nx,ny,ns=Wg1.shape
+    errt=np.zeros([nx,ny])
+    for i in range(0, ny):
+        b1=i*nx
+        b2=(i+1)*nx
+        for k in range(b1,b2):
+            errt[k-b1,i]=out1[(k+0) % (nx*ny),(k+0) % (nx*ny)]
+    return errt
