@@ -610,5 +610,5 @@ def get_error(out,Wg1):
         b1=i*nx
         b2=(i+1)*nx
         for k in range(b1,b2):
-            errt[k-b1,i]=out1[(k+0) % (nx*ny),(k+0) % (nx*ny)]
+            errt[k-b1,i]=out[(k+0) % (nx*ny),(k+0) % (nx*ny)]
     return errt
