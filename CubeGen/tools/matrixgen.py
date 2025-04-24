@@ -164,8 +164,8 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,fcovmat=False,nproc
         xf=xf+pix_s
         Rsp=np.sqrt((x_ifu_V-(xf+xi)/2.0)**2.0)
         #ntp=np.where(Rsp <= (fibA*3.5*2/2.0))[0]
-        if sigm_s > fibA*3.5:#*2:
-            radiT=sigm_s#/2.0
+        if sigm_s > fibA*3.5*2:
+            radiT=sigm_s/2.0
         else:    
             radiT=fibA*3.5*2/2.0
         ntp=np.where(Rsp <= (radiT))[0]    
