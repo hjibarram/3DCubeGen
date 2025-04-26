@@ -257,8 +257,9 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
 
 
     
-    
-    h1=fits.PrimaryHDU(ifu)
+    new_header = wt.to_header()
+    h1=fits.PrimaryHDU(ifu,header=new_header)
+    #h1=fits.PrimaryHDU(ifu)
     h2=fits.ImageHDU(ifuM)
     h3=fits.ImageHDU(ifu_e)
     h4=fits.ImageHDU(ifuM_e)
@@ -276,21 +277,21 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     h["NAXIS"]=2 
     h["NAXIS1"]=nx
     h["NAXIS2"]=ny
-    h["CRVAL1"]=xat#xot/3600.0#hdr1['CRVAL1']
-    h["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    h["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    h["CRPIX1"]=nlx/2+0.5+dx#nlx/2+dx
-    h["CTYPE1"]='RA---TAN'
-    h["CRVAL2"]=yat#yot/3600.0#hdr1['CRVAL2']
-    h["CD2_1"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0
-    h["CD2_2"]=np.cos(thet*np.pi/180.0)*pix_s/3600.0
-    h["CRPIX2"]=nly/2+0.5+dy
-    h["CTYPE2"]='DEC--TAN'
-    h["CUNIT1"]='deg     '                                           
-    h["CUNIT2"]='deg     '
-    h["RADESYS"]='FK5     '
-    h["OBJSYS"]='ICRS    '
-    h["EQUINOX"]=2000.00
+    #h["CRVAL1"]=xat#xot/3600.0#hdr1['CRVAL1']
+    #h["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    #h["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    #h["CRPIX1"]=nlx/2+0.5+dx#nlx/2+dx
+    #h["CTYPE1"]='RA---TAN'
+    #h["CRVAL2"]=yat#yot/3600.0#hdr1['CRVAL2']
+    #h["CD2_1"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0
+    #h["CD2_2"]=np.cos(thet*np.pi/180.0)*pix_s/3600.0
+    #h["CRPIX2"]=nly/2+0.5+dy
+    #h["CTYPE2"]='DEC--TAN'
+    #h["CUNIT1"]='deg     '                                           
+    #h["CUNIT2"]='deg     '
+    #h["RADESYS"]='FK5     '
+    #h["OBJSYS"]='ICRS    '
+    #h["EQUINOX"]=2000.00
     h["IFUCON"]=(str(int(ns))+' ','NFibers')
     h["BUNIT"]='erg/s/cm^2'
     ht=h2.header
