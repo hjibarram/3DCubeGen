@@ -268,11 +268,11 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     dx=0
     dy=0
     h=h1.header
-    keys=list(hdr0.keys())
-    for i in range(0, len(keys)):
-        if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
-            h[keys[i]]=hdr0[keys[i]]
-            h.comments[keys[i]]=hdr0.comments[keys[i]]
+    #keys=list(hdr0.keys())
+    #for i in range(0, len(keys)):
+    #    if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
+    #        h[keys[i]]=hdr0[keys[i]]
+    #        h.comments[keys[i]]=hdr0.comments[keys[i]]
     h["EXTNAME"]='FLUX'
     h["NAXIS"]=2 
     h["NAXIS1"]=nx
@@ -294,6 +294,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     #h["EQUINOX"]=2000.00
     h["IFUCON"]=(str(int(ns))+' ','NFibers')
     h["BUNIT"]='erg/s/cm^2'
+    h.update() 
     ht=h2.header
     for i in range(0, len(keys)):
         if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
@@ -320,6 +321,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     ht["EQUINOX"]=2000.00
     ht["IFUCON"]=(str(int(ns))+' ','NFibers')
     ht["BUNIT"]='ABmag/arcsec'
+    ht.update() 
     hlist=fits.HDUList(head_list)
     hlist.update_extend()
     basenameC=basenameC.replace('TRA',nam)
