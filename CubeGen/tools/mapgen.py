@@ -305,8 +305,8 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     ht["NAXIS1"]=nx
     ht["NAXIS2"]=ny
     ht["CRVAL1"]=xat#xot/3600.0
-    h["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    h["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    ht["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    ht["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
     ht["CRPIX1"]=nlx/2+0.5+dx
     ht["CTYPE1"]='RA---TAN'
     ht["CRVAL2"]=yat#yot/3600.0
