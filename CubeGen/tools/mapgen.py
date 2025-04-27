@@ -268,7 +268,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     dx=0
     dy=0
     h=h1.header
-    #keys=list(hdr0.keys())
+    keys=list(hdr0.keys())
     #for i in range(0, len(keys)):
     #    if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
     #        h[keys[i]]=hdr0[keys[i]]
