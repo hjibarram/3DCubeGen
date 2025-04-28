@@ -82,6 +82,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 wt1.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
                 wt1.wcs.crval = [np.mean(ra_fib)/3600.0,np.mean(dec_fib)/3600.0]
                 wt1.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+                wt1.wcs.equinox = 2024.8
             
             if use_slitmap == False:
                 rac0=rac
@@ -181,11 +182,12 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         nly=1
     
     wt = WCS(naxis=2)
-    wt.wcs.crpix = [nlx/2+1, nly/2+0]
+    wt.wcs.crpix = [nlx/2+0, nly/2+0]
     #wt.wcs.cdelt = np.array([-np.cos(thet*np.pi/180.0)*pix_s/3600.0*np.cos(yot/3600.0*np.pi/180.), np.cos(thet*np.pi/180.0)*pix_s/3600.0])
     wt.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
     wt.wcs.crval = [xat,yat]
     wt.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+    wt.wcs.equinox = 2024.8
 
      
     #sky_coord = SkyCoord(ra=x_ifu_V+xot, dec=y_ifu_V+yot, frame="icrs", unit="deg")
@@ -308,12 +310,12 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     ht["CRVAL1"]=xat#xot/3600.0
     ht["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
     ht["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    ht["CRPIX1"]=nlx/2+0.5+dx
+    ht["CRPIX1"]=nlx/2#+0.5+dx
     ht["CTYPE1"]='RA---TAN'
     ht["CRVAL2"]=yat#yot/3600.0
     ht["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.
     ht["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.
-    ht["CRPIX2"]=nly/2+0.5+dy
+    ht["CRPIX2"]=nly/2#+0.5+dy
     ht["CTYPE2"]='DEC--TAN'
     ht["CUNIT1"]='deg     '                                           
     ht["CUNIT2"]='deg     '
