@@ -56,9 +56,9 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         nt=np.where(typ == 'science')
         xp=xp[nt]
         yp=yp[nt]
-        if i == 0:
-            equinox=hdr1['EQUINOX']
-            print(equinox)
+        #if i == 0:
+        #    equinox=hdr1['EQUINOX']
+        #    print(equinox)
         equinox=TIME(2024.8, format='jyear')
         coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox, unit='deg')
         newcoord = coord.transform_to(SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox='J2000').frame)
