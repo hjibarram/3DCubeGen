@@ -55,8 +55,12 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         nt=np.where(typ == 'science')
         xp=xp[nt]
         yp=yp[nt]
-        ra_fib=ra_fib[nt]
-        dec_fib=dec_fib[nt]
+        coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox='2024.8', unit='deg')
+        newcoord = coord.transform_to(SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox='J2000').frame)
+        new_ra_fib=newcoord.ra.deg
+        new_dec_fib=newcoord.dec.deg
+        ra_fib=new_ra_fib[nt]
+        dec_fib=new_dec_fib[nt]
         Std_id=Std_id[nt]
 
         if use_slitmap == False:
@@ -82,7 +86,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 wt1.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
                 wt1.wcs.crval = [np.mean(ra_fib)/3600.0,np.mean(dec_fib)/3600.0]
                 wt1.wcs.ctype = ["RA---TAN", "DEC--TAN"]
-                wt1.wcs.equinox = 2024.8
+                wt1.wcs.equinox = 'J2000'#2024.8
             
             if use_slitmap == False:
                 rac0=rac
@@ -187,7 +191,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     wt.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
     wt.wcs.crval = [xat,yat]
     wt.wcs.ctype = ["RA---TAN", "DEC--TAN"]
-    wt.wcs.equinox = 2024.8
+    wt.wcs.equinox = 'J2000'
 
      
     #sky_coord = SkyCoord(ra=x_ifu_V+xot, dec=y_ifu_V+yot, frame="icrs", unit="deg")
