@@ -55,7 +55,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         nt=np.where(typ == 'science')
         xp=xp[nt]
         yp=yp[nt]
-        coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox='2024.8', unit='deg')
+        coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=2024.8, unit='deg')
         newcoord = coord.transform_to(SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox='J2000').frame)
         new_ra_fib=newcoord.ra.deg
         new_dec_fib=newcoord.dec.deg
