@@ -7,6 +7,7 @@ from astropy.coordinates import ICRS, Galactic, FK4, FK5
 from astropy import units as u
 from astropy.wcs.utils import skycoord_to_pixel
 from astropy.wcs.utils import pixel_to_skycoord
+from astropy.time import Time
 import os
 from multiprocessing import Pool
 from multiprocessing import cpu_count
@@ -55,7 +56,11 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         nt=np.where(typ == 'science')
         xp=xp[nt]
         yp=yp[nt]
-        coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=2024.8, unit='deg')
+        if i == 0:
+            equinox=hdr1['EQUINOX']
+            print(equinox)
+        equinox=TIME(2024.8, format='jyear')
+        coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox, unit='deg')
         newcoord = coord.transform_to(SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox='J2000').frame)
         new_ra_fib=newcoord.ra.deg
         new_dec_fib=newcoord.dec.deg
