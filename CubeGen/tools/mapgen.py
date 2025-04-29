@@ -92,6 +92,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 wt1.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
                 wt1.wcs.crval = [np.mean(ra_fib)/3600.0,np.mean(dec_fib)/3600.0]
                 wt1.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+                wt1.wcs.radesys = 'ICRS'
                 #wt1.wcs.equinox = 'J2000'#2024.8
             
             if use_slitmap == False:
@@ -197,6 +198,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     wt.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
     wt.wcs.crval = [xat,yat]
     wt.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+    wt.wcs.radesys = 'ICRS'
     #wt.wcs.equinox = 'J2000'
 
      
@@ -329,7 +331,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     ht["CTYPE2"]='DEC--TAN'
     ht["CUNIT1"]='deg     '                                           
     ht["CUNIT2"]='deg     '
-    ht["RADESYS"]='FK5     '
+    ht["RADESYS"]='ICRS     '
     ht["OBJSYS"]='ICRS    '
     ht["EQUINOX"]=2000.00
     ht["IFUCON"]=(str(int(ns))+' ','NFibers')
