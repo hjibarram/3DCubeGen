@@ -61,7 +61,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         #    print(equinox)
         equinox=Time(2024.8, format='jyear')
         equinox_J2000 = Time('J2000')
-        coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox, unit='deg')
+        coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg')
         newcoord = coord.transform_to('icrs')#SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg').frame)
         new_ra_fib=newcoord.ra.deg*3600.0
         new_dec_fib=newcoord.dec.deg*3600.0
@@ -168,7 +168,6 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     else:    
         yot=(np.amax(y_ifu_V)+np.amin(y_ifu_V))/2.0
         xot=(np.amax(x_ifu_V)+np.amin(x_ifu_V))/2.0
-    print(xot/pix_s,yot/pix_s)
     skycor = pixel_to_skycoord(xot/pix_s,yot/pix_s,wt1)
     xat=skycor.ra.value
     yat=skycor.dec.value
