@@ -62,7 +62,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         equinox=Time(2024.8, format='jyear')
         equinox_J2000 = Time('J2000')
         coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox, unit='deg')
-        newcoord = coord.transform_to('fk5')#SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg').frame)
+        newcoord = coord.transform_to('icrs')#SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg').frame)
         new_ra_fib=newcoord.ra.deg*3600.0
         new_dec_fib=newcoord.dec.deg*3600.0
         ra_fib=new_ra_fib[nt]
@@ -323,8 +323,8 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     ht["CRPIX1"]=nlx/2#+0.5+dx
     ht["CTYPE1"]='RA---TAN'
     ht["CRVAL2"]=yat#yot/3600.0
-    ht["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.
-    ht["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.
+    ht["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.0
+    ht["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.0
     ht["CRPIX2"]=nly/2#+0.5+dy
     ht["CTYPE2"]='DEC--TAN'
     ht["CUNIT1"]='deg     '                                           
