@@ -62,7 +62,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         equinox=Time(2024.8, format='jyear')
         equinox_J2000 = Time('J2000')
         coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox, unit='deg')
-        newcoord = coord.transform_to(SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg').frame)
+        newcoord = coord.transform_to('fk5')#SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg').frame)
         new_ra_fib=newcoord.ra.deg*3600.0
         new_dec_fib=newcoord.dec.deg*3600.0
         ra_fib=new_ra_fib[nt]
