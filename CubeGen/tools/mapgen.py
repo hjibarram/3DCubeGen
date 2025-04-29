@@ -257,8 +257,8 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 a2=nly
             ct=0
             for j in range(a1, a2):
-                #ifu[j,nlx-(i+1)]=result[0][ct]
-                ifu[j,i]=result[0][ct]
+                ifu[j,nlx-(i+1)]=result[0][ct]
+                #ifu[j,i]=result[0][ct]
                 ifu_e[j,nlx-(i+1)]=result[1][ct]
                 ifuM[j,nlx-(i+1)]=result[2][ct]
                 ifuM_e[j,nlx-(i+1)]=result[3][ct]
@@ -308,6 +308,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     #h["RADESYS"]='FK5     '
     #h["OBJSYS"]='ICRS    '
     #h["EQUINOX"]=2000.00
+    h['CDELT1']=-1*h['CDELT1']
     h["IFUCON"]=(str(int(ns))+' ','NFibers')
     h["BUNIT"]='erg/s/cm^2'
     h.update() 
