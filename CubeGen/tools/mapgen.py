@@ -199,7 +199,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     wt.wcs.crval = [xat,yat]
     wt.wcs.ctype = ["RA---TAN", "DEC--TAN"]
     wt.wcs.radesys = 'ICRS'
-    wt.wcs.pc = [[np.cos(thet*np.pi/180.0), -np.sin(thet*np.pi/180.0)],[np.sin(thet*np.pi/180.0),  np.cos(thet*np.pi/180.0)]]
+    wt.wcs.pc = [[np.cos(thet*np.pi/180.0), np.sin(thet*np.pi/180.0)],[-np.sin(thet*np.pi/180.0),  np.cos(thet*np.pi/180.0)]]
     #wt.wcs.equinox = 'J2000'
 
      
