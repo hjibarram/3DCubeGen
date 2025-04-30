@@ -87,10 +87,12 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     
         if i == 0:
             if use_slitmap:
+                ra0t=np.mean(ra_fib)/3600.0
+                dec0t=np.mean(dec_fib)/3600.0
                 wt1 = WCS(naxis=2)    
                 wt1.wcs.crpix = [100, 100]
                 wt1.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
-                wt1.wcs.crval = [np.mean(ra_fib)/3600.0,np.mean(dec_fib)/3600.0]
+                wt1.wcs.crval = [ra0t,dec0t]
                 wt1.wcs.ctype = ["RA---TAN", "DEC--TAN"]
                 wt1.wcs.radesys = 'ICRS'
                 #wt1.wcs.equinox = 'J2000'#2024.8
@@ -193,13 +195,15 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         nly=1
     
     wt = WCS(naxis=2)
-    wt.wcs.crpix = [nlx/2+0.5, nly/2+0.5]
+    #wt.wcs.crpix = [nlx/2+0.5, nly/2+0.5]
+    wt.wcs.crpix = [100-xot/pix_s, 100-yot/pix_s]
     #wt.wcs.cdelt = np.array([-np.cos(thet*np.pi/180.0)*pix_s/3600.0, np.cos(thet*np.pi/180.0)*pix_s/3600.0])
     wt.wcs.cdelt = np.array([-pix_s/3600.0, pix_s/3600.0])
-    wt.wcs.crval = [xat,yat]
+    #wt.wcs.crval = [xat,yat]
+    wt.wcs.crval = [ra0t,dec0t]
     wt.wcs.ctype = ["RA---TAN", "DEC--TAN"]
     wt.wcs.radesys = 'ICRS'
-    wt.wcs.pc = [[np.cos(thet*np.pi/180.0), np.sin(thet*np.pi/180.0)],[-np.sin(thet*np.pi/180.0),  np.cos(thet*np.pi/180.0)]]
+    #wt.wcs.pc = [[np.cos(thet*np.pi/180.0), np.sin(thet*np.pi/180.0)],[-np.sin(thet*np.pi/180.0),  np.cos(thet*np.pi/180.0)]]
     #wt.wcs.equinox = 'J2000'
 
      
