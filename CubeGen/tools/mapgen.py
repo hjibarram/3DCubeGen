@@ -176,7 +176,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     nw=len(wave0)
     ns=len(x_ifu_V)
     fibA=35.3
-    thet=0.0
+    thet=-4.0
 
     
     if cent:
@@ -194,11 +194,12 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     
     wt = WCS(naxis=2)
     wt.wcs.crpix = [nlx/2+0.5, nly/2+0.5]
-    #wt.wcs.cdelt = np.array([-np.cos(thet*np.pi/180.0)*pix_s/3600.0*np.cos(yot/3600.0*np.pi/180.), np.cos(thet*np.pi/180.0)*pix_s/3600.0])
-    wt.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
+    #wt.wcs.cdelt = np.array([-np.cos(thet*np.pi/180.0)*pix_s/3600.0, np.cos(thet*np.pi/180.0)*pix_s/3600.0])
+    wt.wcs.cdelt = np.array([-pix_s/3600.0, pix_s/3600.0])
     wt.wcs.crval = [xat,yat]
     wt.wcs.ctype = ["RA---TAN", "DEC--TAN"]
     wt.wcs.radesys = 'ICRS'
+    wt.wcs.pc = [[np.cos(thet*np.pi/180.0), -np.sin(thet*np.pi/180.0)],[np.sin(thet*np.pi/180.0),  np.cos(thet*np.pi/180.0)]]
     #wt.wcs.equinox = 'J2000'
 
      
@@ -307,7 +308,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     #h["RADESYS"]='FK5     '
     #h["OBJSYS"]='ICRS    '
     #h["EQUINOX"]=2000.00
-    h['CDELT1']=-1*h['CDELT1']
+    #h['CDELT1']=-1*h['CDELT1']
     h["IFUCON"]=(str(int(ns))+' ','NFibers')
     h["BUNIT"]='erg/s/cm^2'
     h.update() 
@@ -335,7 +336,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     ht["RADESYS"]='ICRS     '
     ht["OBJSYS"]='ICRS    '
     ht["EQUINOX"]=2000.00
-    ht["IFUCON"]=(str(int(ns))+' ','NFibers')
+    ht["IFUCON"]=(str(int(ns))+' ','NFibers')#5.167640389466101
     ht["BUNIT"]='ABmag/arcsec'
     ht.update() 
     hlist=fits.HDUList(head_list)
