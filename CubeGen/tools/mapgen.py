@@ -196,7 +196,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     
     wt = WCS(naxis=2)
     #wt.wcs.crpix = [nlx/2+0.5, nly/2+0.5]
-    wt.wcs.crpix = [nlx-(nlx/2+(100-xot/pix_s))+0.5, (nly/2+(100-yot/pix_s))+0.5]
+    wt.wcs.crpix = [nlx-(nlx/2+(100-xot/pix_s))-0.5, (nly/2+(100-yot/pix_s))+1.5]
     wt.wcs.cdelt = np.array([-pix_s/3600.0, pix_s/3600.0])
     #wt.wcs.crval = [xat,yat]
     wt.wcs.crval = [ra0t,dec0t]
