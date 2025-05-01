@@ -44,8 +44,8 @@ version = version(VERSION_FILE)
 
 setup(
     name='3DCubeGen',
-    #version=version,
-    use_scm_version={"version_file": "CubeGen/common/_version.py"},
+    version=version,
+    #use_scm_version={"version_file": "CubeGen/common/_version.py"},
     description='A Python implementation for a 3D RSS to cube reconstruction',
     #long_description=readme(),
     classifiers=[
@@ -61,8 +61,8 @@ setup(
     #author_email='pipe3d@astro.unam.mx',
     license='MIT',
     packages=all_packages,
-    #setup_requires=['wheel'],
-    setup_requires=['setuptools_scm', 'wheel'],
+    setup_requires=['wheel'],
+    #setup_requires=['setuptools_scm', 'wheel'],
     install_requires=requirements,
     include_package_data=True,
     package_data=packages_data,
