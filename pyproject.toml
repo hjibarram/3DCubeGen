@@ -8,6 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "3DCubeGen"
+dynamic = ["version"]
 #version = "0.2.0.dev0"
 description = "A Python implementation for a 3D RSS to cube reconstruction"
 license = {text = "MIT"}
