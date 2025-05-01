@@ -44,8 +44,8 @@ version = version(VERSION_FILE)
 
 setup(
     name='3DCubeGen',
-    version=version,
-    #use_scm_version={"version_file": "CubeGen/common/_version.py"},
+    #version=version,
+    use_scm_version={"version_file": "CubeGen/common/_version.py"},
     description='A Python implementation for a 3D RSS to cube reconstruction',
     #long_description=readme(),
     classifiers=[
