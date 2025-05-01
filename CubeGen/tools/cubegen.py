@@ -7,6 +7,7 @@ from astropy.coordinates import ICRS, Galactic, FK4, FK5
 from astropy import units as u
 from astropy.wcs.utils import skycoord_to_pixel
 from astropy.wcs.utils import pixel_to_skycoord
+from astropy.time import Time
 from scipy.interpolate import interp1d
 import os
 from multiprocessing import Pool
@@ -17,7 +18,7 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=False,coord_cen=[0,0],pbars=True,flu16=False,multiT=False,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=18.5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_ver='1.0.2.dev0',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmCube-NAME.fits',path_lvmcore=''):
+def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=False,coord_ast=[0,0],coord_cen=[0,0],pbars=True,flu16=False,multiT=False,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=18.5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_ver='1.0.2.dev0',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmCube-NAME.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
@@ -58,9 +59,16 @@ def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=F
         nt=np.where(typ == 'science')
         xp=xp[nt]
         yp=yp[nt]
-        ra_fib=ra_fib[nt]
-        dec_fib=dec_fib[nt]
+        equinox=Time(2024.8, format='jyear')
+        equinox_J2000 = Time('J2000')
+        coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg')
+        newcoord = coord.transform_to('icrs')
+        new_ra_fib=newcoord.ra.deg*3600.0
+        new_dec_fib=newcoord.dec.deg*3600.0
+        ra_fib=new_ra_fib[nt]
+        dec_fib=new_dec_fib[nt]
         Std_id=Std_id[nt]
+
         
         
         if use_slitmap == False:
@@ -81,12 +89,18 @@ def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=F
         
         if i == 0:
             if use_slitmap:
+                ra0t=coord_ast[0]
+                dec0t=coord_ast[1]
+                if ra0t == 0 and dec0t == 0:
+                    ra0t=np.mean(ra_fib)/3600.0
+                    dec0t=np.mean(dec_fib)/3600.0
                 wt1 = WCS(naxis=2)    
                 wt1.wcs.crpix = [100, 100]
-                #wt1.wcs.cdelt = np.array([-pix_s/3600.0*np.cos(np.mean(dec_fib)/3600.0*np.pi/180.), pix_s/3600.0])
                 wt1.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
-                wt1.wcs.crval = [np.mean(ra_fib)/3600.0,np.mean(dec_fib)/3600.0]
+                wt1.wcs.crval = [ra0t,dec0t]
                 wt1.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+                wt1.wcs.radesys = 'ICRS'
+                #wt1.wcs.equinox = 'J2000'#2024.8    
             
             if use_slitmap == False:
                 rac0=rac
@@ -191,11 +205,16 @@ def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=F
         nly=1
 
     wt = WCS(naxis=2)
-    wt.wcs.crpix = [nlx/2+1, nly/2+0]
-    #wt.wcs.cdelt = np.array([-np.cos(thet*np.pi/180.0)*pix_s/3600.0*np.cos(yot/3600.0*np.pi/180.), np.cos(thet*np.pi/180.0)*pix_s/3600.0])
-    wt.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
-    wt.wcs.crval = [xat,yat]
+    #wt.wcs.crpix = [nlx/2+1, nly/2+0]
+    wt.wcs.crpix = [nlx-(nlx/2+(100-xot/pix_s))+1.5, (nly/2+(100-yot/pix_s))-0.5]
+    wt.wcs.cdelt = np.array([-pix_s/3600.0, pix_s/3600.0])
+    #wt.wcs.crval = [xat,yat]
+    wt.wcs.crval = [ra0t,dec0t]
     wt.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+    wt.wcs.radesys = 'ICRS'
+    #wt.wcs.pc = [[np.cos(thet*np.pi/180.0), np.sin(thet*np.pi/180.0)],[-np.sin(thet*np.pi/180.0),  np.cos(thet*np.pi/180.0)]]
+    #wt.wcs.equinox = 'J2000'
+
 
     #sky_coord = SkyCoord(ra=(x_ifu_V+xot)/3600., dec=(y_ifu_V+yot)/3600., frame="icrs", unit="deg")
     #x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt)
@@ -272,7 +291,9 @@ def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=F
         ifu=ifu/1e-16
         ifu_e=ifu_e/1e-16#*100
     
-    h1=fits.PrimaryHDU(ifu)
+    new_header = wt.to_header()
+    h1=fits.PrimaryHDU(ifu,header=new_header)
+    #h1=fits.PrimaryHDU(ifu)
     h2=fits.ImageHDU(ifu_e)
     h3=fits.ImageHDU(ifu_1)
     h4=fits.ImageHDU(ifu_m)
@@ -284,30 +305,30 @@ def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=F
     h=h1.header
     #h.extend(wt.to_header())
     keys=list(hdr0.keys())
-    for i in range(0, len(keys)):
-        if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
-            h[keys[i]]=hdr0[keys[i]]
-            h.comments[keys[i]]=hdr0.comments[keys[i]]
+    #for i in range(0, len(keys)):
+    #    if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
+    #        h[keys[i]]=hdr0[keys[i]]
+    #        h.comments[keys[i]]=hdr0.comments[keys[i]]
     h["NAXIS"]=3
     h["NAXIS3"]=nw 
     h["NAXIS1"]=nlx
     h["NAXIS2"]=nly
-    #h["NDITER"]=(len(files),'Number of dither observations')
-    #h["BUNIT"]= ('1E-16 erg/s/cm^2','Unit of pixel value ' )
-    #h["OBJECT"]=hdr_0[0]['OBJECT']
-    #h["CTYPE"] = ("RA---TAN", "DEC--TAN")
-    h["CRVAL1"]=xat#xot/3600.0
-    h["CD1_1"]=-np.cos(thet*np.pi/180.)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    h["CD1_2"]=-np.sin(thet*np.pi/180.)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    h["CRPIX1"]=nlx/2+0.5+dx
-    h["CTYPE1"]='RA---TAN'
-    h["CRVAL2"]=yat#yot/3600.0
-    h["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.
-    h["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.
-    h["CRPIX2"]=nly/2+0.5+dy
-    h["CTYPE2"]='DEC--TAN'
-    h["CUNIT1"]='deg     '                                           
-    h["CUNIT2"]='deg     '
+    ##h["NDITER"]=(len(files),'Number of dither observations')
+    ##h["BUNIT"]= ('1E-16 erg/s/cm^2','Unit of pixel value ' )
+    ##h["OBJECT"]=hdr_0[0]['OBJECT']
+    ##h["CTYPE"] = ("RA---TAN", "DEC--TAN")
+    #h["CRVAL1"]=xat#xot/3600.0
+    #h["CD1_1"]=-np.cos(thet*np.pi/180.)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    #h["CD1_2"]=-np.sin(thet*np.pi/180.)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    #h["CRPIX1"]=nlx/2+0.5+dx
+    #h["CTYPE1"]='RA---TAN'
+    #h["CRVAL2"]=yat#yot/3600.0
+    #h["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.
+    #h["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.
+    #h["CRPIX2"]=nly/2+0.5+dy
+    #h["CTYPE2"]='DEC--TAN'
+    #h["CUNIT1"]='deg     '                                           
+    #h["CUNIT2"]='deg     '
     h["CDELT3"]=cdelt
     h["CD3_3"]=cdelt
     h["CRPIX3"]=crpix
@@ -322,6 +343,7 @@ def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=F
         h["BUNIT"]='10^-16 erg/s/cm^2'
     else:
         h["BUNIT"]='erg/s/cm^2'
+    h.update() 
     hlist=fits.HDUList(head_list)
     hlist.update_extend()
     

@@ -15,7 +15,8 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph_s=2.0,verbose=True,agcam_dir='',redux_dir='',mjd=['0000'],redux_ver='1.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
+
+def gen_matrix(expnumL,multiT=False,errors=True,covana=False,fcovmat=False,nprocf=6,pix_s=18.5,fac_sizeX=1.1,fac_sizeY=1.1,ki=5,sigm_s=18.5,alph_s=2.0,verbose=True,agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='1.1.1.dev0/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
@@ -122,8 +123,7 @@ def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph
     fibA=35.3
     thet=0.0
 
-    fac_sizeX=1.1
-    fac_sizeY=1.1
+
     nlx=int(round((np.amax([np.amax(x_ifu_V),-np.amin(x_ifu_V)])+1)*2/pix_s))
     nly=int(round((np.amax([np.amax(y_ifu_V),-np.amin(y_ifu_V)])+1)*2/pix_s))
     nlx=int(nlx*fac_sizeX)
@@ -135,6 +135,11 @@ def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph
     wt.wcs.crval = [xat,yat]
     wt.wcs.ctype = ["RA---TAN", "DEC--TAN"]
 
+    if covana:
+        Wt=np.zeros([nly,nlx,ns])
+        St=np.zeros([ns,ns])
+        for i in range(0,ns):
+            St[i,i]=rss_ef[i]
     ifu=np.zeros([nly,nlx])
     ifu_e=np.ones([nly,nlx])
     ifuM=np.zeros([nly,nlx])
@@ -151,6 +156,7 @@ def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph
     specM_ifu=rss_fm-2.5*np.log10(facto)+5.0*np.log10(pix_s)
     specEM_ifu=rss_efm-2.5*np.log10(facto)+5.0*np.log10(pix_s)
     
+    
     if verbose:
         pbar=tqdm(total=nlx)
     for i in range(0, nlx):
@@ -159,11 +165,37 @@ def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph
         Rsp=np.sqrt((x_ifu_V-(xf+xi)/2.0)**2.0)
         #ntp=np.where(Rsp <= (fibA*3.5*2/2.0))[0]
         if sigm_s > fibA*3.5*2:
-            ntp=np.where(Rsp <= (sigm_s/2.0))[0]
+            radiT=sigm_s/2.0
         else:    
-            ntp=np.where(Rsp <= (fibA*3.5*2/2.0))[0]
+            radiT=fibA*3.5*2/2.0
+        ntp=np.where(Rsp <= (radiT))[0]    
+
+        if covana:
+            xtF=x_ifu_V[ntp]
+            ytF=y_ifu_V[ntp]
+            for j in range(0, nly):
+                yi=yo+pix_s*j
+                yf=yo+pix_s*(j+1)
+                Wgt1=0
+                Rspt=np.sqrt((ytF-(yf+yi)/2.0)**2.0)
+                ntpt=np.where(Rspt <= radiT)[0]
+                for k in range(0, len(xtF[ntpt])):
+                    Rsp=np.sqrt((xtF[ntpt][k]-(xf+xi)/2.0)**2.0+(ytF[ntpt][k]-(yf+yi)/2.0)**2.0)
+                    if Rsp <= (radiT): 
+                        Wg=np.exp(-(Rsp/sigm_s)**alph_s/2.0)
+                        Wgt1=Wgt1+Wg
+                if Wgt1 == 0:
+                    Wgt1=1
+            
+                for k in range(0, len(xtF[ntpt])):
+                    Rsp=np.sqrt((xtF[ntpt][k]-(xf+xi)/2.0)**2.0+(ytF[ntpt][k]-(yf+yi)/2.0)**2.0)
+                    if Rsp <= (radiT): 
+                        Wg=np.exp(-(Rsp/sigm_s)**alph_s/2.0)/Wgt1
+                        ifi=ntp[ntpt][k]
+                        Wt[j,nlx-(i+1),ifi]=Wg*facto
+
         if multiT:
-            nproc=3#3#cpu_count()
+            nproc=nprocf#3#cpu_count()
             with ThreadPool(nproc) as pool:
                 args=[(spec_ifu[ntp],specE_ifu[ntp],specM_ifu[ntp],specEM_ifu[ntp],x_ifu_V[ntp],y_ifu_V[ntp],fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nly,npros,nproc) for npros in range(0, nproc)]                    
                 #args=[(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nly,i,npros,nproc,wt,xot,yot) for npros in range(0, nproc)]                    
@@ -207,8 +239,6 @@ def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph
         if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
             h[keys[i]]=hdr0[keys[i]]
             h.comments[keys[i]]=hdr0.comments[keys[i]]
-    #del h["CDELT1"]
-    #del h["WCSAXES"]
     h["EXTNAME"]='FLUX'
     h["NAXIS"]=2 
     h["NAXIS1"]=nlx
@@ -230,4 +260,11 @@ def gen_matrix(expnumL,multiT=False,errors=True,pix_s=18.5,ki=5,sigm_s=18.5,alph
     h["EQUINOX"]=2000.00
     h["IFUCON"]=(str(int(ns))+' ','NFibers')
     h["BUNIT"]='erg/s/cm^2'
-    return h,ifu,ifu_e,ifuM,ifuM_e
+    if covana:
+        if fcovmat:
+            out2,distF=tools.weighterror2(St,Wt,multiT=multiT,nprocf=nprocf,verbose=verbose)
+            return h,ifu,ifu_e,ifuM,ifuM_e,Wt,St,out2,distF
+        else:
+            return h,ifu,ifu_e,ifuM,ifuM_e,Wt,St
+    else:
+        return h,ifu,ifu_e,ifuM,ifuM_e

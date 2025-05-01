@@ -7,6 +7,7 @@ from astropy.coordinates import ICRS, Galactic, FK4, FK5
 from astropy import units as u
 from astropy.wcs.utils import skycoord_to_pixel
 from astropy.wcs.utils import pixel_to_skycoord
+from astropy.time import Time
 import os
 from multiprocessing import Pool
 from multiprocessing import cpu_count
@@ -16,7 +17,7 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coord_cen=[0,0],pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmMap-NAME_TRA.fits',path_lvmcore=''):
+def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coord_ast=[0,0],coord_cen=[0,0],pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmMap-NAME_TRA.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
@@ -55,8 +56,17 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         nt=np.where(typ == 'science')
         xp=xp[nt]
         yp=yp[nt]
-        ra_fib=ra_fib[nt]
-        dec_fib=dec_fib[nt]
+        #if i == 0:
+        #    equinox=hdr1['EQUINOX']
+        #    print(equinox)
+        equinox=Time(2024.8, format='jyear')
+        equinox_J2000 = Time('J2000')
+        coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg')
+        newcoord = coord.transform_to('icrs')#SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg').frame)
+        new_ra_fib=newcoord.ra.deg*3600.0
+        new_dec_fib=newcoord.dec.deg*3600.0
+        ra_fib=new_ra_fib[nt]
+        dec_fib=new_dec_fib[nt]
         Std_id=Std_id[nt]
 
         if use_slitmap == False:
@@ -77,11 +87,18 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     
         if i == 0:
             if use_slitmap:
+                ra0t=coord_ast[0]
+                dec0t=coord_ast[1]
+                if ra0t == 0 and dec0t == 0:
+                    ra0t=np.mean(ra_fib)/3600.0
+                    dec0t=np.mean(dec_fib)/3600.0
                 wt1 = WCS(naxis=2)    
                 wt1.wcs.crpix = [100, 100]
                 wt1.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
-                wt1.wcs.crval = [np.mean(ra_fib)/3600.0,np.mean(dec_fib)/3600.0]
+                wt1.wcs.crval = [ra0t,dec0t]
                 wt1.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+                wt1.wcs.radesys = 'ICRS'
+                #wt1.wcs.equinox = 'J2000'#2024.8
             
             if use_slitmap == False:
                 rac0=rac
@@ -164,7 +181,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     nw=len(wave0)
     ns=len(x_ifu_V)
     fibA=35.3
-    thet=0.0
+    thet=-4.0
 
     
     if cent:
@@ -181,11 +198,15 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         nly=1
     
     wt = WCS(naxis=2)
-    wt.wcs.crpix = [nlx/2+1, nly/2+0]
-    #wt.wcs.cdelt = np.array([-np.cos(thet*np.pi/180.0)*pix_s/3600.0*np.cos(yot/3600.0*np.pi/180.), np.cos(thet*np.pi/180.0)*pix_s/3600.0])
-    wt.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
-    wt.wcs.crval = [xat,yat]
+    #wt.wcs.crpix = [nlx/2+0.5, nly/2+0.5]
+    wt.wcs.crpix = [nlx-(nlx/2+(100-xot/pix_s))+1.5, (nly/2+(100-yot/pix_s))-0.5]
+    wt.wcs.cdelt = np.array([-pix_s/3600.0, pix_s/3600.0])
+    #wt.wcs.crval = [xat,yat]
+    wt.wcs.crval = [ra0t,dec0t]
     wt.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+    wt.wcs.radesys = 'ICRS'
+    #wt.wcs.pc = [[np.cos(thet*np.pi/180.0), np.sin(thet*np.pi/180.0)],[-np.sin(thet*np.pi/180.0),  np.cos(thet*np.pi/180.0)]]
+    #wt.wcs.equinox = 'J2000'
 
      
     #sky_coord = SkyCoord(ra=x_ifu_V+xot, dec=y_ifu_V+yot, frame="icrs", unit="deg")
@@ -243,6 +264,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
             ct=0
             for j in range(a1, a2):
                 ifu[j,nlx-(i+1)]=result[0][ct]
+                #ifu[j,i]=result[0][ct]
                 ifu_e[j,nlx-(i+1)]=result[1][ct]
                 ifuM[j,nlx-(i+1)]=result[2][ct]
                 ifuM_e[j,nlx-(i+1)]=result[3][ct]
@@ -257,8 +279,9 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
 
 
     
-    
-    h1=fits.PrimaryHDU(ifu)
+    new_header = wt.to_header()
+    h1=fits.PrimaryHDU(ifu,header=new_header)
+    #h1=fits.PrimaryHDU(ifu)
     h2=fits.ImageHDU(ifuM)
     h3=fits.ImageHDU(ifu_e)
     h4=fits.ImageHDU(ifuM_e)
@@ -268,31 +291,33 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     dy=0
     h=h1.header
     keys=list(hdr0.keys())
-    for i in range(0, len(keys)):
-        if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
-            h[keys[i]]=hdr0[keys[i]]
-            h.comments[keys[i]]=hdr0.comments[keys[i]]
+    #for i in range(0, len(keys)):
+    #    if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
+    #        h[keys[i]]=hdr0[keys[i]]
+    #        h.comments[keys[i]]=hdr0.comments[keys[i]]
     h["EXTNAME"]='FLUX'
     h["NAXIS"]=2 
     h["NAXIS1"]=nx
     h["NAXIS2"]=ny
-    h["CRVAL1"]=xat#xot/3600.0#hdr1['CRVAL1']
-    h["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    h["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    h["CRPIX1"]=nlx/2+0.5+dx#nlx/2+dx
-    h["CTYPE1"]='RA---TAN'
-    h["CRVAL2"]=yat#yot/3600.0#hdr1['CRVAL2']
-    h["CD2_1"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0
-    h["CD2_2"]=np.cos(thet*np.pi/180.0)*pix_s/3600.0
-    h["CRPIX2"]=nly/2+0.5+dy
-    h["CTYPE2"]='DEC--TAN'
-    h["CUNIT1"]='deg     '                                           
-    h["CUNIT2"]='deg     '
-    h["RADESYS"]='FK5     '
-    h["OBJSYS"]='ICRS    '
-    h["EQUINOX"]=2000.00
+    #h["CRVAL1"]=xat#xot/3600.0#hdr1['CRVAL1']
+    #h["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    #h["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    #h["CRPIX1"]=nlx/2+0.5+dx#nlx/2+dx
+    #h["CTYPE1"]='RA---TAN'
+    #h["CRVAL2"]=yat#yot/3600.0#hdr1['CRVAL2']
+    #h["CD2_1"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0
+    #h["CD2_2"]=np.cos(thet*np.pi/180.0)*pix_s/3600.0
+    #h["CRPIX2"]=nly/2+0.5+dy
+    #h["CTYPE2"]='DEC--TAN'
+    #h["CUNIT1"]='deg     '                                           
+    #h["CUNIT2"]='deg     '
+    #h["RADESYS"]='FK5     '
+    #h["OBJSYS"]='ICRS    '
+    #h["EQUINOX"]=2000.00
+    #h['CDELT1']=-1*h['CDELT1']
     h["IFUCON"]=(str(int(ns))+' ','NFibers')
     h["BUNIT"]='erg/s/cm^2'
+    h.update() 
     ht=h2.header
     for i in range(0, len(keys)):
         if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
@@ -303,22 +328,23 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     ht["NAXIS1"]=nx
     ht["NAXIS2"]=ny
     ht["CRVAL1"]=xat#xot/3600.0
-    h["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    h["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    ht["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    ht["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
     ht["CRPIX1"]=nlx/2+0.5+dx
     ht["CTYPE1"]='RA---TAN'
     ht["CRVAL2"]=yat#yot/3600.0
-    ht["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.
-    ht["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.
+    ht["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.0
+    ht["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.0
     ht["CRPIX2"]=nly/2+0.5+dy
     ht["CTYPE2"]='DEC--TAN'
     ht["CUNIT1"]='deg     '                                           
     ht["CUNIT2"]='deg     '
-    ht["RADESYS"]='FK5     '
+    ht["RADESYS"]='ICRS     '
     ht["OBJSYS"]='ICRS    '
     ht["EQUINOX"]=2000.00
-    ht["IFUCON"]=(str(int(ns))+' ','NFibers')
+    ht["IFUCON"]=(str(int(ns))+' ','NFibers')#5.167640389466101
     ht["BUNIT"]='ABmag/arcsec'
+    ht.update() 
     hlist=fits.HDUList(head_list)
     hlist.update_extend()
     basenameC=basenameC.replace('TRA',nam)

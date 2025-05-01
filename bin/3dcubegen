@@ -9,7 +9,7 @@ from CubeGen.tools.mapgen import gen_map
 from CubeGen.tools.images import get_jpg,get_jpgNR
 from CubeGen.tools.merge_cube import coadd_cube
 from CubeGen.tools.deconvolve import deconvolve_2dfile
-from CubeGen.daptools.dap_fluxelines import rssp_extract
+from CubeGen.daptools.rss_gen import rssp_extract
 import CubeGen.tools.tools as tools
 import os.path as ptt
 import os
@@ -170,7 +170,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             coord_cen=[0,0]
         explist,mjd,tilelist,tileglist=tools.read_explist(fname=nameF1,path=pathf)
         dit=len(explist)
-        if dit <= 160:
+        if dit <= 100:
             spec_range=(None,None)
             if dit < 3:
                 sigm_s=17.6/2*32*1/8
@@ -180,6 +180,8 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
                 spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
                 alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
                 tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook)
+            if cube2rss:
+                rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook)
         else:
             if dit <= 500:
                 spec_range_l=[(3000,4000),(4000,5000),(5000,6000),(6000,7000),(7000,8000),(8000,9000),(9000,10000)]

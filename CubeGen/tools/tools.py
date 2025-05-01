@@ -5,8 +5,12 @@ from astropy.coordinates import SkyCoord
 from scipy.interpolate import interp1d
 from astropy.convolution import convolve,Gaussian2DKernel
 import CubeGen
+import CubeGen.tools.kernel as kernel 
 import os
 import yaml
+from multiprocessing.pool import ThreadPool
+from scipy.spatial.distance import pdist
+from tqdm.notebook import tqdm
 
 def median_a(x,lw=5,lower=10000,wave=[]):
     if len(wave) > 0:
@@ -464,7 +468,7 @@ def read_config_file(file):
         return None
 
 def kernel_pipe(type='b'):
-    #16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i
+    #16-a,8-b,4-c,2-d,1-e,1/2-f,1/4-g,1/8-h,1/16-i,1/32-i
     if type == 'a':
         valt=16
     if type == 'b':
@@ -488,3 +492,144 @@ def kernel_pipe(type='b'):
     sigm_s=17.6/2*32*valt
     pix_s=17.6/2*0.75*32*valt
     return sigm_s,pix_s
+
+def weighterror1(St,Wt,multiT=True,nprocf=6):
+    nly,nlx,ns=Wt.shape
+    out=np.zeros([nly,nlx,ns])
+    if multiT:
+        nproc=nprocf
+        with ThreadPool(nproc) as pool:
+            args=[]
+            for npros in range(0, nproc):
+                val=int(nlx/nproc)
+                a1=val*npros
+                if npros < nproc-1:
+                    a2=val*(npros+1)
+                else:
+                    a2=nlx
+                Wgt=Wt[:,a1:a2,:]     
+                args.extend([(St,Wgt,nly,ns,a1,a2)])                    
+            result_l = pool.map(kernel.task_wrappercov1, args)
+    else:
+        nproc=1
+        npros=0
+        result_l=[]
+        args=(St,Wt,nly,ns,0,nlx)
+        result_l.extend([kernel.task_wrappercov1(args)])
+    for npros in range(0, nproc):
+        result=result_l[npros]
+        val=int(nlx/nproc)
+        a1=val*npros
+        if npros < nproc-1:
+            a2=val*(npros+1)
+        else:
+            a2=nlx
+        out[:,a1:a2,:]=result[0]
+    return out
+
+def weighterror2(St,Wt,multiT=True,nprocf=6,verbose=True,matf=True):
+    #This function will propagate all the error and generate the full covariance matrix 
+    #St is the error matrix frim all the fibres
+    #Wt are the weigths for the 2d image interpolation
+    #if matf eq False the output shape will be [nx,ny,nx,ny], if True the shape will be [nx*ny,nx*ny] 
+    out=weighterror1(St,Wt,multiT=multiT,nprocf=nprocf)
+    nly,nlx,ns=Wt.shape
+    if matf:
+        outf=np.zeros([nly*nlx,nly*nlx])
+        dist=np.zeros([nly*nlx,nly*nlx])
+    else:
+        outf=np.zeros([nly,nlx,nly,nlx])
+        dist=np.zeros([nly,nlx,nly,nlx]) 
+    indexT=np.array([(k,0) for k in range(nly)])
+    Dq=pdist(indexT, metric='euclidean')
+    if verbose:
+        pbar=tqdm(total=nlx)
+    for i in range(0, nlx):
+        Wgt=Wt[:,i,:]
+        if multiT:
+            nproc=nprocf
+            with ThreadPool(nproc) as pool:
+                args=[]
+                for npros in range(0, nproc):
+                    val=int(nlx/nproc)
+                    a1=val*npros
+                    if npros < nproc-1:
+                        a2=val*(npros+1)
+                    else:
+                        a2=nlx
+                    outt=out[:,a1:a2,:] 
+                    args.extend([(St,Wgt,outt,Dq,nly,i,a1,a2)])                   
+                result_l = pool.map(kernel.task_wrappercov2, args)
+        else:
+            nproc=1
+            npros=0
+            result_l=[]
+            args=(St,Wgt,out,Dq,nly,i,0,nlx)
+            result_l.extend([kernel.task_wrappercov2(args)])
+        for npros in range(0, nproc):
+            result=result_l[npros]
+            val=int(nlx/nproc)
+            a1=val*npros
+            if npros < nproc-1:
+                a2=val*(npros+1)
+            else:
+                a2=nlx
+            if matf:
+                b1=i*nly
+                b2=(i+1)*nly
+                for j in range(a1,a2):
+                    c1=j*nly
+                    c2=(j+1)*nly
+                    outf[b1:b2,c1:c2]=result[0][:,:,j-a1]
+                    dist[b1:b2,c1:c2]=result[1][:,:,j-a1]
+            else:
+                outf[:,i,:,a1:a2]=result[0]
+                dist[:,i,:,a1:a2]=result[1]
+        if verbose:        
+            pbar.update(1)
+    if verbose:
+        pbar.close()    
+    return outf,dist
+
+def correlation_matrix(out,verbose=False):
+    nx,ny=out.shape
+    errf0=np.ones([nx])
+    outf0=np.zeros([nx,nx])
+    if verbose:
+        pbar=tqdm(total=nx)
+    for i in range(0, nx):
+        if out[i,i] > 0:
+                errf0[i]=out[i,i]
+    for i in range(0, nx):
+        for j in range(0, nx):
+            outf0[i,j]=out[i,j]/np.sqrt(errf0[i]*errf0[j])
+        if verbose:        
+            pbar.update(1)
+    if verbose:
+        pbar.close() 
+    return outf0   
+
+def get_error(out,Wg1):
+    nx,ny,ns=Wg1.shape
+    errt=np.zeros([nx,ny])
+    for i in range(0, ny):
+        b1=i*nx
+        b2=(i+1)*nx
+        for k in range(b1,b2):
+            errt[k-b1,i]=out[(k+0) % (nx*ny),(k+0) % (nx*ny)]
+    return errt
+
+def twocorrf(covm,dist,pix_s=1.0,nb=12,aver=True):
+    rad=np.ravel(dist)
+    vals=np.ravel(covm)
+    bins=np.arange(nb+1)
+    nt=np.where(rad < nb)
+    val1=np.histogram(rad[nt], bins=bins, weights=vals[nt])
+    if aver:
+        val0=np.histogram(rad[nt], bins=bins)
+        yp0=val0[0]
+    else:
+        yp0=1.0
+    yp=val1[0]/yp0
+    xp=val1[1][0:nb]*pix_s
+    return xp,yp
