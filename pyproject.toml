@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "3DCubeGen"
-version = "0.2.0.dev0"
+#version = "0.2.0.dev0"
 description = "A Python implementation for a 3D RSS to cube reconstruction"
 license = {text = "MIT"}
 authors = [
@@ -36,7 +36,7 @@ dependencies = [
 ]
 
 #[project.scripts]
-#3dcubegen = "bin.3dcubegen:cli"
+#3dcubegen = "bin.3dcubegen"
 
 [tool.setuptools]
 include-package-data = true
