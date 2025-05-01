@@ -39,11 +39,11 @@ build-backend = "setuptools.build_meta"
 #[project.scripts]
 #3dcubegen = "bin.3dcubegen"
 
-[tool.setuptools]
-include-package-data = true
+#[tool.setuptools]
+#include-package-data = true
 
-[tool.setuptools.package-data]
-"*" = ["legacy/*", "legacy/**/*"]
+#[tool.setuptools.package-data]
+#"*" = ["legacy/*", "legacy/**/*"]
 
 #[tool.setuptools_scm]
 #version_file = "CubeGen/common/_version.py"
