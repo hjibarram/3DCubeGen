@@ -2,13 +2,13 @@
 import os
 from setuptools import setup, find_packages
 
-def version(fn):
-    v = ''
-    with open(fn, 'r') as f:
-        for l in f.readlines():
-            if '__version__' in l:
-                v = l.split('=')[-1].strip().replace("'", '').split(' ')[-1][1:]
-    return v
+#def version(fn):
+#    v = ''
+#    with open(fn, 'r') as f:
+#        for l in f.readlines():
+#            if '__version__' in l:
+#                v = l.split('=')[-1].strip().replace("'", '').split(' ')[-1][1:]
+#    return v
 
 #def readme():
 #   with open('README.md') as f:
@@ -40,11 +40,12 @@ scripts = ["bin/3dcubegen"]
 #    os.path.join(SCRIPTS_DIRNAME, script_name)
 #    for script_name in os.listdir(SCRIPTS_DIRNAME) if script_name.endswith('.py')
 #]
-version = version(VERSION_FILE)
+#version = version(VERSION_FILE)
 
 setup(
     name='3DCubeGen',
-    version=version,
+    #version=version,
+    use_scm_version={"version_file": "CubeGen/common/_version.py"},
     description='A Python implementation for a 3D RSS to cube reconstruction',
     #long_description=readme(),
     classifiers=[
@@ -60,7 +61,8 @@ setup(
     #author_email='pipe3d@astro.unam.mx',
     license='MIT',
     packages=all_packages,
-    setup_requires=['wheel'],
+    #setup_requires=['wheel'],
+    setup_requires=['setuptools_scm', 'wheel'],
     install_requires=requirements,
     include_package_data=True,
     package_data=packages_data,
