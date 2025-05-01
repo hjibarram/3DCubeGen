@@ -17,7 +17,7 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coord_cen=[0,0],pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmMap-NAME_TRA.fits',path_lvmcore=''):
+def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coord_ast=[0,0],coord_cen=[0,0],pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmMap-NAME_TRA.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
@@ -87,8 +87,11 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     
         if i == 0:
             if use_slitmap:
-                ra0t=np.mean(ra_fib)/3600.0
-                dec0t=np.mean(dec_fib)/3600.0
+                ra0t=coord_ast[0]
+                dec0t=coord_ast[1]
+                if ra0t == 0 and dec0t == 0:
+                    ra0t=np.mean(ra_fib)/3600.0
+                    dec0t=np.mean(dec_fib)/3600.0
                 wt1 = WCS(naxis=2)    
                 wt1.wcs.crpix = [100, 100]
                 wt1.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
