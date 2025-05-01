@@ -57,7 +57,7 @@ setup(
     keywords='galaxies',
     #url='https://gitlab.com/pipe3d/pyPipe3D',
     #download_url=f'https://gitlab.com/pipe3d/pyPipe3D/-/archive/v{version}/pyPipe3D-v{version}.tar.gz',
-    author='Hector Javier Ibarra Medel',
+    author='hjibarram',
     author_email='hibarram@astro.unam.mx',
     license='MIT',
     packages=all_packages,
