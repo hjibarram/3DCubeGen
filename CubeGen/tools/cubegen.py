@@ -328,7 +328,7 @@ def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=F
     #h["CRPIX2"]=nly/2+0.5+dy
     #h["CTYPE2"]='DEC--TAN'
     #h["CUNIT1"]='deg     '                                           
-    #h["CUNIT2"]='deg     '
+    #h["CUNIT2"]='deg     '  
     h["CDELT3"]=cdelt
     h["CD3_3"]=cdelt
     h["CRPIX3"]=crpix
