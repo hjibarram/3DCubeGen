@@ -35,8 +35,8 @@ dependencies = [
   "cloup"
 ]
 
-[project.scripts]
-3dcubegen = "bin.3dcubegen:cli"
+#[project.scripts]
+#3dcubegen = "bin.3dcubegen:cli"
 
 [tool.setuptools]
 include-package-data = true
