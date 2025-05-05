@@ -18,7 +18,7 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=False,coord_ast=[0,0],coord_cen=[0,0],pbars=True,flu16=False,multiT=False,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=18.5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_ver='1.0.2.dev0',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmCube-NAME.fits',path_lvmcore=''):
+def map_ifu(expnumL,nameF=None,notebook=True,ofvel=[[0,0,0],[0,0,0],[0,0,0]],use_slitmap=True,errors=True,cent=False,coord_ast=[0,0],coord_cen=[0,0],pbars=True,flu16=False,multiT=False,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=18.5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_ver='1.0.2.dev0',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmCube-NAME.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
@@ -107,8 +107,9 @@ def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=F
                 dec0=dec
             nx0,ny0=rss.shape
             wave0=crval+cdelt*(np.arange(ny0)+1-crpix)
-            wave0=wave0/(1+helio/299792.458)
-            crval0=crval/(1+helio/299792.458)
+            wave0c=wave0*(1+helio/299792.458)
+            crval0=crval#*(1+helio/299792.458)
+            
             wave_1,wave_2=spec_range
             if wave_1 and wave_2:#wave_1 > np.nanmin(wave0) and
                 if wave_1 < np.nanmax(wave0) and wave_2 > wave_1:# and wave_2 < np.nanmax(wave0):
@@ -124,10 +125,12 @@ def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=F
                     return
             nfib0=len(Std_id)  
             rss_f=np.zeros([nfib0*nlt,ny0])
-            rss_f[0:nfib0,:]=rss[Std_id,:]
+            rss_f[0:nfib0,:]=interp1d(wave0c,rss[Std_id,:],kind='linear',bounds_error=False)(wave0)
+            #rss_f[0:nfib0,:]=rss[Std_id,:]
             if errors:
                 rss_ef=np.zeros([nfib0*nlt,ny0])
-                rss_ef[0:nfib0,:]=erss[Std_id,:]
+                #rss_ef[0:nfib0,:]=erss[Std_id,:]
+                rss_ef[0:nfib0,:]=interp1d(wave0c,erss[Std_id,:],kind='linear',bounds_error=False)(wave0)
             x_ifu_V=np.zeros([nfib0*nlt,ny0])
             y_ifu_V=np.zeros([nfib0*nlt,ny0])
             if use_slitmap:
@@ -146,7 +149,7 @@ def map_ifu(expnumL,nameF=None,notebook=True,use_slitmap=True,errors=True,cent=F
         else:
             nx,ny=rss.shape  
             wave=crval+cdelt*(np.arange(ny)+1-crpix)
-            wave=wave/(1+helio/299792.458)
+            wave=wave*(1+helio/299792.458)
             for j in range(0, nfib0):
                 rss_f[nfib0*i+j,:]=interp1d(wave,rss[Std_id[j],:],kind='linear',bounds_error=False)(wave0)
                 if errors:
