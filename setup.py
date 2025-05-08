@@ -45,6 +45,7 @@ version = version(VERSION_FILE)
 setup(
     name='3DCubeGen',
     version=version,
+    #use_scm_version={"version_file": "CubeGen/common/_version.py"},
     description='A Python implementation for a 3D RSS to cube reconstruction',
     #long_description=readme(),
     classifiers=[
@@ -56,11 +57,12 @@ setup(
     keywords='galaxies',
     #url='https://gitlab.com/pipe3d/pyPipe3D',
     #download_url=f'https://gitlab.com/pipe3d/pyPipe3D/-/archive/v{version}/pyPipe3D-v{version}.tar.gz',
-    #author='pipe3d',
-    #author_email='pipe3d@astro.unam.mx',
+    author='hjibarram',
+    author_email='hibarram@astro.unam.mx',
     license='MIT',
     packages=all_packages,
     setup_requires=['wheel'],
+    #setup_requires=['setuptools_scm', 'wheel'],
     install_requires=requirements,
     include_package_data=True,
     package_data=packages_data,

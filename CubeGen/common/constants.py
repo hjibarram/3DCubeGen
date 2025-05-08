@@ -3,5 +3,5 @@ import numpy as np
 globally across the 3DCubeGen modules
 """
 
-__version__ = '3DCubeGen v0.1.0'
+__version__ = '3DCubeGen v0.2.0.dev0'
 
