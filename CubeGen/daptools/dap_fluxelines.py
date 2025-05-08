@@ -250,7 +250,7 @@ def dap_extract_fluxelines(name,out_path='./',path_cube='./',path_dap='./',path_
     ny=hdr['NAXIS1']
     nx=hdr['NAXIS2']
     wcs=WCS(hdr).celestial
-    head = wcs.to_header
+    head = wcs.to_header()
     
     
     if nsplit > 1:
