@@ -249,7 +249,7 @@ def dap_extract_fluxelines(name,out_path='./',path_cube='./',path_dap='./',path_
         hdr=fits.getheader(file, 0)
     ny=hdr['NAXIS1']
     nx=hdr['NAXIS2']
-    wcs=WCS(hdr)
+    wcs=WCS(hdr).celestial
     head = wcs.to_header
     
     
