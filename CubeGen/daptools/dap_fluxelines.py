@@ -342,7 +342,7 @@ def dap_extract_fluxelines(name,out_path='./',path_cube='./',path_dap='./',path_
     h_k["CUNIT1"]=hdr["CUNIT1"]                                           
     h_k["CUNIT2"]=hdr["CUNIT2"]
     h_k["RADESYS"]=hdr["RADESYS"]
-    #h_k["OBJSYS"]=hdr["OBJSYS"]
+    h_k["OBJSYS"]=hdr["OBJSYS"]
     h_k["EQUINOX"]=hdr["EQUINOX"]  
     h_k['EXTNAME']='PM'
     for j in range(0, n_keys2):
