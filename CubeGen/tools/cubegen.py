@@ -149,7 +149,7 @@ def map_ifu(expnumL,nameF=None,notebook=True,ofvel=[[0,0,0],[0,0,0],[0,0,0]],use
         else:
             nx,ny=rss.shape  
             wave=crval+cdelt*(np.arange(ny)+1-crpix)
-            wave=wave*(1+helio/299792.458)
+            wave=wave*(1+helio/299792.458)#
             for j in range(0, nfib0):
                 rss_f[nfib0*i+j,:]=interp1d(wave,rss[Std_id[j],:],kind='linear',bounds_error=False)(wave0)
                 if errors:
