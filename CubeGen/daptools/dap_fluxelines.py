@@ -283,7 +283,7 @@ def dap_extract_fluxelines(name,out_path='./',path_cube='./',path_dap='./',path_
     tools.sycall('mkdir -p '+out_path) 
 
     h1=fits.PrimaryHDU(map_dap,header=head)
-    h2=fits.ImageHDU(map_dap2)
+    h2=fits.ImageHDU(map_dap2,header=head)
     h_k=h1.header
     #h_k["CRVAL1"]=hdr['CRVAL1']
     #h_k["CD1_1"]=hdr["CD1_1"]
@@ -329,21 +329,21 @@ def dap_extract_fluxelines(name,out_path='./',path_cube='./',path_dap='./',path_
     n_mods=len(wave_mod)
     n_keys2=len(keys_vals)
     h_k=h2.header
-    h_k["CRVAL1"]=hdr['CRVAL1']
-    h_k["CD1_1"]=hdr["CD1_1"]
-    h_k["CD1_2"]=hdr["CD1_2"]
-    h_k["CRPIX1"]=hdr["CRPIX1"]
-    h_k["CTYPE1"]=hdr["CTYPE1"]
-    h_k["CRVAL2"]=hdr['CRVAL2']
-    h_k["CD2_1"]=hdr["CD2_1"]
-    h_k["CD2_2"]=hdr["CD2_2"]
-    h_k["CRPIX2"]=hdr["CRPIX2"]
-    h_k["CTYPE2"]=hdr["CTYPE2"]
-    h_k["CUNIT1"]=hdr["CUNIT1"]                                           
-    h_k["CUNIT2"]=hdr["CUNIT2"]
-    h_k["RADESYS"]=hdr["RADESYS"]
-    h_k["OBJSYS"]=hdr["OBJSYS"]
-    h_k["EQUINOX"]=hdr["EQUINOX"]  
+    #h_k["CRVAL1"]=hdr['CRVAL1']
+    #h_k["CD1_1"]=hdr["CD1_1"]
+    #h_k["CD1_2"]=hdr["CD1_2"]
+    #h_k["CRPIX1"]=hdr["CRPIX1"]
+    #h_k["CTYPE1"]=hdr["CTYPE1"]
+    #h_k["CRVAL2"]=hdr['CRVAL2']
+    #h_k["CD2_1"]=hdr["CD2_1"]
+    #h_k["CD2_2"]=hdr["CD2_2"]
+    #h_k["CRPIX2"]=hdr["CRPIX2"]
+    #h_k["CTYPE2"]=hdr["CTYPE2"]
+    #h_k["CUNIT1"]=hdr["CUNIT1"]                                           
+    #h_k["CUNIT2"]=hdr["CUNIT2"]
+    #h_k["RADESYS"]=hdr["RADESYS"]
+    #h_k["OBJSYS"]=hdr["OBJSYS"]
+    #h_k["EQUINOX"]=hdr["EQUINOX"]  
     h_k['EXTNAME']='PM'
     for j in range(0, n_keys2):
         for i in range(0, n_mods):
