@@ -13,4 +13,7 @@ graph TD
     C1 --> C3[mapgen]
     C2 --> C4[map_ifu]
     C3 --> C5[gen_map]
+    C --> T[daptools]
+    T --> T1[rss_gen.py]
+    T --> T2[dap_fluxelines.py]
 ```
