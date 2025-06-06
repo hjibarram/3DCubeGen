@@ -4,6 +4,7 @@ from astropy.io import fits
 from astropy.wcs import WCS
 import numpy as np
 import CubeGen.tools.tools as tools
+from astropy.wcs.utils import pixel_to_skycoord
 
 def rssp_extract(name,path='./',path_out='./',basename_in='lvmCube-NAME.fits.gz',basename_out='lvmRSS-NAMElab.fits',flu16=True,nsplit=0,spt=[0,0],lvm=True,fluxu=1e-16,notebook=True):
     file=basename_in.replace('NAME',name)
