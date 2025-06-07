@@ -181,7 +181,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     nw=len(wave0)
     ns=len(x_ifu_V)
     fibA=35.3
-    thet=-4.0
+    thet=0#-4.0
 
     
     if cent:
