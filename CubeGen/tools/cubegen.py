@@ -332,17 +332,17 @@ def map_ifu(expnumL,nameF=None,notebook=True,ofvel=[[0,0,0],[0,0,0],[0,0,0]],use
     h["CRPIX2"]=nly/2+0.5+dy
     h["CTYPE2"]='DEC--TAN'
     h["CUNIT1"]='deg     '                                           
-    h["CUNIT2"]='deg     '  
+    h["CUNIT2"]='deg     ' 
+    h["RADESYS"]='ICRS     '
+    h["OBJSYS"]='ICRS    '
+    h["EQUINOX"]=2000.00 
+    '''
     ##h["CDELT3"]=cdelt
     h["CD3_3"]=cdelt
     h["CRPIX3"]=crpix
     h["CRVAL3"]=crval0
     h["CUNIT3"]=('Angstrom','Units of coordinate increment and value    ')    
     h["CTYPE3"]=('WAVE    ','Air wavelength (linear) ')
-    h["RADESYS"]='ICRS     '
-    h["OBJSYS"]='ICRS    '
-    h["EQUINOX"]=2000.00
-    '''
     h["IFUCON"]=(str(int(ns))+' ','NFibers')
     if flu16:
         h["BUNIT"]='10^-16 erg/s/cm^2'
