@@ -295,8 +295,8 @@ def map_ifu(expnumL,nameF=None,notebook=True,ofvel=[[0,0,0],[0,0,0],[0,0,0]],use
         ifu_e=ifu_e/1e-16#*100
     
     new_header = wt.to_header()
-    h1=fits.PrimaryHDU(ifu,header=new_header)
-    #h1=fits.PrimaryHDU(ifu)
+    #h1=fits.PrimaryHDU(ifu,header=new_header)
+    h1=fits.PrimaryHDU(ifu)
     h2=fits.ImageHDU(ifu_e)
     h3=fits.ImageHDU(ifu_1)
     h4=fits.ImageHDU(ifu_m)
@@ -320,21 +320,21 @@ def map_ifu(expnumL,nameF=None,notebook=True,ofvel=[[0,0,0],[0,0,0],[0,0,0]],use
     ###h["BUNIT"]= ('1E-16 erg/s/cm^2','Unit of pixel value ' )
     ###h["OBJECT"]=hdr_0[0]['OBJECT']
     ###h["CTYPE"] = ("RA---TAN", "DEC--TAN")
-    #h["CRVAL1"]=xat#xot/3600.0
-    #h["CD1_1"]=-np.cos(thet*np.pi/180.)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    #h["CD1_2"]=-np.sin(thet*np.pi/180.)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    #h["CRPIX1"]=nlx/2+0.5+dx
-    #h["CTYPE1"]='RA---TAN'
-    #h["CRVAL2"]=yat#yot/3600.0
-    #h["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.
-    #h["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.
-    #h["CRPIX2"]=nly/2+0.5+dy
-    #h["CTYPE2"]='DEC--TAN'
-    #h["CUNIT1"]='deg     '                                           
-    #h["CUNIT2"]='deg     '  
-    #h["RADESYS"]='ICRS     '
-    #h["OBJSYS"]='ICRS    '
-    #h["EQUINOX"]=2000.00
+    h["CRVAL1"]=xat#xot/3600.0
+    h["CD1_1"]=-np.cos(thet*np.pi/180.)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    h["CD1_2"]=-np.sin(thet*np.pi/180.)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    h["CRPIX1"]=nlx/2+0.5+dx
+    h["CTYPE1"]='RA---TAN'
+    h["CRVAL2"]=yat#yot/3600.0
+    h["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.
+    h["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.
+    h["CRPIX2"]=nly/2+0.5+dy
+    h["CTYPE2"]='DEC--TAN'
+    h["CUNIT1"]='deg     '                                           
+    h["CUNIT2"]='deg     '  
+    h["RADESYS"]='ICRS     '
+    h["OBJSYS"]='ICRS    '
+    h["EQUINOX"]=2000.00
     h["CDELT3"]=cdelt
     h["CD3_3"]=cdelt
     h["CRPIX3"]=crpix
