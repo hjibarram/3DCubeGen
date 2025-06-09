@@ -339,7 +339,7 @@ def map_ifu(expnumL,nameF=None,notebook=True,ofvel=[[0,0,0],[0,0,0],[0,0,0]],use
     '''
     h["WCSAXES"]=(3,'Number of coordinate axes ')
     h["CDELT3"]=cdelt
-    h["CD3_3"]=cdelt
+    #h["CD3_3"]=cdelt
     h["CRPIX3"]=crpix
     h["CRVAL3"]=crval0
     h["CUNIT3"]=('Angstrom','Units of coordinate increment and value    ')    
