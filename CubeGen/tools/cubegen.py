@@ -337,6 +337,8 @@ def map_ifu(expnumL,nameF=None,notebook=True,ofvel=[[0,0,0],[0,0,0],[0,0,0]],use
     h["OBJSYS"]='ICRS    '
     h["EQUINOX"]=2000.00 
     '''
+    h["CD2_2"]=h["CDELT2"]
+    h["CD1_1"]=h["CDELT1"]
     h["WCSAXES"]=(3,'Number of coordinate axes ')
     h["CDELT3"]=cdelt
     h["CD3_3"]=cdelt
