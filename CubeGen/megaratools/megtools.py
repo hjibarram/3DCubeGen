@@ -62,7 +62,7 @@ def megarafiber_pos(hdr):
     y_ifu=y_posf*psc
     return x_ifu,y_ifu,fib_idt,fib_ids
 
-def read_standar(path_data='',stdar_t='Feige32',stdT='',fergs=True)
+def read_standar(path_data='',stdar_t='Feige32',stdT='',fergs=True):
     wav_i=[]
     res_i=[]
     file=path_data+'/'+stdar_t+stdT+'.dat'
