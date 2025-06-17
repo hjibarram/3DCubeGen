@@ -61,3 +61,22 @@ def megarafiber_pos(hdr):
     x_ifu=x_posf*psc
     y_ifu=y_posf*psc
     return x_ifu,y_ifu,fib_idt,fib_ids
+
+def read_standar(path_data='',stdar_t='Feige32',stdT='',fergs=True)
+    wav_i=[]
+    res_i=[]
+    file=path_data+'/'+stdar_t+stdT+'.dat'
+    f=open(file,'r')
+    for line in f:
+        if not "#" in line:
+            data=line.replace('\n','').split(' ')
+            data=list(filter(None,data))
+            wav_i.extend([float(data[0])])
+            if fergs:
+                res_i.extend([float(data[1])*1e-16])
+            else:
+                res_i.extend([float(data[1])])
+    f.close()
+    wav_i=np.array(wav_i)
+    res_i=np.array(res_i)
+    return wav_i,res_i
