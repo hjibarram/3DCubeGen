@@ -3,6 +3,7 @@ from scipy.interpolate import interp1d
 from astropy.io import fits
 import CubeGen.tools.tools as tools
 import matplotlib.pyplot as plt
+from astropy.coordinates import SkyCoord,EarthLocation
 
 def extintion_c(wave,dir_tem='data',basename='extintion_curve'):
     f=open(dir_tem+'/'+basename+'.txt','r')
@@ -36,7 +37,7 @@ def id_str(id,n_z=2):
             idt=str(id)
     return idt
 
-def megarafiber_pos(hdr):
+def megarafiber_pos(hdr,verbose=False):
     nfib=hdr['NFIBERS']
     psc=hdr['PSCALE']
     x_pos=np.zeros(nfib)
@@ -57,12 +58,13 @@ def megarafiber_pos(hdr):
     fib_idt=fib_id[nt]
     nt=np.where((np.abs(x_pos) > 10) & (np.abs(y_pos) > 10))
     fib_ids=fib_id[nt]
-        
-    #import matplotlib.pyplot as plt
-    #plt.plot(x_posf*psc,y_posf*psc,'o')
-    #plt.show()
-    x_ifu=x_posf*psc
-    y_ifu=y_posf*psc
+    x_ifu=x_posf*psc+hdr['CRVAL1']*3600.0
+    y_ifu=y_posf*psc+hdr['CRVAL2']*3600.0 
+    if verbose:
+        import matplotlib.pyplot as plt
+        plt.plot(x_ifu/3600.,y_ifu/3600.,'o')
+        plt.show() 
+        #print(hdr['CRVAL2'])
     return x_ifu,y_ifu,fib_idt,fib_ids
 
 def read_standar(path_data='data',stdar_t='Feige32',stdT='',fergs=True):
@@ -333,3 +335,96 @@ def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32'):
         flux,s,res_f=gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data=path_data,vph=vph,scalefact=scalefact)
     factor=meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph=vph)
     return factor
+
+
+def lst_c(mjd=56000.0,tai=np.inf,lng=-105.820417):
+    if np.isfinite(tai) == True:
+        jd=2400000.5+tai/(24.0*3600.0)
+    else:
+        jd=mjd+2400000.5
+    c = [280.46061837,360.98564736629,0.000387933,38710000.0]
+    jd2000=2451545.0
+    t0 = jd - jd2000
+    t = t0/36525.0
+    theta=c[0]+(c[1]*t0)+t**2.0*(c[2]-t/c[3])
+    
+    lst=(theta+lng+360.0)/15.0
+    if lst < 0.0:
+        lst = 24.0+(lst % 24.0)
+    lst = lst % 24.0
+    return lst
+
+def paralactic_angle(ha,dec=0.0,phi=32.78):
+    p=np.arctan2(np.sin(ha/24.0*360.0*np.pi/180.0),(np.tan(phi*np.pi/180.0)*np.cos(dec*np.pi/180.0)-np.sin(dec*np.pi/180.0)*np.cos(ha/24.0*360.0*np.pi/180.0)))*180.0/np.pi
+    p=p % 360.0
+    return p    
+
+def airmas(ha,dec=0.0,phi=32.78):
+    cosz=np.sin(phi*np.pi/180.0)*np.sin(dec*np.pi/180.0)+np.cos(phi*np.pi/180.0)*np.cos(dec*np.pi/180.0)*np.cos(ha/24.0*360.0*np.pi/180.0)
+    M=(1.002432*cosz**2.0+0.148386*cosz+0.0096467)/(cosz**3.0+0.149864*cosz**2.0+0.0102963*cosz+0.000303978)# Airmas formula from Young 1994
+    return M
+   
+def refrac_dif(wave,ha,dec=0.0,phi=32.78,lo=5070.0,T=7.0,P=600.0,f=8.0,vapor=False):
+    cosz=np.sin(phi*np.pi/180.0)*np.sin(dec*np.pi/180.0)+np.cos(phi*np.pi/180.0)*np.cos(dec*np.pi/180.0)*np.cos(ha/24.0*360.0*np.pi/180.0)
+    R=64.328+29498.1/(146.0-(1.0/(wave*1e-4))**2.0)+255.4/(41.0-(1.0/(wave*1e-4))**2.0)
+    R=R*P*(1.0+P*(1.049-0.0157*T)*1e-6)/(720.883*(1.0+0.003661*T))
+    R1=64.328+29498.1/(146.0-(1.0/(lo*1e-4))**2.0)+255.4/(41.0-(1.0/(lo*1e-4))**2.0)
+    R1=R1*P*(1.0+P*(1.049-0.0157*T)*1e-6)/(720.883*(1.0+0.003661*T))
+    if vapor == True:
+        R=R*(0.0624-0.000680/(wave*1e-4)**2.0)/(1.0+0.003661*T)*f
+        R1=R1*(0.0624-0.000680/(lo*1e-4)**2.0)/(1.0+0.003661*T)*f
+    R=R-R1
+    z=np.arccos(cosz)
+    R=R*np.tan(z)
+    R=R/1e6*3600*180/np.pi
+    return R
+
+
+def wavelength_virus(header):
+    ref_pixel = header['CRPIX1']
+    coord_ref_pixel = header['CRVAL1']
+    wave_pixel = header['CDELT1']
+    npix=header['NAXIS1']
+    wstart = coord_ref_pixel - ( (ref_pixel-1)*wave_pixel)
+    wave = np.array([wstart + i*wave_pixel for i in range(npix)])
+    return wave,ref_pixel,coord_ref_pixel,wave_pixel
+
+def get_adr(hdr,wave,lo=5000.0):
+    mjd=hdr["MJD-OBS"]
+    lng=hdr["LONGITUD"].replace("+","-")
+    lat=hdr["LATITUDE"]
+    hig=hdr["HEIGHT"]
+    Presure=hdr["PRESSURE"]
+    Temp=hdr["TAMBIENT"]
+    Tai=hdr["DATE-OBS"]
+    pos_obs = EarthLocation(lng,lat,hig*u.m)
+    long=pos_obs.lon.deg
+    lati=pos_obs.lat.deg
+    min_wave=np.nanmin(wave)
+    max_wave=np.nanmax(wave)    
+    #time=Time(Tai,format="fits",scale="tai")
+    #tai=time.to_value('unix_tai', 'long')
+    #tai=time.to_value('mjd', 'long')*(24.0*3600.0
+    dec_0=hdr["DECDEG"]
+    ra_0=hdr["RADEG"]
+    ha=lst_c(lng=long,mjd=mjd)-ra_0/180.0*12.0
+    R=refrac_dif(wave,ha,dec=dec_0,phi=lati,lo=lo,T=Temp,P=Presure,f=8.0)
+    pa=paralactic_angle(ha,dec=dec_0,phi=lati)
+    R2=np.array([[np.cos(pa*np.pi/180.0),-np.sin(pa*np.pi/180.0)],[np.sin(pa*np.pi/180.0),np.cos(pa*np.pi/180.0)]])
+    return R2,R
+
+def get_radvel(hdr):
+    import astropy.units as u
+    mjd=hdr["MJD-OBS"]
+    lng=hdr["LONGITUD"].replace("+","-")
+    lat=hdr["LATITUDE"]
+    hig=hdr["HEIGHT"]
+    Tai=hdr["DATE-OBS"]
+    dec_0=hdr["DECDEG"]
+    ra_0=hdr["RADEG"]
+    sky = SkyCoord(ra_0,dec_0,unit="deg",frame="fk5")
+    pos_obs = EarthLocation(lng,lat,hig*u.m)
+    time = Time(mjd, format='mjd', scale='utc')
+    rv=sky.radial_velocity_correction(obstime=time, location=pos_obs).value 
+    rv=rv/299792458.0
+    return rv
