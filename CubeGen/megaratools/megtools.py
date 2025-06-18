@@ -106,7 +106,7 @@ def extract_cube(wave0,s,r,xo=0,yo=0,stdar_t='Feige32',path_ifu='',vph='B'):
     flux=flux*1e-16#/1.501045#/0.172
     return flux,wave,s
 
-def get_rssflux_sens(r,xo=0,yo=0,path_sensfits='',path_data='data',vph='B',phase=0):
+def get_rssflux_sens(r,xo=0,yo=0,path_block9='',path_sensfits='',path_data='data',vph='B',phase=0):
     file=path_sensfits+'master_sensitivity.fits'
     if phase >= 1:
         file=path_data+'/master_sensitivity'+vph+'_n.fits'
