@@ -63,7 +63,7 @@ def megarafiber_pos(hdr):
     y_ifu=y_posf*psc
     return x_ifu,y_ifu,fib_idt,fib_ids
 
-def read_standar(path_data='',stdar_t='Feige32',stdT='',fergs=True):
+def read_standar(path_data='data',stdar_t='Feige32',stdT='',fergs=True):
     wav_i=[]
     res_i=[]
     file=path_data+'/'+stdar_t+stdT+'.dat'
@@ -105,6 +105,30 @@ def extract_cube(wave0,s,r,xo=0,yo=0,stdar_t='Feige32',path_ifu='',vph='B'):
     s=interp1d(wave0,s0,bounds_error=False,fill_value=0.)(wave)
     flux=flux*1e-16#/1.501045#/0.172
     return flux,wave,s
+
+def get_rssflux_sens(r,xo=0,yo=0,path_sensfits='',path_data='data',vph='B',phase=0):
+    file=path_sensfits+'master_sensitivity.fits'
+    if phase >= 1:
+        file=path_data+'/master_sensitivity'+vph+'_n.fits'
+    [s, hdr2]=fits.getdata(file, 0, header=True)
+    file=path_block9+'final_rss.fits'
+    [flux, hdr0]=fits.getdata(file, 0, header=True)
+    l0=hdr0['CRVAL1']
+    dl=hdr0['CDELT1']
+    Xa=hdr0['AIRMASS']
+    [flux0, hdr1]=fits.getdata(file, 1, header=True)
+    x_ifu,y_ifu,fib_idt,fib_ids=megarafiber_pos(hdr1)
+    xs=xo*0.35-7 #-npix/2*dpix IFU
+    ys=yo*0.35-7 #-npix/2*dpix IFU
+    nt=np.where(np.sqrt((x_ifu-xs)**2.0+(y_ifu-ys)**2.0) <= r)
+    fib_idt=fib_idt[nt]
+    fluxf=0
+    for i in range(0, len(fib_idt)):
+        fluxf=fluxf+flux[int(fib_idt[i])-1,:]
+    flux=fluxf
+    wave=l0+np.arange(len(flux))*dl
+    return wave,flux,Xa,s,hdr2
+
 
 def high_res_std(wav_i,res_i,wave,flux,flux1,path_data='',stdar_t='Feige32',vph='B'):
 	#Generate high resolution standard star spectra
@@ -188,3 +212,4 @@ def high_res_std(wav_i,res_i,wave,flux,flux1,path_data='',stdar_t='Feige32',vph=
         f.write(str(wav_i[i])+' '+str(res_i[i])+' \n')
     f.close()
     return wav_i,res_i
+    #end high resolution standard star spectra
