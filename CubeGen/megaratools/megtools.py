@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.interpolate import interp1d
+from astropy.io import fits
 
 def extintion_c(wave,dir_tem='data',basename='extintion_curve'):
     f=open(dir_tem+'/'+basename+'.txt','r')
@@ -80,3 +81,27 @@ def read_standar(path_data='',stdar_t='Feige32',stdT='',fergs=True):
     wav_i=np.array(wav_i)
     res_i=np.array(res_i)
     return wav_i,res_i
+
+def extract_cube(wave0,s,r,stdar_t='Feige32',path_ifu='',vph='B'):
+	file=path_ifu+'/SPSTD_'+stdar_t+'_'+vph+'.fits.gz'
+    [flux, hdrT]=fits.getdata(file, 0, header=True)
+    nz,nx,ny=flux.shape
+    rad=np.zeros([nx,ny])
+    for i in range(0, nx):
+        for j in range(0,ny):
+            rt=np.sqrt((i-xo)**2.0+(j-yo)**2.0)*0.35
+            if rt <= r:
+                rad[i,j]=1.0
+    fluxf=np.zeros(nz)
+    nt=np.where(rad == 1.0)
+    for z in range(0, nz):
+        fluxf0=flux[z,:,:]
+        fluxf[z]=np.nansum(fluxf0[nt])
+    flux=fluxf
+    l0=hdrT['CRVAL3']
+    dl=hdrT['CDELT3']
+    wave=l0+np.arange(len(flux))*dl
+    s0=np.copy(s)
+    s=interp1d(wave0,s0,bounds_error=False,fill_value=0.)(wave)
+    flux=flux*1e-16#/1.501045#/0.172
+    return flux,wave,s
