@@ -317,19 +317,19 @@ def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32'):
         fergs=False
         stdT='_hr'+vph
 
-    wav_i,res_i=mtools.read_standar(path_data=path_data,stdar_t=stdar_t,stdT=stdT,fergs=fergs)
-    wave,flux,Xa,s,hdr2=mtools.get_rssflux_sens(r,xo=xo,yo=yo,path_block9=path_block9,path_sensfits=path_sensfits,path_data=path_data,vph=vph,phase=phase)
+    wav_i,res_i=read_standar(path_data=path_data,stdar_t=stdar_t,stdT=stdT,fergs=fergs)
+    wave,flux,Xa,s,hdr2=get_rssflux_sens(r,xo=xo,yo=yo,path_block9=path_block9,path_sensfits=path_sensfits,path_data=path_data,vph=vph,phase=phase)
     if cube == True:
-        flux,wave,s=mtools.extract_cube(wave,s,r,xo=xo,yo=yo,stdar_t=stdar_t,path_ifu='ifu',vph=vph)
+        flux,wave,s=extract_cube(wave,s,r,xo=xo,yo=yo,stdar_t=stdar_t,path_ifu='ifu',vph=vph)
     maxwave=np.round(np.nanmax(wave)-70)
     minwave=np.round(np.nanmin(wave)+70)
-    Kvl=mtools.extintion_c(wave)
+    Kvl=extintion_c(wave)
     at_ext=10.0**(-0.4*Xa*Kvl)
     flux1=flux/s/at_ext
     if gen_hr == True:
-        wav_i,res_i=mtools.high_res_std(wav_i,res_i,wave,flux,flux1,path_data=path_data,stdar_t=stdar_t,vph=vph)
+        wav_i,res_i=high_res_std(wav_i,res_i,wave,flux,flux1,path_data=path_data,stdar_t=stdar_t,vph=vph)
     res_f=interp1d(wav_i,res_i,bounds_error=False,fill_value=0.)(wave)
     if gen_sensf == True:
-        flux,s,res_f=mtools.gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data=path_data,vph=vph,scalefact=scalefact)
-    factor=mtools.meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph=vph)
+        flux,s,res_f=gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data=path_data,vph=vph,scalefact=scalefact)
+    factor=meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph=vph)
     return factor
