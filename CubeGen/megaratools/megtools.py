@@ -254,4 +254,4 @@ def gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data='data'
     s=resp
     fits.writeto(path_data+'/master_sensitivity'+vph+'_n.fits', resp*scalefact, hdr2,overwrite=True)#*0.2*0.555#*0.3336#*0.864
     flux=flux/s
-    return flux,s
+    return flux,s,res_f
