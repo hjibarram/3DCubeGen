@@ -83,7 +83,7 @@ def read_standar(path_data='',stdar_t='Feige32',stdT='',fergs=True):
     return wav_i,res_i
 
 def extract_cube(wave0,s,r,stdar_t='Feige32',path_ifu='',vph='B'):
-	file=path_ifu+'/SPSTD_'+stdar_t+'_'+vph+'.fits.gz'
+    file=path_ifu+'/SPSTD_'+stdar_t+'_'+vph+'.fits.gz'
     [flux, hdrT]=fits.getdata(file, 0, header=True)
     nz,nx,ny=flux.shape
     rad=np.zeros([nx,ny])
