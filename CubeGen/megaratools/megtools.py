@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 from astropy.io import fits
+import CubeGen.tools.tools as tools
 
 def extintion_c(wave,dir_tem='data',basename='extintion_curve'):
     f=open(dir_tem+'/'+basename+'.txt','r')
@@ -213,3 +214,44 @@ def high_res_std(wav_i,res_i,wave,flux,flux1,path_data='',stdar_t='Feige32',vph=
     f.close()
     return wav_i,res_i
     #end high resolution standard star spectra
+
+
+def gen_sensf(wav_i,res_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data='data',vph='B',scalefact=1.0):
+    la1=6550#7594#6550
+    la2=6590#7619#6590
+    lb1=6860#8100#6860
+    lb2=6910#8300#6910#6890
+    nt=np.where((wav_i >= np.min(wave)) & (wav_i <= np.max(wave)))
+    fluxt=interp1d(wave,flux,bounds_error=False,fill_value=0.)(wav_i[nt])
+    fluxt1=interp1d(wav_i[nt],fluxt,bounds_error=False,fill_value=0.)(wave)
+    res_f=res_f*at_ext
+    resp=fluxt1/res_f
+    nt=np.where((wave >= minwave-20) & (wave <= maxwave+20))
+    resp_t=resp[nt]
+    resp_t0=resp[nt]
+    wave_t=wave[nt]
+    nt0=np.where((wave_t >= la1) & (wave_t <= la2))
+    resp_t[nt0]=0
+    nt1=np.where((wave_t >= lb1) & (wave_t <= lb2))
+    resp_t[nt1]=0
+    nt2=np.where(resp_t > 0)
+    resp_tt=resp_t[nt2]
+    wave_tt=wave_t[nt2]
+    resp_t=interp1d(wave_tt,resp_tt,bounds_error=False,fill_value=0.)(wave_t)
+    resp_t1=tools.median_a(resp_t,lw=60)
+    resp_t1[nt0]=0
+    resp_t1[nt1]=0
+    resp_t1=resp_t1[nt2]
+    resp_t1=interp1d(wave_tt,resp_t1,bounds_error=False,fill_value=0.)(wave_t)
+    #nt3=np.where((wave_t >= 6860) & (wave_t <= 7400))#6884-7400
+    #nt3=np.where((wave_t >= 8100) & (wave_t <= 8400))#6884-7400
+    nt3=np.where((wave_t >= 6860) & (wave_t <= 7400))#6884-7400
+    resp_t1[nt3]=resp_t0[nt3]
+    #nt3=np.where((wave_t >= 7617) & (wave_t <= 7720))#6884-7400
+    nt3=np.where((wave_t >= 6860) & (wave_t <= 7400))#6884-7400
+    resp_t1[nt3]=resp_t0[nt3]
+    resp[nt]=resp_t1#model
+    s=resp
+    fits.writeto(path_data+'/master_sensitivity'+vph+'_n.fits', resp*scalefact, hdr2,overwrite=True)#*0.2*0.555#*0.3336#*0.864
+    flux=flux/s
+    return flux,s
