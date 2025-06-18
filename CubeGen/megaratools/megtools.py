@@ -5,6 +5,7 @@ import CubeGen.tools.tools as tools
 import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord,EarthLocation
 from astropy.time import Time
+from astropy import units as u
 
 def extintion_c(wave,dir_tem='data',basename='extintion_curve'):
     f=open(dir_tem+'/'+basename+'.txt','r')
