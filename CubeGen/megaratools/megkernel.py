@@ -2,7 +2,7 @@ import numpy as np
 
 
 #spec_ifu,specE_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nl,npros,nproc,erroF
-def kernel_int(spec_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yi,yf,xi,xf,nw,nl,erroF=False):
+def kernel_int(ifu,ifuE,spec_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yi,yf,xi,xf,nw,nl,i,erroF=False):
 	if sigm_s > fibA*3.5*2:
         radiT=sigm_s/2.0
     else:
@@ -21,20 +21,14 @@ def kernel_int(spec_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yi,yf,xi,xf,nw,
             Wg=np.zeros(nw)
             if len(ntp[0]) > 0:   
                 Wg[ntp]=np.exp(-(Rsp[ntp]/sigm_s)**alph_s/2.0)
-                ##fib=np.int(fib_idt[k])-1
                 spt_new[ntp]=spec_ifu[k,ntp]*Wg[ntp]+spt_new[ntp]
-                ##spt_err=(spec_ifu_e[k,:]*Wg)**2.0+spt_err**2.0
+                if erroF:
+                    sptE_new[ntp]=(specE_ifut[k,ntp]**2.0)*Wg[ntp]**2.0+sptE_new[ntp]
             Wgt=Wgt+Wg
-        #if Wgt == 0:
-        #    Wgt=1
-        #print Wgt
         ntp=np.where(Wgt == 0)
         if len(ntp[0]) > 0:
             Wgt[ntp]=1
         ifu[:,j,i]=spt_new/Wgt
-        ##if np.sum(np.sqrt(spt_err/Wgt**2.0)) == 0:
-        ##    ifu_e[:,j,i]=1.0
-        ##else:
-        ##    ifu_e[:,j,i]=np.sqrt(spt_err/Wgt**2.0)
-        #   # ifu_m[:,j,i]=1.0
-        #int_spect=int_spect+spt_new/Wgt
+        if erroF:
+            ifuE[:,j,i]=np.sqrt(sptE_new)/Wgt
+    return ifu,ifuE
