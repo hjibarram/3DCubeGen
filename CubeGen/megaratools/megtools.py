@@ -216,7 +216,7 @@ def high_res_std(wav_i,res_i,wave,flux,flux1,path_data='',stdar_t='Feige32',vph=
     #end high resolution standard star spectra
 
 
-def gen_sensf(wav_i,res_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data='data',vph='B',scalefact=1.0):
+def gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data='data',vph='B',scalefact=1.0):
     la1=6550#7594#6550
     la2=6590#7619#6590
     lb1=6860#8100#6860
