@@ -260,8 +260,7 @@ def gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data='data'
 def meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph='B'):
     nt=np.where((wave > minwave) & np.isfinite(flux))# & (s > 0)) 4332
     max_val1=np.nanmax(flux[nt])*1.1
-    print(np.nanmean(flux[nt]/res_f[nt]))
-
+    factor=np.nanmean(flux[nt]/res_f[nt])
     fig, ax = plt.subplots(figsize=(6.5,5.5))
     ax.set_ylim(0,max_val1)#/100.0)
     ax.set_xlim(minwave,maxwave)#4332,5230)#7250,8700)#6109,7399)#3500,10100)  7550,7720)#
@@ -275,3 +274,62 @@ def meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph='B'):
     fig.tight_layout()
     plt.savefig('spec'+vph+'.jpg')#,dpi=1000)
     plt.close()
+    return factor
+
+def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32'):
+    r=4.0#Aperture radius
+    path_data='data'
+    path_block9='obsid9'+vph+'_results/'
+    path_sensfits='obsid9'+vph+'_results/'
+    if phase == 0:
+        cube=False
+        gen_hr=False
+        gen_sensf=True
+        scalefact=1.0
+        fergs=True
+        stdT=''
+    if phase == 1:
+        cube=False
+        gen_hr=True
+        gen_sensf=False
+        scalefact=1.0
+        fergs=True
+        stdT=''
+    if phase == 2:
+        cube=False
+        gen_hr=False
+        gen_sensf=True
+        scalefact=1.0
+        fergs=False
+        stdT='_hr'+vph
+    if phase == 3 or phase == 5:
+        cube=True
+        gen_hr=False
+        gen_sensf=False
+        scalefact=1.0
+        fergs=False
+        stdT='_hr'+vph
+    if phase == 4:
+        cube=False
+        gen_hr=False
+        gen_sensf=True
+        scalefact=scfact
+        fergs=False
+        stdT='_hr'+vph
+
+    wav_i,res_i=mtools.read_standar(path_data=path_data,stdar_t=stdar_t,stdT=stdT,fergs=fergs)
+    wave,flux,Xa,s,hdr2=mtools.get_rssflux_sens(r,xo=xo,yo=yo,path_block9=path_block9,path_sensfits=path_sensfits,path_data=path_data,vph=vph,phase=phase)
+    if cube == True:
+        flux,wave,s=mtools.extract_cube(wave,s,r,xo=xo,yo=yo,stdar_t=stdar_t,path_ifu='ifu',vph=vph)
+    maxwave=np.round(np.nanmax(wave)-70)
+    minwave=np.round(np.nanmin(wave)+70)
+    Kvl=mtools.extintion_c(wave)
+    at_ext=10.0**(-0.4*Xa*Kvl)
+    flux1=flux/s/at_ext
+    if gen_hr == True:
+        wav_i,res_i=mtools.high_res_std(wav_i,res_i,wave,flux,flux1,path_data=path_data,stdar_t=stdar_t,vph=vph)
+    res_f=interp1d(wav_i,res_i,bounds_error=False,fill_value=0.)(wave)
+    if gen_sensf == True:
+        flux,s,res_f=mtools.gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data=path_data,vph=vph,scalefact=scalefact)
+    factor=mtools.meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph=vph)
+    return factor
