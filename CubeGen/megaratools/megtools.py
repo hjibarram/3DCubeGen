@@ -2,6 +2,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 from astropy.io import fits
 import CubeGen.tools.tools as tools
+import matplotlib.pyplot as plt
 
 def extintion_c(wave,dir_tem='data',basename='extintion_curve'):
     f=open(dir_tem+'/'+basename+'.txt','r')
