@@ -255,3 +255,22 @@ def gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data='data'
     fits.writeto(path_data+'/master_sensitivity'+vph+'_n.fits', resp*scalefact, hdr2,overwrite=True)#*0.2*0.555#*0.3336#*0.864
     flux=flux/s
     return flux,s,res_f
+
+def meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph='B'):
+    nt=np.where((wave > minwave) & np.isfinite(flux))# & (s > 0)) 4332
+    max_val1=np.nanmax(flux[nt])*1.1
+    print(np.nanmean(flux[nt]/res_f[nt]))
+
+    fig, ax = plt.subplots(figsize=(6.5,5.5))
+    ax.set_ylim(0,max_val1)#/100.0)
+    ax.set_xlim(minwave,maxwave)#4332,5230)#7250,8700)#6109,7399)#3500,10100)  7550,7720)#
+    ax.set_xlabel("$Wavelength [A]$",fontsize=14)
+    ax.set_ylabel(r'Flux $[erg/s/cm^2/\AA]$',fontsize=14)
+    plt.plot(wave,flux,alpha=0.4,color='grey')
+    #plt.plot(wave,s,alpha=1.0,color='black')#spectro final
+    plt.plot(wave,res_f,color='blue',alpha=0.8)#spectro original
+    #plt.plot(wave_t,resp_t1,alpha=0.9,color='red')
+    #plt.plot(wave_t,resp_t,alpha=0.9,color='green')
+    fig.tight_layout()
+    plt.savefig('spec'+vph+'.jpg')#,dpi=1000)
+    plt.close()
