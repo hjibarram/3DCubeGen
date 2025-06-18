@@ -105,3 +105,86 @@ def extract_cube(wave0,s,r,xo=0,yo=0,stdar_t='Feige32',path_ifu='',vph='B'):
     s=interp1d(wave0,s0,bounds_error=False,fill_value=0.)(wave)
     flux=flux*1e-16#/1.501045#/0.172
     return flux,wave,s
+
+def high_res_std(wav_i,res_i,wave,flux,flux1,path_data='',stdar_t='Feige32',vph='B'):
+	#Generate high resolution standard star spectra
+    #First line
+    la1=4800#7550#6530#6884
+    la2=4900#7619#6590#7120
+    nt1=np.where((wav_i <= la1))
+    nt2=np.where((wav_i >= la2))
+    flutt1=res_i[nt1]
+    flutt2=res_i[nt2]
+    wavt1=wav_i[nt1]
+    wavt2=wav_i[nt2]
+    nt0=np.where((wave > la1) & (wave < la2))
+    flutt0=flux1[nt0]
+    #flutt0[len(flutt0)-2:len(flutt0)]=4.23e-11#np.mean(flutt0[0:3])#esto es valido solo para este objeto
+    wavt0=wave[nt0]
+    res_i=np.append(np.append(flutt1,flutt0),flutt2)
+    wav_i=np.append(np.append(wavt1,wavt0),wavt2)
+    #Second line
+    la1=6530
+    la2=6590
+    nt1=np.where((wav_i <= la1))
+    nt2=np.where((wav_i >= la2))
+    flutt1=res_i[nt1]
+    flutt2=res_i[nt2]
+    wavt1=wav_i[nt1]
+    wavt2=wav_i[nt2]
+    nt0=np.where((wave > la1) & (wave < la2))
+    flutt0=flux1[nt0]
+    wavt0=wave[nt0]
+    res_i=np.append(np.append(flutt1,flutt0),flutt2)
+    wav_i=np.append(np.append(wavt1,wavt0),wavt2)
+    #Second line
+    #la1=6860#6884
+    #la2=6884#7120
+    #nt1=np.where((wav_i <= la1))
+    #nt2=np.where((wav_i >= la2))
+    #flutt1=res_i[nt1]
+    #flutt2=res_i[nt2]
+    #wavt1=wav_i[nt1]
+    #wavt2=wav_i[nt2]
+    #nt0=np.where((wave > la1) & (wave < la2))
+    #flutt0=flux1[nt0]
+    #wavt0=wave[nt0]
+    #res_i=np.append(np.append(flutt1,flutt0),flutt2)
+    #wav_i=np.append(np.append(wavt1,wavt0),wavt2)
+    #First Atmospheric bands 
+    la1=6860#7619#6860#6884
+    la2=6950#7720#6950#7120
+    nt1=np.where((wav_i <= la1))
+    nt2=np.where((wav_i >= la2))
+    wavt1=wav_i[nt1]
+    wavt2=wav_i[nt2]
+    nt0=np.where((wave > la1) & (wave < la2))
+    wavt0=wave[nt0]
+    wav_it=np.append(np.append(wavt1,wavt0),wavt2)
+    nt3=np.where((wav_i <= la1) | (wav_i >= la2))
+    flutt3=res_i[nt3]
+    wavt3=wav_i[nt3]
+    fluxft=interp1d(wavt3,flutt3,bounds_error=False,fill_value=0.)(wav_it)
+    res_i=fluxft
+    wav_i=wav_it
+    #Second Atmospheric bands 
+    la1=6950#8100#6950#7150#6884
+    la2=7380#8350#7380#7120
+    nt1=np.where((wav_i <= la1))
+    nt2=np.where((wav_i >= la2))
+    wavt1=wav_i[nt1]
+    wavt2=wav_i[nt2]
+    nt0=np.where((wave > la1) & (wave < la2))
+    wavt0=wave[nt0]
+    wav_it=np.append(np.append(wavt1,wavt0),wavt2)
+    nt3=np.where((wav_i <= la1) | (wav_i >= la2))
+    flutt3=res_i[nt3]
+    wavt3=wav_i[nt3]
+    fluxft=interp1d(wavt3,flutt3,bounds_error=False,fill_value=0.)(wav_it)
+    res_i=fluxft
+    wav_i=wav_it
+    f=open(path_data+'/'+stdar_t+'_hr'+vph+'.dat','w')
+    for i in range(0, len(wav_i)):
+        f.write(str(wav_i[i])+' '+str(res_i[i])+' \n')
+    f.close()
+    return wav_i,res_i
