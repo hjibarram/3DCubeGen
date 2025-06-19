@@ -338,6 +338,7 @@ def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=Tr
         wav_i,res_i=high_res_std(wav_i,res_i,wave,flux,flux1,path_data=path_data,stdar_t=stdar_t,vph=vph)
     res_f=interp1d(wav_i,res_i,bounds_error=False,fill_value=0.)(wave)
     if gen_sensf == True:
+    	print('R')
         flux,s,res_f=gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data=path_data,vph=vph,scalefact=scalefact)
     factor=meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph=vph)
     if verbose:
