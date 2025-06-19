@@ -208,8 +208,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
     ifuE=np.ones([nw,nly,nlx])
     ifu_1=np.ones([nw,nly,nlx])
     ifu_m=np.zeros([nw,nly,nlx])
-    xo=-nl/2*pix_s
-    yo=-nl/2*pix_s
+    xo=-nlx/2*pix_s
+    yo=-nly/2*pix_s
     xi=xo
     xf=xo
     facto=(pix_s)**2.0/(np.pi*(fibA/2.0)**2.0)
