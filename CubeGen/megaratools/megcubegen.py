@@ -24,6 +24,8 @@ def megmap_ifu(nameF=None):
         None
     """
 
+    
+
 #files=['obsid5','obsid12']
 files=['obsid12R']
 if len (files) > 1:
