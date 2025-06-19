@@ -227,7 +227,7 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
 
     if flu16:
         ifu=ifu/1e-16
-        ifu_e=ifu_e/1e-16#*100    
+        ifuE=ifuE/1e-16#*100    
 
     h1=fits.PrimaryHDU(ifu)
     h2=fits.ImageHDU(ifuE)
