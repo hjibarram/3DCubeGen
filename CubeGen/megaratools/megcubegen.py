@@ -15,7 +15,7 @@ import CubeGen.megaratools.megkernel as mkernel
 
 #notebook=True,ofvel=[[0,0,0],[0,0,0],[0,0,0]],use_slitmap=True,cent=False,coord_ast=[0,0],coord_cen=[0,0],pbars=True,multiT=False,agcam_dir='',
 #redux_ver='1.0.2.dev0',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],path_lvmcore=''
-def megmap_ifu(reduxL,nameF=None,plot_sky=False,errors=False,flu16=False,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',vph='R',scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits'):
+def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',vph='R',scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits'):
     """
     Generate a cube from MEGARA IFU data.
     

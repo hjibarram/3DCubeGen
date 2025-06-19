@@ -64,7 +64,7 @@ def megarafiber_pos(hdr,verbose=False,astmet=True):
         x_ifu=x_posf*psc+hdr['CRVAL1']*3600.0
         y_ifu=y_posf*psc+hdr['CRVAL2']*3600.0 
     else:
-    	x_ifu=x_posf*psc
+        x_ifu=x_posf*psc
         y_ifu=y_posf*psc
     if verbose:
         import matplotlib.pyplot as plt
