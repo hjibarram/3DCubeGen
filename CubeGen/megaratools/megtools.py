@@ -39,7 +39,7 @@ def id_str(id,n_z=2):
             idt=str(id)
     return idt
 
-def megarafiber_pos(hdr,verbose=False):
+def megarafiber_pos(hdr,verbose=False,astmet=True):
     nfib=hdr['NFIBERS']
     psc=hdr['PSCALE']
     x_pos=np.zeros(nfib)
@@ -60,8 +60,12 @@ def megarafiber_pos(hdr,verbose=False):
     fib_idt=fib_id[nt]
     nt=np.where((np.abs(x_pos) > 10) & (np.abs(y_pos) > 10))
     fib_ids=fib_id[nt]
-    x_ifu=x_posf*psc+hdr['CRVAL1']*3600.0
-    y_ifu=y_posf*psc+hdr['CRVAL2']*3600.0 
+    if astmet:
+        x_ifu=x_posf*psc+hdr['CRVAL1']*3600.0
+        y_ifu=y_posf*psc+hdr['CRVAL2']*3600.0 
+    else:
+    	x_ifu=x_posf*psc
+        y_ifu=y_posf*psc
     if verbose:
         import matplotlib.pyplot as plt
         plt.plot(x_ifu/3600.,y_ifu/3600.,'o')
@@ -123,7 +127,7 @@ def get_rssflux_sens(r,xo=0,yo=0,path_block9='',path_sensfits='',path_data='data
     dl=hdr0['CDELT1']
     Xa=hdr0['AIRMASS']
     [flux0, hdr1]=fits.getdata(file, 1, header=True)
-    x_ifu,y_ifu,fib_idt,fib_ids=megarafiber_pos(hdr1)
+    x_ifu,y_ifu,fib_idt,fib_ids=megarafiber_pos(hdr1,astmet=False)
     xs=xo*0.35-7 #-npix/2*dpix IFU
     ys=yo*0.35-7 #-npix/2*dpix IFU
     nt=np.where(np.sqrt((x_ifu-xs)**2.0+(y_ifu-ys)**2.0) <= r)
