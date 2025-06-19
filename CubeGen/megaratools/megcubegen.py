@@ -277,7 +277,7 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
     h["NAXIS3"]=nw 
     h["NAXIS1"]=nlx
     h["NAXIS2"]=nly
-    h["NDITER"]=(len(files),'Number of dither observations')
+    h["NDITER"]=(len(reduxL),'Number of dither observations')
     h["BUNIT"]= ('1E-16 erg/s/cm^2','Unit of pixel value ' )
     h["OBJECT"]=hdr_0[0]['OBJECT']
     h["CRVAL1"]=xot/3600.0#hdr1['CRVAL1']
@@ -298,7 +298,7 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
     h['CUNIT3']=('Angstrom','Units of coordinate increment and value    ')    
     h['CTYPE3']=('AWAV    ','Air wavelength (linear) ')
     h['RADECSYS']='ICRS    '
-    h['SYSTEM']='FK5     '
+    h['SYSTEM']='ICRS     '
     h['EQUINOX']=2000.00
     h['IFUCON']=(str(int(ns))+' ','NFibers')
     if flu16:
