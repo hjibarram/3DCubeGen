@@ -53,8 +53,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
                     print('The wave Range is not well defined')  
                     return
             else:
-                wave_1=np.round(np.nanmax(wave0)-70)
-                wave_2=np.round(np.nanmin(wave0)+70)
+                wave_2=np.round(np.nanmax(wave0)-70)
+                wave_1=np.round(np.nanmin(wave0)+70)
                 nt=np.where((wave0 >= wave_1) & (wave0 <= wave_2))[0]
                 wave0=wave0[nt]
                 rss=rss[:,nt]
