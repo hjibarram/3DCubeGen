@@ -6,7 +6,7 @@ import CubeGen.tools.tools as tools
 import CubeGen.megaratools.megtools as mtools
 import CubeGen.megaratools.megkernel as mkernel
 
-def meggen_map(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',vph='R',scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits'):
+def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',vph='R',scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits'):
     """
     Generate a map from MEGARA IFU data.
     
