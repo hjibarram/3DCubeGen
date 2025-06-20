@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord,EarthLocation
 from astropy.time import Time
 from astropy import units as u
+from astropy.convolution import convolve, convolve_fft, Gaussian2DKernel
 
 def extintion_c(wave,dir_tem='data',basename='extintion_curve'):
     f=open(dir_tem+'/'+basename+'.txt','r')
@@ -435,3 +436,77 @@ def get_radvel(hdr):
     rv=sky.radial_velocity_correction(obstime=time, location=pos_obs).value 
     rv=rv/299792458.0
     return rv
+
+
+def evaluate_2dPSF(pf_map,model=True,sig=2,plotview=False):
+    nx,ny=pf_map.shape
+    if sig == 0:
+        pf_map_c=pf_map
+    else:
+        PSF=Gaussian2DKernel(x_stddev=sig,y_stddev=sig)
+        pf_map_c=convolve(pf_map, PSF)
+    min_in=np.unravel_index(np.nanargmax(pf_map_c), (nx,ny))
+    At=np.nanmax(pf_map)
+    x_t=np.arange(ny)-min_in[1]
+    y_t=np.arange(nx)-min_in[0]
+    x_t=np.array([x_t]*nx)
+    y_t=np.array([y_t]*ny).T
+    n_ds=100
+    n_dx=50
+    n_dy=50
+    ds_t=np.arange(n_ds)/float(n_ds)*(4.0-1.0)+1.0
+    dx=np.arange(n_dx)/float(n_dx)*10-5.0
+    dy=np.arange(n_dy)/float(n_dy)*10-5.0
+    chi2_m=np.zeros([n_ds,n_dx,n_dy])
+    for j in range(0, n_ds):
+        for k in range(0, n_dx):
+            for w in range(0, n_dy):
+                spec_t=np.exp(-0.5*((((x_t-dx[k])/ds_t[j])**2.0)+((y_t-dy[w])/ds_t[j])**2.0))*At
+                chi2_m[j,k,w]=np.nansum((pf_map-spec_t)**2.0)
+    min_int=np.unravel_index(np.nanargmin(chi2_m), (n_ds,n_dx,n_dy))
+    ds_m=ds_t[min_int[0]]
+    dx_m=dx[min_int[1]]
+    dy_m=dy[min_int[2]]
+    
+    
+    if plotview:
+        cm=plt.cm.get_cmap('jet')
+        lev=np.sqrt(np.arange(0.0,10.0,1.5)+0.008)/np.sqrt(10.008)
+        fig, ax = plt.subplots(figsize=(6.8*1.1,5.5*1.2))
+        #ict=plt.imshow(np.log10(pf_map/At),cmap=cm) 
+        ict=plt.imshow((pf_map_c/At),cmap=cm) 
+        cbar=plt.colorbar(ict)
+        ics=plt.contour(pf_map/At,lev,colors='k',linewidths=1)            
+        cbar.set_label(r"Relative Density")
+        fig.tight_layout()
+        plt.show()
+    
+    if model:
+        spec_t=np.exp(-0.5*((((x_t-dx_m)/ds_m)**2.0)+((y_t-dy_m)/ds_m)**2.0))*At
+        if plotview:
+            fig, ax = plt.subplots(figsize=(6.8*1.1,5.5*1.2))
+            ict=plt.imshow(spec_t/At,cmap=cm) 
+            cbar=plt.colorbar(ict)
+            ics=plt.contour(spec_t/At,lev,colors='k',linewidths=1)
+            ics=plt.contour(pf_map/At,lev,colors='red',linewidths=1)            
+            cbar.set_label(r"Relative Density")
+            fig.tight_layout()
+            plt.show()
+        
+            fig, ax = plt.subplots(figsize=(6.8*1.1,5.5*1.2))
+            ict=plt.imshow((pf_map-spec_t)/At,cmap=cm) 
+            cbar=plt.colorbar(ict)
+            ics=plt.contour((pf_map-spec_t)/At,lev,colors='k',linewidths=1)
+            cbar.set_label(r"Relative Density")
+            fig.tight_layout()
+            plt.show()
+        
+        dx_m=dx_m+min_in[1]#0
+        dy_m=dy_m+min_in[0]#1
+        psf=ds_m*2.0*np.sqrt(2.0*np.log10(2.0))
+        return dx_m,dy_m,ds_m,psf,spec_t
+    else:    
+        dx_m=dx_m+min_in[1]
+        dy_m=dy_m+min_in[0]
+        psf=ds_m*2.0*np.sqrt(2.0*np.log10(2.0))
+        return dx_m,dy_m,ds_m,psf
