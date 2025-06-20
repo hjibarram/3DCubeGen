@@ -186,4 +186,4 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
         hlist.writeto(out_fit,overwrite=True)
         tools.sycall('gzip -f '+out_fit)
     else:
-        ifu,h
+        return,ifu,h
