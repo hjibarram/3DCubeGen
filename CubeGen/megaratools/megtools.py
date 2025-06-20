@@ -340,7 +340,7 @@ def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=Tr
         flux,s,res_f=gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data=path_data,vph=vph,scalefact=scalefact)
     factor=meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph=vph)
     if verbose:
-        print(factor)
+        print('The scale factor is:',factor)
     return factor
 
 
