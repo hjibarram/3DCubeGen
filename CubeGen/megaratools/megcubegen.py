@@ -24,7 +24,7 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
     hdr_0=[]
     hdr_1=[]
     for ii in range(0, nlt):
-        file=redux_dir+'/'+reduxL[ii]+'_results/'+basename
+        file=redux_dir+reduxL[ii]+'_results/'+basename
         [rss, hdr]=fits.getdata(file,0, header=True)
         [erss, hdr1]=fits.getdata(file,1, header=True)
         print('Processing '+hdr['OBJECT'])

@@ -284,9 +284,8 @@ def meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph='B'):
     plt.close()
     return factor
 
-def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=True):
+def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=True,path_data='data'):
     r=4.0#Aperture radius
-    path_data='data'
     path_block9='obsid9'+vph+'_results/'
     path_sensfits='obsid9'+vph+'_results/'
     if phase == 0:
