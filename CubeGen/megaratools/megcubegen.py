@@ -30,7 +30,7 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
         print('Processing '+hdr['OBJECT'])
         n_fib,ny0=rss.shape
         if ii == 0:
-            outf=hdr['OBJECT']+'_R'
+            outf=hdr['OBJECT']+'_'+vph
             x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1)
             crval=hdr['CRVAL1']
             cdelt=hdr['CDELT1']
