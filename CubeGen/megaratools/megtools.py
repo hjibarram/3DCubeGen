@@ -500,9 +500,9 @@ def evaluate_2dPSF(pf_map,model=True,sig=2,plotview=False,centroid=False):
         dy_m=dy_m+min_in[0]#1
         psf=ds_m*2.0*np.sqrt(2.0*np.log10(2.0))
         if centroid:
-        	yo=dx_m+1
+            yo=dx_m+1
             xo=dy_m+1
-        	return xo,yo
+            return xo,yo
         else:
             return dx_m,dy_m,ds_m,psf,spec_t
     else:    
@@ -510,8 +510,8 @@ def evaluate_2dPSF(pf_map,model=True,sig=2,plotview=False,centroid=False):
         dy_m=dy_m+min_in[0]
         psf=ds_m*2.0*np.sqrt(2.0*np.log10(2.0))
         if centroid:
-        	yo=dx_m+1
+            yo=dx_m+1
             xo=dy_m+1
-        	return xo,yo
+            return xo,yo
         else:
             return dx_m,dy_m,ds_m,psf
