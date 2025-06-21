@@ -43,11 +43,6 @@ def id_str(id,n_z=2):
 def megarafiber_pos(hdr,verbose=False,astmet=True):
     nfib=hdr['NFIBERS']
     psc=hdr['PSCALE']
-    try:
-        pc11=hdr['PC1_1']
-        pc12=hdr['PC1_2']
-        pc21=hdr['PC2_1']
-        pc22=hdr['PC2_2']
     x_pos=np.zeros(nfib)
     y_pos=np.zeros(nfib)
     fib_a=np.zeros(nfib)
@@ -67,6 +62,10 @@ def megarafiber_pos(hdr,verbose=False,astmet=True):
     fib_ids=fib_id[nt]
     if astmet:
         try:
+            pc11=hdr['PC1_1']
+            pc12=hdr['PC1_2']
+            pc21=hdr['PC2_1']
+            pc22=hdr['PC2_2']
             x_ifu=(x_posf*pc11+y_posf*pc21)*psc+hdr['CRVAL1']*3600.0    
             y_ifu=(x_posf*pc12+y_posf*pc22)*psc+hdr['CRVAL2']*3600.0
         except:
