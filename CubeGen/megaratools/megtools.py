@@ -43,13 +43,17 @@ def id_str(id,n_z=2):
 def megarafiber_pos(hdr,verbose=False,astmet=True):
     nfib=hdr['NFIBERS']
     psc=hdr['PSCALE']
+    try:
+        pc11=hdr['PC1_1']
+        pc12=hdr['PC1_2']
+        pc21=hdr['PC2_1']
+        pc22=hdr['PC2_2']
     x_pos=np.zeros(nfib)
     y_pos=np.zeros(nfib)
     fib_a=np.zeros(nfib)
     fib_b=np.zeros(nfib)
     fib_id=np.zeros(nfib)
     for i in range(0, nfib):
-        #print 'FIB'+str(i+1)+'_X'
         x_pos[i]=hdr['FIB'+id_str(i+1,n_z=3)+'_X']
         y_pos[i]=hdr['FIB'+id_str(i+1,n_z=3)+'_Y']
         fib_a[i]=hdr['FIB'+id_str(i+1,n_z=3)+'_D']
@@ -62,8 +66,12 @@ def megarafiber_pos(hdr,verbose=False,astmet=True):
     nt=np.where((np.abs(x_pos) > 10) & (np.abs(y_pos) > 10))
     fib_ids=fib_id[nt]
     if astmet:
-        x_ifu=x_posf*psc+hdr['CRVAL1']*3600.0
-        y_ifu=y_posf*psc+hdr['CRVAL2']*3600.0 
+        try:
+            x_ifu=(x_posf*pc11+y_posf*pc21)*psc+hdr['CRVAL1']*3600.0    
+            y_ifu=(x_posf*pc12+y_posf*pc22)*psc+hdr['CRVAL2']*3600.0
+        except:
+            x_ifu=x_posf*psc+hdr['CRVAL1']*3600.0
+            y_ifu=y_posf*psc+hdr['CRVAL2']*3600.0 
     else:
         x_ifu=x_posf*psc
         y_ifu=y_posf*psc
@@ -71,7 +79,6 @@ def megarafiber_pos(hdr,verbose=False,astmet=True):
         import matplotlib.pyplot as plt
         plt.plot(x_ifu/3600.,y_ifu/3600.,'o')
         plt.show() 
-        #print(hdr['CRVAL2'])
     return x_ifu,y_ifu,fib_idt,fib_ids
 
 def read_standar(path_data='data',stdar_t='Feige32',stdT='',fergs=True):
