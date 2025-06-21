@@ -93,14 +93,14 @@ def read_standar(path_data='data',stdar_t='Feige32',stdT='',fergs=True):
     res_i=np.array(res_i)
     return wav_i,res_i
 
-def extract_cube(wave0,s,r,xo=0,yo=0,stdar_t='Feige32',path_ifu='',vph='B'):
+def extract_cube(wave0,s,r,xo=0,yo=0,stdar_t='Feige32',path_ifu='',vph='B',dpix=0.35):
     file=path_ifu+'/SPSTD_'+stdar_t+'_'+vph+'.fits.gz'
     [flux, hdrT]=fits.getdata(file, 0, header=True)
     nz,nx,ny=flux.shape
     rad=np.zeros([nx,ny])
     for i in range(0, nx):
         for j in range(0,ny):
-            rt=np.sqrt((i-xo)**2.0+(j-yo)**2.0)*0.35
+            rt=np.sqrt((i-xo)**2.0+(j-yo)**2.0)*dpix
             if rt <= r:
                 rad[i,j]=1.0
     fluxf=np.zeros(nz)
@@ -117,7 +117,7 @@ def extract_cube(wave0,s,r,xo=0,yo=0,stdar_t='Feige32',path_ifu='',vph='B'):
     flux=flux*1e-16#/1.501045#/0.172
     return flux,wave,s
 
-def get_rssflux_sens(r,xo=0,yo=0,path_block9='',path_sensfits='',path_data='data',vph='B',phase=0):
+def get_rssflux_sens(r,xo=0,yo=0,path_block9='',path_sensfits='',path_data='data',vph='B',phase=0,dpix=0.35):
     file=path_sensfits+'master_sensitivity.fits'
     if phase >= 1:
         file=path_data+'/master_sensitivity'+vph+'_n.fits'
@@ -129,8 +129,8 @@ def get_rssflux_sens(r,xo=0,yo=0,path_block9='',path_sensfits='',path_data='data
     Xa=hdr0['AIRMASS']
     [flux0, hdr1]=fits.getdata(file, 1, header=True)
     x_ifu,y_ifu,fib_idt,fib_ids=megarafiber_pos(hdr1,astmet=False)
-    xs=xo*0.35-7 #-npix/2*dpix IFU
-    ys=yo*0.35-7 #-npix/2*dpix IFU
+    xs=xo*dpix-12.5/2#7 #-npix/2*dpix IFU
+    ys=yo*dpix-11.3/2#7 #-npix/2*dpix IFU
     nt=np.where(np.sqrt((x_ifu-xs)**2.0+(y_ifu-ys)**2.0) <= r)
     fib_idt=fib_idt[nt]
     fluxf=0
@@ -285,7 +285,7 @@ def meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph='B'):
     plt.close()
     return factor
 
-def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=True,path_data='data',r=4.0):
+def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=True,path_data='data',r=4.0,dpix=0.35):
     #r is Aperture radius
     path_block9='obsid9'+vph+'_results/'
     path_sensfits='obsid9'+vph+'_results/'
@@ -324,11 +324,10 @@ def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=Tr
         scalefact=scfact
         fergs=False
         stdT='_hr'+vph
-
     wav_i,res_i=read_standar(path_data=path_data,stdar_t=stdar_t,stdT=stdT,fergs=fergs)
-    wave,flux,Xa,s,hdr2=get_rssflux_sens(r,xo=xo,yo=yo,path_block9=path_block9,path_sensfits=path_sensfits,path_data=path_data,vph=vph,phase=phase)
+    wave,flux,Xa,s,hdr2=get_rssflux_sens(r,xo=xo,yo=yo,path_block9=path_block9,path_sensfits=path_sensfits,path_data=path_data,vph=vph,phase=phase,dpix=dpix)
     if cube == True:
-        flux,wave,s=extract_cube(wave,s,r,xo=xo,yo=yo,stdar_t=stdar_t,path_ifu='ifu',vph=vph)
+        flux,wave,s=extract_cube(wave,s,r,xo=xo,yo=yo,stdar_t=stdar_t,path_ifu='ifu',vph=vph,dpix=dpix)
     maxwave=np.round(np.nanmax(wave)-70)
     minwave=np.round(np.nanmin(wave)+70)
     Kvl=extintion_c(wave)
@@ -500,8 +499,8 @@ def evaluate_2dPSF(pf_map,model=True,sig=2,plotview=False,centroid=False):
         dy_m=dy_m+min_in[0]#1
         psf=ds_m*2.0*np.sqrt(2.0*np.log10(2.0))
         if centroid:
-            yo=dx_m+1
-            xo=dy_m+1
+            yo=dx_m
+            xo=dy_m
             return xo,yo
         else:
             return dx_m,dy_m,ds_m,psf,spec_t
@@ -510,8 +509,8 @@ def evaluate_2dPSF(pf_map,model=True,sig=2,plotview=False,centroid=False):
         dy_m=dy_m+min_in[0]
         psf=ds_m*2.0*np.sqrt(2.0*np.log10(2.0))
         if centroid:
-            yo=dx_m+1
-            xo=dy_m+1
+            yo=dx_m
+            xo=dy_m
             return xo,yo
         else:
             return dx_m,dy_m,ds_m,psf
