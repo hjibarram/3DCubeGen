@@ -11,7 +11,7 @@ import CubeGen.tools.tools as tools
 #import warnings
 #warnings.filterwarnings("ignore")
 
-@click.group('megaradrp', short_help='CLI for the MEGARA DRP tools')
+@click.group('pipemegara', short_help='CLI for the MEGARA DRP tools')
 def cli():
     pass
 
