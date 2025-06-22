@@ -8,16 +8,15 @@ import CubeGen.megaratools.megtools as mtools
 import CubeGen.megaratools.megcubegen as mcube
 import CubeGen.megaratools.megmapgen as mmap
 import CubeGen.tools.tools as tools
-import warnings
-warnings.filterwarnings("ignore")
+#import warnings
+#warnings.filterwarnings("ignore")
 
-@click.group('run_megaradrp', short_help='CLI for the MEGARA DRP tools')
+@click.group('megaradrp', short_help='CLI for the MEGARA DRP tools')
 def cli():
     pass
 
 
 @cloup.command(short_help='Run the MEGARA DRP')
-#@click.option('-c', '--config_file', type=str, default='', help='name of the config file')
 @click.option('-o', '--out_path', type=str, default='out_cubes', help='path of the output cube files')
 @click.option('-v', '--redux_ver', type=str, default='0.0.1', help='the DRP reduction version of the MEGARA cubes')
 @click.option('-r', '--redux_dir', type=str, default='', help='path of the redux dir, default set to " " to local files')
@@ -25,15 +24,18 @@ def cli():
 @click.option('-p', '--pix_s', type=float, default=0.0, help='spaxel size used to reconstruct the cube, default set to 0 to fix it to sigm_s')
 @click.option('-a', '--alph_s', type=float, default=2.0, help='kernel "shape" factor, a value equal of 2 returns a Gaussian kerner, larger than 2 returns a sharper kernel')
 @click.option('-f', '--flu16', is_flag=True, default=True,help='keyword to return a cube with units of 10^{-16} erg/s/cm2/A, if False, the units are erg/s/cm2/A')
-@click.option('-n', '--name', type=str, help='output root name of the data cube')
+@click.option('-n', '--name', type=str, default=None, help='output root name of the data cube')
 @click.option('-m', '--stdar_t', type=str, help='name of the STD star')
 @click.option('-b', '--basename', type=str, default='megCube-NAME.fits',help='basename of the final data cube, default megCube-NAME.fits, not remove NAME')
 @click.option('-y', '--vph', type=str, default='LR-R', help='VPH name of the observation')
-#@click.option('-e', '--errors', is_flag=True, default=True,help='activate or deactivate the error estimation')
 @click.option('-u', '--fac_sizey', type=float, default=1.0, help='factor of the FoV in Y, default 1')
 @click.option('-i', '--fac_sizex', type=float, default=1.0, help='factor of the FoV in X, default 1')
+#@click.option('-c', '--config_file', type=str, default='', help='name of the config file')
+#@click.option('-e', '--errors', is_flag=True, default=True,help='activate or deactivate the error estimation')
 
-def run_megara(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,basename,vph,fac_sizey,fac_sizex):
+
+def run(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,basename,vph,fac_sizey,fac_sizex):
+
     if pix_s == 0:
         pix_s=sigm_s
     if name == 'None':
@@ -89,4 +91,5 @@ def run_megara(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar
     	out_path='ifu/',redux_dir='',vph=vph,basenameC=basename)
     tools.sycall(call13)
     tools.sycall(call14)
-cli.add_command(run_megara)
+
+cli.add_command(run)
