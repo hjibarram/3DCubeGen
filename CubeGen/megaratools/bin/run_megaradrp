@@ -33,7 +33,7 @@ def cli():
 @click.option('-u', '--fac_sizey', type=float, default=1.0, help='factor of the FoV in Y, default 1')
 @click.option('-i', '--fac_sizex', type=float, default=1.0, help='factor of the FoV in X, default 1')
 
-def run_megaradrp(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,basename,vph,fac_sizey,fac_sizex):
+def run_megara(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,basename,vph,fac_sizey,fac_sizex):
 	if pix_s == 0:
         pix_s=sigm_s
     if name == 'None'
@@ -89,4 +89,4 @@ def run_megaradrp(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,st
     	out_path='ifu/',redux_dir='',vph=vph,basenameC=basename)
     tools.sycall(call13)
     tools.sycall(call14)
-cli.add_command(run_megaradrp)
+cli.add_command(run_megara)
