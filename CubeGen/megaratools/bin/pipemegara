@@ -93,3 +93,6 @@ def run(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,base
     tools.sycall(call14)
 
 cli.add_command(run)
+
+if __name__ == "__main__":
+    cli()
