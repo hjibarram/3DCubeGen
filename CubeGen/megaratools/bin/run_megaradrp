@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+
+import click
+import cloup
+from cloup.constraints import mutually_exclusive, RequireExactly, IsSet, If
+import numpy as np
+import CubeGen.megaratools.megtools as mtools
+import CubeGen.megaratools.megcubegen as mcube
+import CubeGen.megaratools.megmapgen as mmap
+import CubeGen.tools.tools as tools
+import warnings
+warnings.filterwarnings("ignore")
+
+@click.group('run_megaradrp', short_help='CLI for the MEGARA DRP tools')
+def cli():
+    pass
+
+
+@cloup.command(short_help='Run the MEGARA DRP')
+#@click.option('-c', '--config_file', type=str, default='', help='name of the config file')
+@click.option('-o', '--out_path', type=str, default='out_cubes', help='path of the output cube files')
+@click.option('-v', '--redux_ver', type=str, default='0.0.1', help='the DRP reduction version of the MEGARA cubes')
+@click.option('-r', '--redux_dir', type=str, default='', help='path of the redux dir, default set to " " to local files')
+@click.option('-s', '--sigm_s', type=float, default=0.35, help='smoth kernel size used to reconstruct the cube')
+@click.option('-p', '--pix_s', type=float, default=0.0, help='spaxel size used to reconstruct the cube, default set to 0 to fix it to sigm_s')
+@click.option('-a', '--alph_s', type=float, default=2.0, help='kernel "shape" factor, a value equal of 2 returns a Gaussian kerner, larger than 2 returns a sharper kernel')
+@click.option('-f', '--flu16', is_flag=True, default=True,help='keyword to return a cube with units of 10^{-16} erg/s/cm2/A, if False, the units are erg/s/cm2/A')
+@click.option('-n', '--name', type=str, help='output root name of the data cube')
+@click.option('-m', '--stdar_t', type=str, help='name of the STD star')
+@click.option('-b', '--basename', type=str, default='megCube-NAME.fits',help='basename of the final data cube, default megCube-NAME.fits, not remove NAME')
+@click.option('-y', '--vph', type=str, default='LR-R', help='VPH name of the observation')
+#@click.option('-e', '--errors', is_flag=True, default=True,help='activate or deactivate the error estimation')
+@click.option('-u', '--fac_sizey', type=float, default=1.0, help='factor of the FoV in Y, default 1')
+@click.option('-i', '--fac_sizex', type=float, default=1.0, help='factor of the FoV in X, default 1')
+
+def run_megaradrp(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,basename,vph,fac_sizey,fac_sizex):
+	if pix_s == 0:
+        pix_s=sigm_s
+    if name == 'None'
+        name=None
+    reduxL0=['obsid9'+vph]
+    reduxL1=['obsid11'+vph]
+    reduxL2=['obsid12'+vph]
+    comand_base='numina run obsresult-NRVPH.yaml -r requirementsVPH.yaml'
+    dir_base='obsidNRVPH_results'
+    call0=comand_base.replace('NRVPH','1').replace('VPH',vph)
+    call1='cp '+dir_base.replace('NRVPH','1')+'/master_bias.fits data/master_bias.fits'
+    call2=comand_base.replace('NR','2').replace('VPH',vph)
+    call3='cp '+dir_base.replace('NR','2').replace('VPH',vph)+'/master_traces.json data/master_tracesVPH.json'.replace('VPH',vph)
+    call4=comand_base.replace('NR','8').replace('VPH',vph)
+    call5='cp '+dir_base.replace('NR','8').replace('VPH',vph)+'/master_model.json data/master_modelVPH.json'.replace('VPH',vph)
+    call6=comand_base.replace('NR','3').replace('VPH',vph)
+    call7='cp '+dir_base.replace('NR','3').replace('VPH',vph)+'/master_wlcalib.json data/master_wlcalibVPH.json'.replace('VPH',vph)
+    call8=comand_base.replace('NR','6').replace('VPH',vph)
+    call9='cp '+dir_base.replace('NR','6').replace('VPH',vph)+'/master_fiberflat.fits data/master_fiberflatVPH.fits'.replace('VPH',vph)
+    call10=comand_base.replace('NR','9').replace('sVPH','sVPHT').replace('VPH',vph)
+    call11=comand_base.replace('NR','11').replace('VPH',vph)
+    call12=comand_base.replace('NR','12').replace('VPH',vph)
+    call13='mkdir -p '+out_path+'_v'+redux_ver+'/'
+    call14'cp '+'ifu/'+basename.replace('NAME','*')+' '+out_path+'_v'+redux_ver+'/'
+    tools.sycall(call0)
+    tools.sycall(call1)
+    tools.sycall(call2)
+    tools.sycall(call3)
+    tools.sycall(call4)
+    tools.sycall(call5)
+    tools.sycall(call6)
+    tools.sycall(call7)
+    tools.sycall(call8)
+    tools.sycall(call9)
+    tools.sycall(call10)
+    mapt,hdr=mmap.meggen_map(reduxL0,savefile=False,nameF=None,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,
+    	sigm_s=sigm_s,alph_s=alph_s,out_path='ifu/',redux_dir='',vph=vph,basenameC='tNAME.fits')
+    xo,yo=mtools.evaluate_2dPSF(mapt,model=False,sig=0,plotview=False,centroid=True)
+    fact=mtools.calib_spec(phase=0,scfact=1.0,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t)
+    fact=mtools.calib_spec(phase=1,scfact=1.0,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t)
+    fact=mtools.calib_spec(phase=2,scfact=1.0,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t)
+    tools.sycall(call11)
+    mcube.megmap_ifu(reduxL1,nameF=None,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
+    	out_path='ifu/',redux_dir='',vph=vph,basenameC='NAME.fits')
+    fact=mtools.calib_spec(phase=3,scfact=1.0,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t)
+    fact=mtools.calib_spec(phase=4,scfact=fact,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t)
+    tools.sycall(call11)
+    mcube.megmap_ifu(reduxL1,nameF=None,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
+    	out_path='ifu/',redux_dir='',vph=vph,basenameC='NAME.fits')
+    fact=mtools.calib_spec(phase=5,scfact=1.0,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t)
+    tools.sycall(call12)
+    mcube.megmap_ifu(reduxL2,nameF=name,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
+    	out_path='ifu/',redux_dir='',vph=vph,basenameC=basename)
+    tools.sycall(call13)
+    tools.sycall(call14)
+cli.add_command(run_megaradrp)
