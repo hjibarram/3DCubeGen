@@ -36,7 +36,7 @@ def cli():
 def run_megara(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,basename,vph,fac_sizey,fac_sizex):
     if pix_s == 0:
         pix_s=sigm_s
-    if name == 'None'
+    if name == 'None':
         name=None
     reduxL0=['obsid9'+vph]
     reduxL1=['obsid11'+vph]
