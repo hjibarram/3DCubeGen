@@ -336,7 +336,7 @@ def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=Tr
         flux,wave,s=extract_cube(wave,s,r,xo=xo,yo=yo,stdar_t=stdar_t,path_ifu=path_ifu,vph=vph,dpix=dpix)
     maxwave=np.round(np.nanmax(wave)-70)
     minwave=np.round(np.nanmin(wave)+70)
-    Kvl=extintion_c(wave)
+    Kvl=extintion_c(wave,dir_tem=path_data)
     at_ext=10.0**(-0.4*Xa*Kvl)
     flux1=flux/s/at_ext
     if gen_hr == True:
