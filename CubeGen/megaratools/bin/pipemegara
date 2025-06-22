@@ -43,14 +43,14 @@ def rundrp(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,b
     if name == 'None':
         name=None
     if redux_dir != '':
-    	path_work='--basedir '+redux_dir+'/'
-    	redux_dirT=redux_dir+'/'
-    	path_data='--datadir '+redux_dir+'/data/'
+        path_work='--basedir '+redux_dir+'/'
+        redux_dirT=redux_dir+'/'
+        path_data='--datadir '+redux_dir+'/data/'
     else:
-    	path_work=''
-    	redux_dirT=''
+        path_work=''
+        redux_dirT=''
         path_data=''
-    		
+    
     reduxL0=['obsid9'+vph]
     reduxL1=['obsid11'+vph]
     reduxL2=['obsid12'+vph]
