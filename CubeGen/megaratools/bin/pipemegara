@@ -16,7 +16,7 @@ def cli():
     pass
 
 
-@cloup.command('run', short_help='Run the MEGARA DRP')
+@cloup.command('rundrp', short_help='Run the MEGARA DRP')
 @click.option('-o', '--out_path', type=str, default='out_cubes', help='path of the output cube files')
 @click.option('-v', '--redux_ver', type=str, default='0.0.1', help='the DRP reduction version of the MEGARA cubes')
 @click.option('-r', '--redux_dir', type=str, default='', help='path of the redux dir, default set to " " to local files')
@@ -34,7 +34,7 @@ def cli():
 #@click.option('-e', '--errors', is_flag=True, default=True,help='activate or deactivate the error estimation')
 
 
-def run(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,basename,vph,fac_sizey,fac_sizex):
+def rundrp(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,basename,vph,fac_sizey,fac_sizex):
 
     if pix_s == 0:
         pix_s=sigm_s
@@ -92,7 +92,7 @@ def run(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,base
     tools.sycall(call13)
     tools.sycall(call14)
 
-cli.add_command(run)
+cli.add_command(rundrp)
 
 if __name__ == "__main__":
     cli()
