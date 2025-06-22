@@ -272,7 +272,7 @@ def gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data='data'
     flux=flux/s
     return flux,s,res_f
 
-def meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph='B'):
+def meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph='B',pathwork=''):
     nt=np.where((wave > minwave) & np.isfinite(flux))# & (s > 0)) 4332
     max_val1=np.nanmax(flux[nt])*1.1
     factor=np.nanmean(flux[nt]/res_f[nt])
@@ -287,14 +287,14 @@ def meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph='B'):
     #plt.plot(wave_t,resp_t1,alpha=0.9,color='red')
     #plt.plot(wave_t,resp_t,alpha=0.9,color='green')
     fig.tight_layout()
-    plt.savefig('spec'+vph+'.jpg')#,dpi=1000)
+    plt.savefig(pathwork+'spec'+vph+'.jpg')#,dpi=1000)
     plt.close()
     return factor
 
-def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=True,path_data='data',r=4.0,dpix=0.35):
+def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=True,path_data='data',pathwork='',path_ifu='ifu',r=4.0,dpix=0.35):
     #r is Aperture radius
-    path_block9='obsid9'+vph+'_results/'
-    path_sensfits='obsid9'+vph+'_results/'
+    path_block9=pathwork+'obsid9'+vph+'_results/'
+    path_sensfits=pathwork+'obsid9'+vph+'_results/'
     if phase == 0:
         cube=False
         gen_hr=False
@@ -333,7 +333,7 @@ def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=Tr
     wav_i,res_i=read_standar(path_data=path_data,stdar_t=stdar_t,stdT=stdT,fergs=fergs)
     wave,flux,Xa,s,hdr2=get_rssflux_sens(r,xo=xo,yo=yo,path_block9=path_block9,path_sensfits=path_sensfits,path_data=path_data,vph=vph,phase=phase,dpix=dpix)
     if cube == True:
-        flux,wave,s=extract_cube(wave,s,r,xo=xo,yo=yo,stdar_t=stdar_t,path_ifu='ifu',vph=vph,dpix=dpix)
+        flux,wave,s=extract_cube(wave,s,r,xo=xo,yo=yo,stdar_t=stdar_t,path_ifu=path_ifu,vph=vph,dpix=dpix)
     maxwave=np.round(np.nanmax(wave)-70)
     minwave=np.round(np.nanmin(wave)+70)
     Kvl=extintion_c(wave)
@@ -344,7 +344,7 @@ def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=Tr
     res_f=interp1d(wav_i,res_i,bounds_error=False,fill_value=0.)(wave)
     if gensensf == True:
         flux,s,res_f=gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data=path_data,vph=vph,scalefact=scalefact)
-    factor=meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph=vph)
+    factor=meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph=vph,pathwork=pathwork)
     if verbose:
         print('The scale factor is:',factor)
     return factor
