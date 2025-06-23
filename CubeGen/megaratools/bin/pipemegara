@@ -8,8 +8,8 @@ import CubeGen.megaratools.megtools as mtools
 import CubeGen.megaratools.megcubegen as mcube
 import CubeGen.megaratools.megmapgen as mmap
 import CubeGen.tools.tools as tools
-#import warnings
-#warnings.filterwarnings("ignore")
+import warnings
+warnings.filterwarnings("ignore")
 
 @click.group('pipemegara', short_help='CLI for the MEGARA DRP tools')
 def cli():
