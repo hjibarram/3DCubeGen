@@ -1,0 +1,48 @@
+# MR-Z Nico's version
+# ThI wavelengths have been extrated from:
+# http://iraf.noao.edu/specatlas/thar_photron/thar_photron.html
+# (Ar lines from that list have been removed).
+# Ne wavelengths were initially identified in:
+# http://www.ctio.noao.edu/noao/sites/default/files/instruments/spectrographs/hydne.dat
+# but then they were refined using:
+# http://physics.nist.gov/PhysRefData/ASD/lines_form.html
+#------------------------------------------------------------------------------
+#Column #1: wavelength
+#Column #2: flag (1: bright enough subsample; 0: faint subsample)
+#Column #3: relative intensity (NIST)
+#Column #4: comment (after '#' symbol)
+#------------------------------------------------------------------------------
+#uuid: 110B2B2E-E3EA-4F8C-82AE-19852A8FC7E3
+8771.6575  1  10000 # NeI from NIST
+8780.6223  1  57000 # NeI from NIST
+8783.7539  1  43000 # NeI from NIST
+8853.8669  1  27000 # NeI from NIST
+8865.7562  1  15000 # NeI from NIST
+8868.8330  0   4900 # ThI from NIST
+8919.5007  1   6400 # NeI from NIST
+8967.6399  0  19000 # ThI from NIST
+8988.5564  1   1800 # NeI from NIST
+9016.5899  0   2400 # ThI from NIST
+9048.2496  0  24000 # ThI from NIST
+9079.4519  0    200 # NeII from NIST
+9148.6720  1  12000 # NeI from NIST
+9201.7588  1   8900 # NeI from NIST
+9203.9612  0  37000 # ThI from NIST
+9220.0598  1   6000 # NeI from NIST
+9221.5802  0   2200 # NeI from NIST
+9266.2064  0  10000 # ThI from NIST
+9226.6910  0   1800 # NeI from NIST
+9275.5191  0    910 # NeI from NIST (weak)
+9287.5630  0    400 # NeI from NIST (weak)
+9300.8532  1   7700 # NeI from NIST
+9310.5833  0    830 # NeI from NIST (weak)
+9313.9731  0   2700 # NeI from NIST (weak)
+9326.5072  1   6900 # NeI from NIST
+9373.3079  0   1500 # NeI from NIST
+9399.0891  0   2.00 # ThI from Photron (weak)
+9425.3797  1   4800 # NeI from NIST
+9459.2110  1   2800 # NeI from NIST
+9486.6825  1   5000 # NeI from NIST
+9534.1640  1   6100 # NeI from NIST
+9547.4052  0   2800 # NeI from NIST
+9665.4200  1  18000 # NeI from NIST

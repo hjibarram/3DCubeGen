@@ -1,0 +1,48 @@
+# HR-I Nico's version
+# ThI wavelengths have been extrated from:
+# http://iraf.noao.edu/specatlas/thar_photron/thar_photron.html
+# (Ar lines from that list have been removed).
+# Ne wavelengths were initially identified in:
+# http://www.ctio.noao.edu/noao/sites/default/files/instruments/spectrographs/hydne.dat
+# but then they were refined using:
+# http://physics.nist.gov/PhysRefData/ASD/lines_form.html
+#------------------------------------------------------------------------------
+8300.3248  0.0  0.0  # NeI from NIST (very weak)
+#8320.8554  1.0 2.00  # ThI
+#8330.4494  1.0 2.00  # ThI
+8365.7464  0.0  0.0  # NeI from NIST (weak)
+8376.3590  0.0   6600 # NeI from NIST (weak)
+8377.6070  1.0  0.0  # NeI from NIST
+8416.7269  0.0 2.00  # ThI
+8418.4265  1.0  0.0  # NeI from NIST
+#8446.5116  1.0 2.00  # ThI
+8463.3569  0.0  0.0  # NeI from NIST (weak)
+8478.3580  0.0 2.00  # ThI
+8484.4424  0.0   1300  # NeI from NIST (weak)
+8495.3591  1.0  0.0  # NeI from NIST( weak)
+8544.6952  0.0  0.0  # NeI from NIST (very weak)
+#8554.9440  1.0 2.00  # ThI
+8571.3535  0.0  0.0  # NeI from NIST (very weak)
+#8573.1205  1.0 2.00  # ThI
+8582.9031  0.0  0.0  # NeI from NIST (very weak)
+8591.2583  1.0  0.0  # NeI from NIST
+8634.6472  1.0  0.0  # NeI from NIST
+8647.0412  1.0  0.0  # NeI from NIST (weak)
+8654.3828  1.0  0.0  # NeI from NIST
+8655.5220  0.0   7600  # NeI from NIST
+#8665.4855  1.0 2.00  # ThI
+8679.4936  1.0  0.0  # NeI from NIST (almost blended to next one)
+8681.9216  1.0  0.0  # NeI from NIST (almost blended to previous one)
+8704.1122  0.0  0.0  # NeI from NIST (weak)
+#8748.0309  1.0 2.00  # ThI
+#8758.2434  1.0 2.00  # ThI
+8771.6575  1.0  0.0  # NeI from NIST
+#8775.5733  1.0 2.00  # ThI
+8780.6223  1.0  0.0  # NeI from NIST
+8783.7539  1.0  0.0  # NeI from NIST
+8853.8669  1.0  27000  # NeI from NIST
+8865.7562  1.0  15000  # NeI from NIST
+#8868.8334  1.0 2.00  # ThI
+8919.5007  1.0   6400  # NeI from NIST
+8967.6403  0.0 2.00  # ThI
+8988.5564  1.0   1800  # NeI from NIST

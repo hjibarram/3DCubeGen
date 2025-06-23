@@ -1,0 +1,93 @@
+# LR-Z Nico's version
+# ThI wavelengths were initially extrated from:
+# http://iraf.noao.edu/specatlas/thar_photron/thar_photron.html
+# (Ar lines from that list have been removed).
+# Ne wavelengths were initially identified in:
+# http://www.ctio.noao.edu/noao/sites/default/files/instruments/spectrographs/hydne.dat
+# but they were refined using:
+# http://physics.nist.gov/PhysRefData/ASD/lines_form.html
+#------------------------------------------------------------------------------
+7978.9732  0  27000 # ThI from NIST
+8032.4315  0   6200 # ThI from NIST
+8082.4576  1   5700 # NeI from NIST
+8093.6240  0   4400 # ThI from NIST
+8118.5495  0   3800 # NeI from NIST
+8128.9110  0   1200 # NeI from NIST
+8136.4061  1  17000 # NeI from NIST
+8143.1382  0  12000 # ThI from NIST
+8159.7279  0   6800 # ThI from NIST
+8169.7868  0   3000 # ThI from NIST
+8186.9116  0  12000 # ThI from NIST
+8248.6826  0    310 # NeI from NIST
+8252.3938  0   4200 # ThI from NIST
+8259.3795  0   3300 # NeI from NIST
+8266.0769  0   7200 # NeI from NIST
+8275.6266  0   5900 # ThI from NIST
+8300.3248  1  29000 # NeI from NIST
+8320.8553  0   9600 # ThI from NIST
+8330.4495  0  26000 # ThI from NIST
+8365.7464  0   4600 # NeI from NIST
+8377.6070  1  76000 # NeI from NIST
+8416.7269  0  21000 # ThI from NIST
+8418.4265  1  26000 # NeI from NIST
+8446.5115  0  16000 # ThI from NIST
+8463.3569  0   3700 # NeI from NIST
+8478.3578  0  15000 # ThI from NIST
+8484.4424  0   1300 # NeI from NIST
+8495.3591  1  69000 # NeI from NIST
+8544.6952  0   1600 # NeI from NIST
+8554.9438  0   2800 # ThI from NIST
+8571.3535  0   2900 # NeI from NIST
+8573.1204  0   7500 # ThI from NIST
+8582.9031  0   1600 # NeI from NIST
+8591.2583  1  41000 # NeI from NIST
+8634.6472  1  35000 # NeI from NIST
+8647.0412  0   6000 # NeI from NIST
+8654.3828  1  64000 # NeI from NIST
+8665.4853  0   6700 # ThI from NIST
+8668.2670  0    200 # NeII from NIST
+8679.4936  1  13000 # NeI from NIST (quite close to next one)
+8681.9216  1  15000 # NeI from NIST (quite close to previous one)
+8704.1122  0   2900 # NeI from NIST
+8709.2340  0   3000 # ThI from NIST
+8748.0307  0  10000 # ThI from NIST
+8758.2431  0   7400 # ThI from NIST
+8771.6575  0  10000 # NeI from NIST
+8775.5729  0   3300 # ThI from NIST
+8780.6223  1  57000 # NeI from NIST
+8783.7539  1  43000 # NeI from NIST
+8792.5056  0    260 # NeI from NIST
+8830.9067  0    550 # NeI from NIST
+8853.8669  1  27000 # NeI from NIST
+8865.7562  1  15000 # NeI from NIST
+8868.8330  0   4900 # ThI from NIST
+8919.5007  1   6400 # NeI from NIST
+8967.6399  0  19000 # ThI from NIST
+8988.5564  1   1800 # NeI from NIST
+9048.2496  0  24000 # ThI from NIST
+9063.9593  0   2600 # ThI from NIST
+9079.4519  0    200 # NeII from NIST
+9094.8283  0   4500 # ThI from NIST
+9119.6270  0   8400 # ThII from NIST
+9148.6720  1  12000 # NeI from NIST
+9201.7588  1   8900 # NeI from NIST
+9203.9612  0  37000 # ThI from NIST
+9220.0598  1   6000 # NeI from NIST
+9226.6910  1   1800 # NeI from NIST
+9266.2064  0  10000 # ThI from NIST
+9275.5191  0    910 # NeI from NIST (weak)
+9276.2726  0   4800 # ThI from NIST
+9287.5630  0    400 # NeI from NIST (weak)
+9300.8532  1   7700 # NeI from NIST
+9310.5833  0    830 # NeI from NIST (weak)
+9313.9731  1   2700 # NeI from NIST (weak)
+9326.5072  1   6900 # NeI from NIST
+9373.3079  0   1500 # NeI from NIST
+9399.0886  0  43000 # ThI from Photron
+9425.3797  1   4800 # NeI from NIST
+9459.2110  0   2800 # NeI from NIST
+9474.8788  0  18000 # ThI from NIST
+9486.6825  1   5000 # NeI from NIST
+9534.1640  0   6100 # NeI from NIST
+9547.4052  0   2800 # NeI from NIST
+9665.4200  0  18000 # NeI from NIST

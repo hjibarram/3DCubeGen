@@ -1,0 +1,67 @@
+# MR-R Nico's version
+# ThI wavelengths have been extrated from:
+# http://iraf.noao.edu/specatlas/thar_photron/thar_photron.html
+# (Ar lines from that list have been removed).
+# Ne wavelengths were initially identified in:
+# http://www.ctio.noao.edu/noao/sites/default/files/instruments/spectrographs/hydne.dat
+# but then they were refined using:
+# http://physics.nist.gov/PhysRefData/ASD/lines_form.html
+#------------------------------------------------------------------------------
+#Column #1: wavelength
+#Column #2: flag (1: bright enough subsample; 0: faint subsample)
+#Column #3: relative intensity (NIST)
+#Column #4: comment (after '#' symbol)
+#------------------------------------------------------------------------------
+#uuid: 9017EE0D-2110-428C-87C5-6C19CCABA9D8
+6217.2812  1  10000 # NeI from NIST
+6246.7294  0   1000 # NeI from NIST
+6258.7884  0   1000 # NeI from NIST
+6266.4952  1  10000 # NeI from NIST
+6276.0327  0    500 # NeI from NIST
+6293.7447  0   1000 # NeI from NIST
+6304.7893  1   1000 # NeI from NIST
+6313.6855  0   1500 # NeI from NIST
+6327.2776  0   6900 # ThI from NIST
+6328.1646  0   3000 # NeI from NIST
+6330.8894  0   1500 # NeI from NIST
+6334.4276  1  10000 # NeI from NIST
+6342.8595  0  15000 # ThI from NIST
+6348.7374  0   2600 # ThI from NIST
+6351.8532  0   1000 # NeI from NIST
+6364.9969  0   1000 # NeI from NIST
+6382.9914  1  10000 # NeI from NIST
+6402.2480  1  20000 # NeI from NIST
+6409.7469  0   1500 # NeI from NIST
+6411.8990  0  11000 # ThI from NIST
+6421.7053  0   1000 # NeI from NIST
+6444.7118  0   1500 # NeI from NIST
+6457.2824  0  44000 # ThI from NIST
+6506.5277  1  15000 # NeI from NIST
+6532.8824  1   1000 # NeI from NIST
+6554.1602  0   6500 # ThI from NIST
+6577.2144  0   5800 # ThI from NIST
+6583.9058  0  32000 # ThI from NIST
+6588.5395  0  26000 # ThI from NIST
+#6593.9390  0  12000 # ThI from NIST (too faint)
+6591.4843  0  21000 # ThI from NIST
+6598.9528  1  10000 # NeI from NIST
+#6602.9007  0   1000 # NeI from NIST (overlaps with ghost)
+6640.0095  0    100 # NeI from NIST
+6652.0925  1   1500 # NeI from NIST
+6662.2685  0  16000 # ThI from NIST
+6666.8920  0   1000 # NeI from NIST
+6678.2766  1   5000 # NeI from NIST
+6717.0430  1    700 # NeI from NIST
+6727.4582  0   4400 # ThI from NIST
+6738.0320  0    700 # NeI from NIST
+6756.4527  0   9700 # ThI from NIST
+6759.5855  0    150 # NeI from NIST
+#6778.3122  0   3800 # ThI from NIST (too faint)
+#6780.1251  0   3300 # ThI from NIST 
+#6780.4130  0   4300 # ThI from NIST
+6780.2691  0      0 # average of previous two lines
+6791.2350  0   1800 # ThI from NIST
+6829.0354  0   4400 # ThI from NIST
+6834.9245  0   9800 # ThI from NIST
+6874.7528  0   2900 # ThI from NIST
+6929.4672  1 100000 # NeI from NIST

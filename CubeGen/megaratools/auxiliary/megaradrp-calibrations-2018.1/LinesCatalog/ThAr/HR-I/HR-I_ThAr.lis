@@ -1,0 +1,44 @@
+# HR-I Nico's version
+# Some wavelengths have been extrated from:
+# http://iraf.noao.edu/specatlas/thar_photron/thar_photron.html
+#------------------------------------------------------------------------------
+#8330.425 0.0 #manually interpolated with R5-findarc, replaced below
+8330.4494 0.0 #ThI (from Photron) weak line
+8384.607 0.0 #manually interpolated with R5-findarc, weak line
+8392.255 0.0 #manually interpolated with R5-findarc, weak line
+8399.2578 0.0 #ThI (from Photron) weak line
+8408.209 4.900e+05
+8416.7269 0.0 #ThI (from Photron) weak line
+8421.2254 0.0 #ThI (from Photron) weak line
+8424.647 1.916e+06
+8445.487  0.0 #ThI (from Photron) weak line
+8446.5116 0.0 #ThI (from Photron) weak line
+8464.2367 0.0 #ThI (from Photron) weak line
+8471.826  0.0 #ThI (from Photron) weak line
+8478.3580 0.0 #ThI (from Photron) weak line
+#8490.265 0.0 #manually interpolated with R5-findarc, weak line
+8490.3065 0.0 # ArI (from Photron) weak line
+8510.624  0.0 #ThI (from Photron) weak line
+8521.441 3.053e+07
+8539.793 0.0 #ThI (from Photron) weak line
+#8554.996 0.0 #manually interpolated with R5-findarc, weak line
+8554.944 0.0 #ThI (from Photron) weak line
+8573.1200 0.0 #ThI (from Photron) weak line
+#8605.768 0.0 #manually interpolated with R5-findarc, replaced below
+8605.7762 0.0 #ArI (from Photron) weak line
+#8620.491 0.0 #manually interpolated with R5-findarc
+8620.4600 0.0 #ArI (from Photron) weak line
+8665.4855 0.0 #ThI (from Photron) weak line
+8667.9442 6.175e+06
+#8678.648 0.0 #manually interpolated with R5-findarc, weak line
+8678.4083 0.0 #ArI (from Photron) weak line
+8709.2341 0.0 #ThI (from Photron) weak line
+8748.0309 0.0 #ThI (from Photron) weak line
+8758.2434 0.0 #ThI (from Photron) weak line
+8761.6862 0.0 #ArI (from Photron) weak line
+8771.8602 0.0 #ArII (from Photron) weak line
+8775.5733 0.0 #ThI (from Photron) weak line
+8784.5621 0.0 #ThII (from Photron) weak line
+8799.0875 0.0 #ArI (from Photron) weak line
+8849.9316 0.0 #manually interpolated with R5-findarc, weak line
+8868.8334 0.0 #ThI (from Photron) weak line
