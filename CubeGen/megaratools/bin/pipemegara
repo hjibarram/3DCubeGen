@@ -4,6 +4,7 @@ import click
 import cloup
 from cloup.constraints import mutually_exclusive, RequireExactly, IsSet, If
 import numpy as np
+import CubeGen
 import CubeGen.megaratools.megtools as mtools
 import CubeGen.megaratools.megcubegen as mcube
 import CubeGen.megaratools.megmapgen as mmap
@@ -14,7 +15,6 @@ warnings.filterwarnings("ignore")
 @click.group('pipemegara', short_help='CLI for the MEGARA DRP tools')
 def cli():
     pass
-
 
 @cloup.command('rundrp', short_help='Run the MEGARA DRP')
 @click.option('-o', '--out_path', type=str, default='out_cubes', help='path of the output cube files, defaul "out_cubes"')
@@ -71,6 +71,8 @@ def rundrp(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,b
     call12=comand_base.replace('NR','12').replace('VPH',vph).replace('STD',stdar_t)
     call13='mkdir -p '+out_path+'/'+redux_ver+'/'
     call14='cp '+redux_dirT+'ifu/'+basename.replace('NAME','*').replace('.fits','_'+vph+'.fits')+'.gz '+out_path+'/'+redux_ver+'/'
+    print(call10)
+    sys.exit()
     tools.sycall(call0)
     tools.sycall(call1)
     tools.sycall(call2)
@@ -110,6 +112,29 @@ def rundrp(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,b
     tools.sycall(call14)
 
 cli.add_command(rundrp)
+
+@cli.command('runfulldrp', short_help='Full pipeline to reduce the MEGARA data')
+@click.option('-o', '--out_path', type=str, default='out_cubes', help='path of the output cube files, defaul "out_cubes"')
+@click.option('-v', '--redux_ver', type=str, default='0.0.1', help='the DRP reduction version of the MEGARA cubes')
+@click.option('-r', '--redux_dir', type=str, default='', help='path of the redux dir, default set to " " to local files')
+@click.option('-s', '--sigm_s', type=float, default=0.35, help='smoth kernel size used to reconstruct the cube, default 0.35 arcsec')
+@click.option('-p', '--pix_s', type=float, default=0.0, help='spaxel size used to reconstruct the cube, default set to 0 to fix it to sigm_s')
+@click.option('-a', '--alph_s', type=float, default=2.0, help='kernel "shape" factor, a value equal of 2 returns a Gaussian kerner, larger than 2 returns a sharper kernel')
+@click.option('-f', '--flu16', is_flag=True, default=True,help='keyword to return a cube with units of 10^{-16} erg/s/cm2/A, if False, the units are erg/s/cm2/A')
+@click.option('-n', '--name', type=str, default=None, help='optional output root name of the data cube')
+@click.option('-m', '--stdar_t', type=str, help='name of the STD star')
+@click.option('-b', '--basename', type=str, default='megCube-NAME.fits',help='basename of the final data cube, default megCube-NAME.fits, not remove NAME')
+@click.option('-y', '--vph', type=str, default='LR-R', help='VPH name of the observation')
+@click.option('-u', '--fac_sizey', type=float, default=1.0, help='factor of the FoV in Y, default 1')
+@click.option('-i', '--fac_sizex', type=float, default=1.0, help='factor of the FoV in X, default 1')
+@click.option('-i', '--fac_sizex', type=float, default=1.0, help='factor of the FoV in X, default 1')
+@click.option('-u', '--aper_std', type=float, default=4.0, help='aperture radius for spectrofotometric calibration, default 4 arcsec')
+
+def runfulldrp(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,basename,vph,fac_sizey,fac_sizex,aper_std):
+
+    calib_path=os.path.join(CubeGen.__path__[0], 'megaratools')+'/auxiliary/'
+
+    rundrp(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,basename,vph,fac_sizey,fac_sizex,aper_std)
 
 if __name__ == "__main__":
     cli()
