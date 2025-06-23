@@ -997,7 +997,6 @@ def create_requirement(data,stds,vph,redux_path='',ob_path='',poly=False,calib_p
         f.write("    - {id: 7, type: 'ModelMap', tags: {}, content: 'master_modelVPH.json'}\n".replace('VPH',vph))
         f.write("    - {id: 8, type: 'ReferenceSpectrumTable', tags: {}, content: 'mSTD.dat'}\n".replace('STD',stds[j]))
         f.write("    - {id: 9, type: 'ReferenceExtinctionTable', tags: {}, content: 'extintion_curve.txt'}\n")
-        f.write("    - {id: 10, type: 'MasterSensitivity', tags: {}, content: 'master_sensitivityVPH_n.fits'}\n".replace('VPH',vph))
         f.write('requirements: {} \n')
         if poly:
             f.write('  MEGARA:\n')
