@@ -7,6 +7,7 @@ from astropy.coordinates import SkyCoord,EarthLocation
 from astropy.time import Time
 from astropy import units as u
 from astropy.convolution import convolve, convolve_fft, Gaussian2DKernel
+import os.path as ptt
 
 def extintion_c(wave,dir_tem='data',basename='extintion_curve'):
     f=open(dir_tem+'/'+basename+'.txt','r')
@@ -520,3 +521,615 @@ def evaluate_2dPSF(pf_map,model=True,sig=2,plotview=False,centroid=False):
             return xo,yo
         else:
             return dx_m,dy_m,ds_m,psf
+
+def read_obs(name,path=''):
+    """
+    Reads an observation file and returns the data as a numpy array.
+    Parameters:
+    name (str): The name of the file to read.
+    path (str): The directory path where the file is located.
+
+    Returns:
+    np.ndarray: The data read from the file.
+    """
+    file=path+name
+    f=open(file,'r')
+    dic={}
+    ct=0
+    img=1000
+    for line in f:
+        ct+=1
+        if 'IMAGE' in line:
+            data=line.replace('\n','').split(' ')
+            data=list(filter(None, data)) # Remove empty strings
+            data.extend(['Type'])
+            nh=len(data)
+            for it in range(0, nh):
+                dic.update({data[it]:[]})
+            head=data
+            img=ct
+            typ='IMAGE'
+        if 'Flat' in line and img != 1000:
+            typ='Flat'
+            img=ct
+        if 'Bias' in line and img != 1000 and not '.fits' in line:
+            typ='Bias'
+            img=ct
+        if 'Arcs' in line and img != 1000:
+            typ='Arcs'
+            img=ct
+        if 'Spectrophotometric standard' in line and img != 1000:
+            typ='SPTD'
+            img=ct
+        if ct >=  img+2:
+            data=line.replace('\n','').split(' ')
+            data=list(filter(None,data))
+            if len(data)+1 == nh:
+                for it in range(0, nh-1):
+                    try:
+                        val=float(data[it])
+                    except:
+                        val=data[it].replace(' ','')
+                    dic[head[it]].extend([val])
+                dic[head[it+1]].extend([typ])
+    f.close()
+    return dic,head
+            
+def create_obsBIAS(data,redux_path='',ob_path=''):
+    """
+    Creates a bias observation file with the given name and path.
+    Parameters:
+    data (dic): Dictionary from the observation file data
+    redux_path (str): The directory path where the file will be created.
+    ob_path (str): The directory path where the observation files are located.
+    """
+    tools.sycall('mkdir -p '+redux_path)
+    tools.sycall('mkdir -p '+redux_path+'/data')
+    nt=np.where(np.array(data['Type']) == 'Bias')[0]
+    if len(nt) == 0:
+        print('No Bias observations found')
+        return
+    dat=np.array(data['IMAGE'])
+    filelists=dat[nt]
+    file=redux_path+'/obsresult-1.yaml'
+    f=open(file,'w')
+    f.write('id: 1\n')
+    f.write('instrument: MEGARA\n')
+    f.write('mode: MegaraBiasImage\n')
+    f.write('images:\n')
+    for i in range(0, len(nt)):
+        line='  - '+filelists[i]+'\n'
+        f.write(line)
+        if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+            call='cp '+ob_path+'bias/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+            tools.sycall(call)
+    f.close()
+    
+def get_vph(data):
+    """
+    Returns the VPH (Variable Passband Holography) value from the observation file data.
+    data (dic): Dictionary from the observation file data
+
+    Returns:
+    str: The VPH value.
+    """
+    nt=np.where(np.array(data['Type']) == 'IMAGE')[0]
+    dat=np.array(data['VPH'])
+    vph=np.unique(dat[nt])
+    return vph
+
+def get_std(data):
+    """
+    Returns the standard star name from the observation file data.
+    Parameters:
+    data (dic): Dictionary from the observation file data.
+
+    Returns:
+    str: The standard star name.
+    """
+    nt=np.where(np.array(data['Type']) == 'SPTD')[0]
+    dat=np.array(data['OBJECT'])
+    std=dat[nt]
+    if len(std) > 0:
+        std=np.unique(std)
+        for i in range(0, len(std)):
+            std[i]=std[i].replace('SPSTD_','')
+        return std
+    else:
+        return None
+
+
+def get_obj(data):
+    """
+    Returns the Object name from the observation file data.
+    Parameters:
+    data (dic): Dictionary from the observation file data.
+
+    Returns:
+    str: The Object name.
+    """
+    nt=np.where(np.array(data['Type']) == 'IMAGE')[0]
+    dat=np.array(data['OBJECT'])
+    obj=dat[nt]
+    if len(obj) > 0:
+        obj=np.unique(obj)
+        for i in range(0, len(obj)):
+            obj[i]=obj[i].replace('SPSTD_','')
+        return obj
+    else:
+        return None
+
+def create_obsTraceMap(data,vph,redux_path='',ob_path=''):
+    """
+    Creates a TraceMap observation file with the given name and path.
+    Parameters:
+    data (dic): Dictionary from the observation file data
+    vph (str): The Variable Passband Holography value.
+    redux_path (str): The directory path where the file will be created.
+    ob_path (str): The directory path where the observation files are located.
+    """
+    tools.sycall('mkdir -p '+redux_path)
+    tools.sycall('mkdir -p '+redux_path+'/data')
+    nt=np.where((np.array(data['Type']) == 'Flat'))[0]
+    if len(nt) == 0:
+        print('No Flat observations found')
+        return
+    dat=np.array(data['IMAGE'])
+    dat1=np.array(data['VPH'])
+    filelists=dat[nt]
+    vphs=dat1[nt]
+    filelists,uin=np.unique(filelists,return_index=True)
+    vphs=vphs[uin]
+    file=redux_path+'/obsresult-2VPH.yaml'.replace('VPH',vph)
+    f=open(file,'w')
+    f.write('id: 2VPH\n'.replace('VPH',vph))
+    f.write('instrument: MEGARA\n')
+    f.write('mode: MegaraTraceMap\n')
+    f.write('images:\n')
+    for i in range(0, len(filelists)):
+        if vphs[i] == vph:
+            line='  - '+filelists[i]+'\n'
+            f.write(line)
+            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                tools.sycall(call)
+    f.close()
+
+def create_obsFiberFlatImage(data,vph,redux_path='',ob_path=''):
+    """
+    Creates a FiberFlatImage observation file with the given name and path.
+    Parameters:
+    data (dic): Dictionary from the observation file data
+    vph (str): The Variable Passband Holography value.
+    redux_path (str): The directory path where the file will be created.
+    ob_path (str): The directory path where the observation files are located.
+    """
+    tools.sycall('mkdir -p '+redux_path)
+    tools.sycall('mkdir -p '+redux_path+'/data')
+    nt=np.where((np.array(data['Type']) == 'Flat'))[0]
+    if len(nt) == 0:
+        print('No Flat observations found')
+        return
+    dat=np.array(data['IMAGE'])
+    dat1=np.array(data['VPH'])
+    filelists=dat[nt]
+    vphs=dat1[nt]
+    filelists,uin=np.unique(filelists,return_index=True)
+    vphs=vphs[uin]
+    file=redux_path+'/obsresult-6VPH.yaml'.replace('VPH',vph)
+    f=open(file,'w')
+    f.write('id: 6VPH\n'.replace('VPH',vph))
+    f.write('instrument: MEGARA\n')
+    f.write('mode: MegaraFiberFlatImage\n')
+    f.write('images:\n')
+    for i in range(0, len(filelists)):
+        if vphs[i] == vph:
+            line='  - '+filelists[i]+'\n'
+            f.write(line)
+            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                tools.sycall(call)
+    f.close()
+
+def create_obsModelMap(data,vph,redux_path='',ob_path=''):
+    """
+    Creates a ModelMap observation file with the given name and path.
+    Parameters:
+    data (dic): Dictionary from the observation file data
+    vph (str): The Variable Passband Holography value.
+    redux_path (str): The directory path where the file will be created.
+    ob_path (str): The directory path where the observation files are located.
+    """
+    tools.sycall('mkdir -p '+redux_path)
+    tools.sycall('mkdir -p '+redux_path+'/data')
+    nt=np.where((np.array(data['Type']) == 'Flat'))[0]
+    if len(nt) == 0:
+        print('No Flat observations found')
+        return
+    dat=np.array(data['IMAGE'])
+    dat1=np.array(data['VPH'])
+    filelists=dat[nt]
+    vphs=dat1[nt]
+    filelists,uin=np.unique(filelists,return_index=True)
+    vphs=vphs[uin]
+    file=redux_path+'/obsresult-8VPH.yaml'.replace('VPH',vph)
+    f=open(file,'w')
+    f.write('id: 8VPH\n'.replace('VPH',vph))
+    f.write('instrument: MEGARA\n')
+    f.write('mode: MegaraModelMap\n')
+    f.write('images:\n')
+    for i in range(0, len(filelists)):
+        if vphs[i] == vph:
+            line='  - '+filelists[i]+'\n'
+            f.write(line)
+            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                tools.sycall(call)
+    f.close()
+
+def create_obsArcCalibration(data,vph,redux_path='',ob_path=''):
+    """
+    Creates a ArcCalibration observation file with the given name and path.
+    Parameters:
+    data (dic): Dictionary from the observation file data
+    vph (str): The Variable Passband Holography value.
+    redux_path (str): The directory path where the file will be created.
+    ob_path (str): The directory path where the observation files are located.
+    """
+    tools.sycall('mkdir -p '+redux_path)
+    tools.sycall('mkdir -p '+redux_path+'/data')
+    nt=np.where((np.array(data['Type']) == 'Arcs'))[0]
+    if len(nt) == 0:
+        print('No Arcs observations found')
+        return
+    dat=np.array(data['IMAGE'])
+    dat1=np.array(data['VPH'])
+    dat2=np.array(data['OSFILT'])
+    dat3=np.array(data['ThNe1on'])
+    filelists=dat[nt]
+    vphs=dat1[nt]
+    filt=dat2[nt]
+    ThNe=dat3[nt]
+    filelists,uin=np.unique(filelists,return_index=True)
+    vphs=vphs[uin]
+    filt=filt[uin]
+    ThNe=ThNe[uin]
+    file=redux_path+'/obsresult-3VPH.yaml'.replace('VPH',vph)
+    f=open(file,'w')
+    f.write('id: 3VPH\n'.replace('VPH',vph))
+    f.write('instrument: MEGARA\n')
+    f.write('mode: MegaraArcCalibration\n')
+    f.write('images:\n')
+    for i in range(0, len(filelists)):
+        if filt[i] == 'BLUE':
+            svt=True
+        elif filt[i] == 'RED' and ThNe[i] == 1:
+            svt=True
+        else:
+            svt=False
+        if vphs[i] == vph and svt:
+            line='  - '+filelists[i]+'\n'
+            f.write(line)
+            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                call='cp '+ob_path+'arc/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                tools.sycall(call)
+    f.close()
+
+
+def create_obsLcbStdStar(data,vph,redux_path='',ob_path=''):
+    """
+    Creates a LcbStdStar observation file with the given name and path.
+    Parameters:
+    data (dic): Dictionary from the observation file data
+    vph (str): The Variable Passband Holography value.
+    redux_path (str): The directory path where the file will be created.
+    ob_path (str): The directory path where the observation files are located.
+    """
+    tools.sycall('mkdir -p '+redux_path)
+    tools.sycall('mkdir -p '+redux_path+'/data')
+    nt=np.where((np.array(data['Type']) == 'SPTD'))[0]
+    if len(nt) == 0:
+        print('No SPTD observations found')
+        return
+    dat=np.array(data['IMAGE'])
+    dat1=np.array(data['VPH'])
+    dat2=np.array(data['OBJECT'])
+    filelists=dat[nt]
+    vphs=dat1[nt]
+    stdt=dat2[nt]
+    ustdt=np.unique(stdt)
+    filelists,uin=np.unique(filelists,return_index=True)
+    vphs=vphs[uin]
+    stdt=stdt[uin]
+    idst=['9','10','14','15']
+    for j in range(0, len(ustdt)):
+        file=redux_path+'/obsresult-NVPH.yaml'.replace('VPH',vph).replace('N',idst[j])
+        f=open(file,'w')
+        f.write('id: NVPH\n'.replace('VPH',vph).replace('N',idst[j]))
+        f.write('instrument: MEGARA\n')
+        f.write('mode: MegaraLcbStdStar\n')
+        f.write('images:\n')
+        for i in range(0, len(filelists)):
+            if stdt[i] == ustdt[j]:
+                svt=True
+            else:
+                svt=False
+            if vphs[i] == vph and svt:
+                line='  - '+filelists[i]+'\n'
+                f.write(line)
+                if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                    call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                    tools.sycall(call)
+        f.close()
+
+def create_obsLcbImageStd(data,vph,redux_path='',ob_path=''):
+    """
+    Creates a LcbImageStd observation file with the given name and path.
+    Parameters:
+    data (dic): Dictionary from the observation file data
+    vph (str): The Variable Passband Holography value.
+    redux_path (str): The directory path where the file will be created.
+    ob_path (str): The directory path where the observation files are located.
+    """
+    tools.sycall('mkdir -p '+redux_path)
+    tools.sycall('mkdir -p '+redux_path+'/data')
+    nt=np.where((np.array(data['Type']) == 'SPTD'))[0]
+    if len(nt) == 0:
+        print('No SPTD observations found')
+        return
+    dat=np.array(data['IMAGE'])
+    dat1=np.array(data['VPH'])
+    dat2=np.array(data['OBJECT'])
+    filelists=dat[nt]
+    vphs=dat1[nt]
+    stdt=dat2[nt]
+    ustdt=np.unique(stdt)
+    filelists,uin=np.unique(filelists,return_index=True)
+    vphs=vphs[uin]
+    stdt=stdt[uin]
+    idst=['11','13','16','17']
+    for j in range(0, len(ustdt)):
+        file=redux_path+'/obsresult-NVPH.yaml'.replace('VPH',vph).replace('N',idst[j])
+        f=open(file,'w')
+        f.write('id: NVPH\n'.replace('VPH',vph).replace('N',idst[j]))
+        f.write('instrument: MEGARA\n')
+        f.write('mode: MegaraLcbImage\n')
+        f.write('images:\n')
+        for i in range(0, len(filelists)):
+            if stdt[i] == ustdt[j]:
+                svt=True
+            else:
+                svt=False
+            if vphs[i] == vph and svt:
+                line='  - '+filelists[i]+'\n'
+                f.write(line)
+                if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                    call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                    tools.sycall(call)
+        f.close()
+
+def create_obsLcbImage(data,vph,redux_path='',ob_path=''):
+    """
+    Creates a LcbImage observation file with the given name and path.
+    Parameters:
+    data (dic): Dictionary from the observation file data
+    vph (str): The Variable Passband Holography value.
+    redux_path (str): The directory path where the file will be created.
+    ob_path (str): The directory path where the observation files are located.
+    """
+    tools.sycall('mkdir -p '+redux_path)
+    tools.sycall('mkdir -p '+redux_path+'/data')
+    nt=np.where((np.array(data['Type']) == 'IMAGE'))[0]
+    if len(nt) == 0:
+        print('No Object observations found')
+        return
+    dat=np.array(data['IMAGE'])
+    dat1=np.array(data['VPH'])
+    filelists=dat[nt]
+    vphs=dat1[nt]
+    filelists,uin=np.unique(filelists,return_index=True)
+    vphs=vphs[uin]
+    file=redux_path+'/obsresult-12VPH.yaml'.replace('VPH',vph)
+    f=open(file,'w')
+    f.write('id: 12VPH\n'.replace('VPH',vph))
+    f.write('instrument: MEGARA\n')
+    f.write('mode: MegaraLcbImage\n')
+    f.write('images:\n')
+    for i in range(0, len(filelists)):
+        if vphs[i] == vph:
+            line='  - '+filelists[i]+'\n'
+            f.write(line)
+            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                call='cp '+ob_path+'object/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                tools.sycall(call)
+    f.close()
+
+
+def create_requirement(data,stds,vph,redux_path='',ob_path='',poly=False,calib_path='auxiliary/'):
+    """
+    Creates the create_requirement files with the given path.
+    Parameters:
+    data (dic): Dictionary from the observation file data
+    stds (list): List of standard star names.
+    vph (str): The Variable Passband Holography value.
+    redux_path (str): The directory path where the file will be created.
+    ob_path (str): The directory path where the observation files are located.
+    """
+    lampname=get_lamp(data,vph,calib_path=calib_path,redux_path=redux_path)
+    tools.sycall('mkdir -p '+redux_path)
+    tools.sycall('mkdir -p '+redux_path+'/data')
+    for j in range(0, len(stds)):
+        get_stdfile(stds[j],redux_path=redux_path,calib_path=calib_path)
+        file=redux_path+'/requirements-'+stds[j]+'VPH.yaml'.replace('VPH',vph)
+        f=open(file,'w')
+        f.write('version: 1\n')
+        f.write('products:\n')
+        f.write('  MEGARA:\n')
+        f.write('    ca3558e3-e50d-4bbc-86bd-da50a0998a48: \n')
+        f.write("    - {id: 1, type: 'LinesCatalog', tags: {}, content: 'LAMP'}\n".replace('LAMP',lampname))
+        f.write("    - {id: 2, type: 'MasterBias', tags: {}, content: 'master_bias.fits'}\n")
+        f.write("    - {id: 3, type: 'TraceMap', tags: {}, content: 'master_tracesVPH.json'}\n".replace('VPH',vph))
+        f.write("    - {id: 4, type: 'MasterFiberFlat', tags: {}, content: 'master_fiberflatVPH.fits'}\n".replace('VPH',vph))
+        f.write("    - {id: 5, type: 'WavelengthCalibration', tags: {}, content: 'master_wlcalibVPH.json'}\n".replace('VPH',vph))
+        f.write("    - {id: 6, type: 'MasterFiberFlatFrame', tags: {}, content: 'fiberflat_frameVPH.fits'}\n".replace('VPH',vph))
+        f.write("    - {id: 7, type: 'ModelMap', tags: {}, content: 'master_modelVPH.json'}\n".replace('VPH',vph))
+        f.write("    - {id: 8, type: 'ReferenceSpectrumTable', tags: {}, content: 'mSTD.dat'}\n".replace('STD',stds[j]))
+        f.write("    - {id: 9, type: 'ReferenceExtinctionTable', tags: {}, content: 'extintion_curve.txt'}\n")
+        f.write("    - {id: 10, type: 'MasterSensitivity', tags: {}, content: 'master_sensitivityVPH_n.fits'}\n".replace('VPH',vph))
+        f.write('requirements: {} \n')
+        if poly:
+            f.write('  MEGARA:\n')
+            f.write('    MegaraArcCalibration:\n')
+            f.write('      polynomial_degree: 2\n')
+        f.close()
+        file=redux_path+'/requirements-'+stds[j]+'VPHT.yaml'.replace('VPH',vph)
+        f=open(file,'w')
+        f.write('version: 1\n')
+        f.write('products:\n')
+        f.write('  MEGARA:\n')
+        f.write('    ca3558e3-e50d-4bbc-86bd-da50a0998a48: \n')
+        f.write("    - {id: 1, type: 'LinesCatalog', tags: {}, content: 'LAMP'}\n".replace('LAMP',lampname))
+        f.write("    - {id: 2, type: 'MasterBias', tags: {}, content: 'master_bias.fits'}\n")
+        f.write("    - {id: 3, type: 'TraceMap', tags: {}, content: 'master_tracesVPH.json'}\n".replace('VPH',vph))
+        f.write("    - {id: 4, type: 'MasterFiberFlat', tags: {}, content: 'master_fiberflatVPH.fits'}\n".replace('VPH',vph))
+        f.write("    - {id: 5, type: 'WavelengthCalibration', tags: {}, content: 'master_wlcalibVPH.json'}\n".replace('VPH',vph))
+        f.write("    - {id: 6, type: 'MasterFiberFlatFrame', tags: {}, content: 'fiberflat_frameVPH.fits'}\n".replace('VPH',vph))
+        f.write("    - {id: 7, type: 'ModelMap', tags: {}, content: 'master_modelVPH.json'}\n".replace('VPH',vph))
+        f.write("    - {id: 8, type: 'ReferenceSpectrumTable', tags: {}, content: 'mSTD.dat'}\n".replace('STD',stds[j]))
+        f.write("    - {id: 9, type: 'ReferenceExtinctionTable', tags: {}, content: 'extintion_curve.txt'}\n")
+        f.write("    - {id: 10, type: 'MasterSensitivity', tags: {}, content: 'master_sensitivityVPH_n.fits'}\n".replace('VPH',vph))
+        f.write('requirements: {} \n')
+        if poly:
+            f.write('  MEGARA:\n')
+            f.write('    MegaraArcCalibration:\n')
+            f.write('      polynomial_degree: 2\n')
+        f.close()
+    if ptt.exists(redux_path+'/data/extintion_curve.txt' == False):
+        call='cp '+calib_path+'extintion_curve.txt '+redux_path+'/data/extintion_curve.txt'
+        tools.sycall(call)
+
+def get_lamp(data,vph,calib_path='auxiliary/',redux_path=''):
+    """
+    Returns the lamp file based on the VPH value.
+    Parameters:
+    data (dic): Dictionary from the observation file data
+    vph (str): The Variable Passband Holography value.
+
+    Returns:
+    str: The lamp file.
+    """
+    nt=np.where((np.array(data['Type']) == 'Arcs'))[0]
+    if len(nt) == 0:
+        print('No Arcs observations found')
+        return
+    root_p='megaradrp-calibrations-2018.1/LinesCatalog'
+    dat=np.array(data['IMAGE'])
+    dat1=np.array(data['VPH'])
+    dat2=np.array(data['OSFILT'])
+    #dat3=np.array(data['ThAr1on'])
+    #dat4=np.array(data['ThAr2on'])
+    dat3=np.array(data['ThNe1on'])
+    #dat6=np.array(data['ThAr3on'])
+    #dat7=np.array(data['ThAr4on'])
+    #dat8=np.array(data['ThAr5on'])
+    filelists=dat[nt]
+    vphs=dat1[nt]
+    filt=dat2[nt]
+    ThNe=dat3[nt]
+    filelists,uin=np.unique(filelists,return_index=True)
+    vphs=vphs[uin]
+    filt=filt[uin]
+    ThNe=ThNe[uin]
+    for i in range(0, len(filelists)):
+        if filt[i] == 'BLUE':
+            svt=True
+        elif filt[i] == 'RED' and ThNe[i] == 1:
+            svt=True
+        else:
+            svt=False
+        if vphs[i] == vph and svt:
+            if ThNe[i] == 1:
+                pathL='ThNe'
+            else:
+                pathL='ThAr'
+            file_name=vph+'_'+pathL+'.lis'
+            pathT=calib_path+root_p+'/'+pathL+'/'+vph+'/'
+            if ptt.exists(redux_path+'/data/'+file_name == False):
+                call='cp '+pathT+file_name+' '+redux_path+'/data/'+file_name
+                tools.sycall(call)
+    return file_name
+
+def get_stdfile(std,redux_path='',calib_path='auxiliary/'):
+    """
+    Returns the standard star file based on the standard name.
+    Parameters:
+    std (str): The standard star name.
+
+    Returns:
+    str: The standard star file.
+    """
+    stdt=std.replace('HR','hr').replace('Feige','feige')
+    root_p='esostandars/'
+    if ptt.exists(calib_path+root_p+'ctiostan/mSTD.dat'.replace('STD',stdt)) == True:
+        filestd1=calib_path+root_p+'ctiostan/mSTD.dat'.replace('STD',stdt)
+        filestd2=calib_path+root_p+'ctiostan/fSTD.dat'.replace('STD',stdt)
+    elif ptt.exists(calib_path+root_p+'okestan/mSTD.dat'.replace('STD',stdt)) == True:
+        filestd1=calib_path+root_p+'okestan/mSTD.dat'.replace('STD',stdt)
+        filestd2=calib_path+root_p+'okestan/fSTD.dat'.replace('STD',stdt)
+    elif ptt.exists(calib_path+root_p+'hststan/mSTD.dat'.replace('STD',stdt)) == True:
+        filestd1=calib_path+root_p+'hststan/mSTD.dat'.replace('STD',stdt)
+        filestd2=calib_path+root_p+'hststan/fSTD.dat'.replace('STD',stdt)
+    else:
+        print('No standard star file found for: ',std)
+        return
+    if ptt.exists(redux_path+'/data/mSTD.dat'.replace('STD',std)) == False:
+        call1='cp '+filestd1+' '+redux_path+'/data/mSTD.dat'.replace('STD',std)
+        call2='cp '+filestd2+' '+redux_path+'/data/STD.dat'.replace('STD',std)
+        tools.sycall(call1)
+        tools.sycall(call2)
+    return
+
+def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/'):
+    """
+    Sorts the Megara files based on the observation file and creates necessary files.
+    Parameters:
+    run (str): The observation run identifier.
+    ob (str): The observation identifier.
+    obser_path (str): The directory path where the observation run are located.
+    path_redux (str): The directory path where the reduced files will be created.
+    calib_path (str): The directory path where the calibration files are located.
+    """
+    ob_path=obser_path+'OBob'.replace('ob',ob)+'/'
+    rootf='RUN_ob_qc.txt'.replace('ob',ob).replace('RUN',run)
+    print('Reading Megara observation file: ', rootf)
+    data,hdr=read_obs(rootf,path=ob_path)
+    obj_list=get_obj(data)
+    vph_list=get_vph(data)
+    std_list=get_std(data)
+    print('Creating MegaraBiasImage file')
+    create_obsBIAS(data,redux_path=path_redux,ob_path=ob_path)
+    for i in range(0, len(vph_list)):
+        print('Creating MegaraTraceMap files for VPH: ', vph_list[i])
+        create_obsTraceMap(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
+    for i in range(0, len(vph_list)):
+        print('Creating MegaraArcCalibration files for VPH: ', vph_list[i])
+        create_obsArcCalibration(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
+    for i in range(0, len(vph_list)):
+        print('Creating MegaraFiberFlatImage files for VPH: ', vph_list[i])
+        create_obsFiberFlatImage(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
+    for i in range(0, len(vph_list)):
+        print('Creating MegaraModelMap files for VPH: ', vph_list[i])
+        create_obsModelMap(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
+    for i in range(0, len(vph_list)):
+        print('Creating MegaraLcbStdStar files for VPH: ', vph_list[i])
+        create_obsLcbStdStar(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
+    for i in range(0, len(vph_list)):
+        print('Creating MegaraLcbImageStd files for VPH: ', vph_list[i])
+        create_obsLcbImageStd(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
+    for i in range(0, len(vph_list)):
+        print('Creating MegaraLcbImage files for VPH: ', vph_list[i])
+        create_obsLcbImage(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
+    for i in range(0, len(vph_list)):
+        print('Creating Requirement files for VPH: ', vph_list[i])
+        create_requirement(data,std_list,vph_list[i],redux_path=path_redux,ob_path=ob_path,calib_path=calib_path)
+    return obj_list,std_list,vph_list
