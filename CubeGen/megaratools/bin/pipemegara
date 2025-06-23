@@ -71,8 +71,6 @@ def rundrp(out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,name,stdar_t,b
     call12=comand_base.replace('NR','12').replace('VPH',vph).replace('STD',stdar_t)
     call13='mkdir -p '+out_path+'/'+redux_ver+'/'
     call14='cp '+redux_dirT+'ifu/'+basename.replace('NAME','*').replace('.fits','_'+vph+'.fits')+'.gz '+out_path+'/'+redux_ver+'/'
-    print(call10)
-    sys.exit()
     tools.sycall(call0)
     tools.sycall(call1)
     tools.sycall(call2)
