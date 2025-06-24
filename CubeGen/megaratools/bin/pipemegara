@@ -152,8 +152,6 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             fac_sizex=data['run_drp'][0]['fac_sizex']
             aper_std=data['run_drp'][0]['aper_std']
 
-
-
     if pix_s == 0:
         pix_s=sigm_s
     if name == 'None':
@@ -234,4 +232,5 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             
 if __name__ == "__main__":
     cli()
+#pipemegara runfulldrp --run_name GTC5-24AMEX --run_number '0003' --obrun_path /mnt/D14TB/GTC/GTC_Erika/GTC5-24AMEX_OB03/  --redux_path /mnt/D14TB/GTC/GTC_Erika/GTC5-24AMEX_OB03/reduxN --out_path /mnt/D14TB/GTC/GTC_Erika/redux/
 #pipemegara runfulldrp --run_name GTC5-24AMEX --run_number '0002' --obrun_path /Volumes/WDBlue/MacFiles/GTC/GTC_Erika/GTC5-24AMEX_OB02/  --redux_path /Volumes/WDBlue/MacFiles/GTC/GTC_Erika/GTC5-24AMEX_OB02/reduxN --out_path /Volumes/WDBlue/MacFiles/GTC/GTC_Erika/redux/

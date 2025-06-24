@@ -39,6 +39,15 @@ def id_str(id,n_z=2):
             idt='0'+str(id)
         else:
             idt=str(id)
+    elif n_z == 4:
+        if id < 10:
+            idt='000'+str(id)
+        elif id < 100:
+            idt='00'+str(id)
+        elif id < 1000:
+            idt='0'+str(id)    
+        else:
+            idt=str(id)
     return idt
 
 def megarafiber_pos(hdr,verbose=False,astmet=True):
