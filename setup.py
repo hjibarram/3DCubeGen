@@ -28,7 +28,7 @@ requirements = [
 ]
 
 #DATA_DIRNAME = 'legacy'
-DATA_DIRS = ['legacy', 'CubeGen/megaratools/auxiliary']
+DATA_DIRS = ['legacy', 'megaratools/auxiliary']
 SCRIPTS_DIRNAME = 'bin'
 VERSION_FILE = 'CubeGen/common/constants.py'
 
