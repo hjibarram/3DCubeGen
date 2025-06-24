@@ -136,7 +136,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
     #/home/hjibarram/D14TB/GTC/GTC_Erika/GTC8-20BMEX_OB04/OB0004_copy4/
     for i in range(0, len(stds)):
         for j in range(0, len(vphs)):
-            rundrp()#out_path,redux_ver,redux_path,sigm_s,pix_s,alph_s,flu16,name,stds[i],basename,vphs[j],fac_sizey,fac_sizex,aper_std)
+            rundrp --help#out_path,redux_ver,redux_path,sigm_s,pix_s,alph_s,flu16,name,stds[i],basename,vphs[j],fac_sizey,fac_sizex,aper_std)
 
 if __name__ == "__main__":
     cli()
