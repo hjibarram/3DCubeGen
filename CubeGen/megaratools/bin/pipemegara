@@ -131,12 +131,85 @@ cli.add_command(rundrp)
 @click.option('-u', '--aper_std', type=float, default=4.0, help='aperture radius for spectrofotometric calibration, default 4 arcsec')
 
 def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm_s,pix_s,alph_s,flu16,name,basename,fac_sizey,fac_sizex,aper_std):
+    
+    if pix_s == 0:
+        pix_s=sigm_s
+    if name == 'None':
+        name=None
+    if redux_path != '':
+        path_work='--basedir '+redux_path+'/'
+        redux_dirT=redux_path+'/'
+        path_data='--datadir '+redux_path+'/data/'
+    else:
+        path_work=''
+        redux_dirT=''
+        path_data=''
+
     calib_path=os.path.join(CubeGen.__path__[0], 'megaratools')+'/auxiliary/'
     objs,stds,vphs=mtools.sort_megfiles(run_name,run_number,obser_path=obrun_path,path_redux=redux_path,calib_path=calib_path)
     #/home/hjibarram/D14TB/GTC/GTC_Erika/GTC8-20BMEX_OB04/OB0004_copy4/
     for i in range(0, len(stds)):
         for j in range(0, len(vphs)):
-            rundrp --help#out_path,redux_ver,redux_path,sigm_s,pix_s,alph_s,flu16,name,stds[i],basename,vphs[j],fac_sizey,fac_sizex,aper_std)
-
+            vph=vphs[j]
+            stdar_t=stds[i]
+            #rundrp(out_path,redux_ver,redux_path,sigm_s,pix_s,alph_s,flu16,name,stds[i],basename,vphs[j],fac_sizey,fac_sizex,aper_std)
+            reduxL0=['obsid9'+vph]
+            reduxL1=['obsid11'+vph]
+            reduxL2=['obsid12'+vph]
+            comand_base='numina run PATHWORK PATHDATA PWORKobsresult-NRVPH.yaml -r PWORKrequirements-STDVPH.yaml'.replace('PATHWORK',path_work).replace('PWORK',redux_dirT).replace('PATHDATA',path_data)
+            dir_base='obsidNRVPH_results'
+            call0=comand_base.replace('NRVPH','1').replace('VPH',vph).replace('STD',stdar_t)
+            call1='cp '+redux_dirT+dir_base.replace('NRVPH','1')+'/master_bias.fits PWORKdata/master_bias.fits'.replace('PWORK',redux_dirT)
+            call2=comand_base.replace('NR','2').replace('VPH',vph).replace('STD',stdar_t)
+            call3='cp '+redux_dirT+dir_base.replace('NR','2').replace('VPH',vph)+'/master_traces.json PWORKdata/master_tracesVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
+            call4=comand_base.replace('NR','8').replace('VPH',vph).replace('STD',stdar_t)
+            call5='cp '+redux_dirT+dir_base.replace('NR','8').replace('VPH',vph)+'/master_model.json PWORKdata/master_modelVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
+            call6=comand_base.replace('NR','3').replace('VPH',vph).replace('STD',stdar_t)
+            call7='cp '+redux_dirT+dir_base.replace('NR','3').replace('VPH',vph)+'/master_wlcalib.json PWORKdata/master_wlcalibVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
+            call8=comand_base.replace('NR','6').replace('VPH',vph).replace('STD',stdar_t)
+            call9='cp '+redux_dirT+dir_base.replace('NR','6').replace('VPH',vph)+'/master_fiberflat.fits PWORKdata/master_fiberflatVPH.fits'.replace('VPH',vph).replace('PWORK',redux_dirT)
+            call10=comand_base.replace('NR','9').replace('DVPH','DVPHT').replace('VPH',vph).replace('STD',stdar_t)
+            call11=comand_base.replace('NR','11').replace('VPH',vph).replace('STD',stdar_t)
+            call12=comand_base.replace('NR','12').replace('VPH',vph).replace('STD',stdar_t)
+            call13='mkdir -p '+out_path+'/'+redux_ver+'/'
+            call14='cp '+redux_dirT+'ifu/'+basename.replace('NAME','*').replace('.fits','_'+vph+'.fits')+'.gz '+out_path+'/'+redux_ver+'/'
+            tools.sycall(call0)
+            tools.sycall(call1)
+            tools.sycall(call2)
+            tools.sycall(call3)
+            tools.sycall(call4)
+            tools.sycall(call5)
+            tools.sycall(call6)
+            tools.sycall(call7)
+            tools.sycall(call8)
+            tools.sycall(call9)
+            tools.sycall(call10)
+            mapt,hdr=mmap.meggen_map(reduxL0,savefile=False,nameF=None,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,
+                sigm_s=sigm_s,alph_s=alph_s,out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=vph,basenameC='tNAME.fits')
+            xo,yo=mtools.evaluate_2dPSF(mapt,model=False,sig=0,plotview=False,centroid=True)
+            fact=mtools.calib_spec(phase=0,scfact=1.0,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t,r=aper_std,dpix=pix_s,pathwork=redux_dirT,
+                path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
+            fact=mtools.calib_spec(phase=1,scfact=1.0,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t,r=aper_std,dpix=pix_s,pathwork=redux_dirT,
+                path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
+            fact=mtools.calib_spec(phase=2,scfact=1.0,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t,r=aper_std,dpix=pix_s,pathwork=redux_dirT,
+                path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
+            tools.sycall(call11)
+            mcube.megmap_ifu(reduxL1,nameF=None,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
+                out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=vph,basenameC='NAME.fits')
+            fact=mtools.calib_spec(phase=3,scfact=1.0,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t,r=aper_std,dpix=pix_s,pathwork=redux_dirT,
+                path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
+            fact=mtools.calib_spec(phase=4,scfact=fact,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t,r=aper_std,dpix=pix_s,pathwork=redux_dirT,
+                path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
+            tools.sycall(call11)
+            mcube.megmap_ifu(reduxL1,nameF=None,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
+                out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=vph,basenameC='NAME.fits')
+            fact=mtools.calib_spec(phase=5,scfact=1.0,xo=xo,yo=yo,vph=vph,stdar_t=stdar_t,r=aper_std,dpix=pix_s,pathwork=redux_dirT,
+                path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
+            tools.sycall(call12)
+            mcube.megmap_ifu(reduxL2,nameF=name,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
+                out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=vph,basenameC=basename)
+            tools.sycall(call13)
+            tools.sycall(call14)
+            
 if __name__ == "__main__":
     cli()
