@@ -212,3 +212,4 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             
 if __name__ == "__main__":
     cli()
+#pipemegara runfulldrp --run_name GTC5-24AMEX --run_number '0002' --obrun_path /Volumes/WDBlue/MacFiles/GTC/GTC_Erika/GTC5-24AMEX_OB02/  --redux_path /Volumes/WDBlue/MacFiles/GTC/GTC_Erika/GTC5-24AMEX_OB02/reduxN --out_path /Volumes/WDBlue/MacFiles/GTC/GTC_Erika/redux/
