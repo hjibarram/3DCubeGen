@@ -694,7 +694,10 @@ def create_obsTraceMap(data,vph,redux_path='',ob_path=''):
             line='  - '+filelists[i]+'\n'
             f.write(line)
             if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz' == True):
+                    call='gunzip -c '+ob_path+'flat/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
+                else:
+                    call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
 
@@ -730,7 +733,10 @@ def create_obsFiberFlatImage(data,vph,redux_path='',ob_path=''):
             line='  - '+filelists[i]+'\n'
             f.write(line)
             if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz' == True):
+                    call='gunzip -c '+ob_path+'flat/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
+                else:
+                    call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
 
@@ -766,7 +772,10 @@ def create_obsModelMap(data,vph,redux_path='',ob_path=''):
             line='  - '+filelists[i]+'\n'
             f.write(line)
             if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz' == True):
+                    call='gunzip -c '+ob_path+'flat/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
+                else:
+                    call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
 
@@ -817,7 +826,10 @@ def create_obsArcCalibration(data,vph,redux_path='',ob_path=''):
             line='  - '+filelists[i]+'\n'
             f.write(line)
             if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                call='cp '+ob_path+'arc/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                if ptt.exists(ob_path+'arc/'+filelists[i]+'.gz' == True):
+                    call='gunzip -c '+ob_path+'arc/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
+                else:
+                    call='cp '+ob_path+'arc/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
 
@@ -864,7 +876,10 @@ def create_obsLcbStdStar(data,vph,redux_path='',ob_path=''):
                 line='  - '+filelists[i]+'\n'
                 f.write(line)
                 if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                    call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                    if ptt.exists(ob_path+'stds/'+filelists[i]+'.gz' == True):
+                        call='gunzip -c '+ob_path+'stds/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
+                    else:
+                        call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                     tools.sycall(call)
         f.close()
 
@@ -910,7 +925,10 @@ def create_obsLcbImageStd(data,vph,redux_path='',ob_path=''):
                 line='  - '+filelists[i]+'\n'
                 f.write(line)
                 if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                    call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                    if ptt.exists(ob_path+'stds/'+filelists[i]+'.gz' == True):
+                        call='gunzip -c '+ob_path+'stds/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
+                    else:
+                        call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                     tools.sycall(call)
         f.close()
 
@@ -946,7 +964,10 @@ def create_obsLcbImage(data,vph,redux_path='',ob_path=''):
             line='  - '+filelists[i]+'\n'
             f.write(line)
             if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                call='cp '+ob_path+'object/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                if ptt.exists(ob_path+'object/'+filelists[i]+'.gz' == True):
+                    call='gunzip -c '+ob_path+'object/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
+                else:
+                    call='cp '+ob_path+'object/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
 
