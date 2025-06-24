@@ -4,6 +4,7 @@ import click
 import cloup
 from cloup.constraints import mutually_exclusive, RequireExactly, IsSet, If
 import numpy as np
+import os
 import CubeGen
 import CubeGen.megaratools.megtools as mtools
 import CubeGen.megaratools.megcubegen as mcube
