@@ -27,16 +27,29 @@ requirements = [
 #    'scikit-image',
 ]
 
-DATA_DIRNAME = 'legacy'
+#DATA_DIRNAME = 'legacy'
+DATA_DIRS = ['legacy', 'CubeGen/megaratools/auxiliary']
 SCRIPTS_DIRNAME = 'bin'
 VERSION_FILE = 'CubeGen/common/constants.py'
 
 all_packages = find_packages()
 packages_data = {
-    package: [f'{DATA_DIRNAME}/*']+[f'{os.path.join(DATA_DIRNAME, sub)}/*' for root, subs, files in os.walk(os.path.join(package, DATA_DIRNAME)) for sub in subs]
-    for package in all_packages if os.path.isdir(os.path.join(package, DATA_DIRNAME))
+    package: sum(
+        [
+            [f'{data_dir}/*'] +
+            [f'{os.path.join(data_dir, sub)}/*'
+             for root, subs, _ in os.walk(os.path.join(package, data_dir)) for sub in subs]
+            for data_dir in DATA_DIRS if os.path.isdir(os.path.join(package, data_dir))
+        ],
+        []
+    )
+    for package in all_packages
+    if any(os.path.isdir(os.path.join(package, data_dir)) for data_dir in DATA_DIRS)
 }
-print(packages_data)
+#packages_data = {
+#    package: [f'{DATA_DIRNAME}/*']+[f'{os.path.join(DATA_DIRNAME, sub)}/*' for root, subs, files in os.walk(os.path.join(package, DATA_DIRNAME)) for sub in subs]
+#    for package in all_packages if os.path.isdir(os.path.join(package, DATA_DIRNAME))
+#}
 scripts = ['bin/3dcubegen','CubeGen/megaratools/bin/pipemegara']
 #    os.path.join(SCRIPTS_DIRNAME, script_name)
 #    for script_name in os.listdir(SCRIPTS_DIRNAME) if script_name.endswith('.py')
