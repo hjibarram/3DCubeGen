@@ -127,11 +127,33 @@ cli.add_command(rundrp)
 @click.option('-b', '--basename', type=str, default='megCube-NAME.fits',help='basename of the final data cube, default megCube-NAME.fits, not remove NAME')
 @click.option('-u', '--fac_sizey', type=float, default=1.0, help='factor of the FoV in Y, default 1')
 @click.option('-i', '--fac_sizex', type=float, default=1.0, help='factor of the FoV in X, default 1')
-@click.option('-i', '--fac_sizex', type=float, default=1.0, help='factor of the FoV in X, default 1')
 @click.option('-u', '--aper_std', type=float, default=4.0, help='aperture radius for spectrofotometric calibration, default 4 arcsec')
+@click.option('-c', '--config_file', type=str, default='', help='name of the config file')
 
-def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm_s,pix_s,alph_s,flu16,name,basename,fac_sizey,fac_sizex,aper_std):
-    
+def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm_s,pix_s,alph_s,flu16,name,basename,fac_sizey,fac_sizex,aper_std,config_file):
+
+    data=tools.read_config_file(config_file)
+    if data:
+        typeF=data['run_drp'][0]['pipe_type']
+        if 'FULL' in typeF:
+            run_name=data['run_drp'][0]['run_name']
+            run_number=data['run_drp'][0]['run_number']
+            out_path=data['run_drp'][0]['out_path']
+            redux_ver=data['run_drp'][0]['redux_ver']
+            redux_path=data['run_drp'][0]['redux_path']
+            obrun_path=data['run_drp'][0]['obrun_path']
+            sigm_s=data['run_drp'][0]['sigm_s']
+            pix_s=data['run_drp'][0]['pix_s']
+            alph_s=data['run_drp'][0]['alph_s']
+            flu16=data['run_drp'][0]['flu16']
+            name=data['run_drp'][0]['name']
+            basename=data['run_drp'][0]['basename']
+            fac_sizey=data['run_drp'][0]['fac_sizey']
+            fac_sizex=data['run_drp'][0]['fac_sizex']
+            aper_std=data['run_drp'][0]['aper_std']
+
+
+
     if pix_s == 0:
         pix_s=sigm_s
     if name == 'None':
