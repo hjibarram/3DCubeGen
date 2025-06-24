@@ -28,7 +28,9 @@ requirements = [
 ]
 
 #DATA_DIRNAME = 'legacy'
-DATA_DIRS = ['legacy', 'megaratools/auxiliary']
+#DATA_DIRS = ['legacy', 'megaratools/auxiliary']#megaradrp-calibrations-2018.1
+DATA_DIRS = ['legacy','megaratools/auxiliary','megaratools/auxiliary/megaradrp-calibrations-2018.1',
+'megaratools/auxiliary/esostandars']
 SCRIPTS_DIRNAME = 'bin'
 VERSION_FILE = 'CubeGen/common/constants.py'
 
