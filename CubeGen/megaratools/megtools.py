@@ -786,14 +786,17 @@ def create_obsArcCalibration(data,vph,redux_path='',ob_path=''):
     dat1=np.array(data['VPH'])
     dat2=np.array(data['OSFILT'])
     dat3=np.array(data['ThNe1on'])
+    dat4=np.array(data['ThAr1on'])
     filelists=dat[nt]
     vphs=dat1[nt]
     filt=dat2[nt]
     ThNe=dat3[nt]
+    ThAr=dat4[nt]
     filelists,uin=np.unique(filelists,return_index=True)
     vphs=vphs[uin]
     filt=filt[uin]
     ThNe=ThNe[uin]
+    ThAr=ThAr[uin]
     file=redux_path+'/obsresult-3VPH.yaml'.replace('VPH',vph)
     f=open(file,'w')
     f.write('id: 3VPH\n'.replace('VPH',vph))
@@ -801,7 +804,7 @@ def create_obsArcCalibration(data,vph,redux_path='',ob_path=''):
     f.write('mode: MegaraArcCalibration\n')
     f.write('images:\n')
     for i in range(0, len(filelists)):
-        if filt[i] == 'BLUE':
+        if filt[i] == 'BLUE' and ThAr[i] == 1:
             svt=True
         elif filt[i] == 'RED' and ThNe[i] == 1:
             svt=True
