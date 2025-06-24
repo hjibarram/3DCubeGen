@@ -1042,6 +1042,7 @@ def get_lamp(data,vph,calib_path='auxiliary/',redux_path=''):
     ThNe=ThNe[uin]
     ThAr=ThAr[uin]
     for i in range(0, len(filelists)):
+        svt=False
         if filt[i] == 'BLUE' and ThAr[i] == 1:
             svt=True
         elif filt[i] == 'RED' and ThNe[i] == 1:
