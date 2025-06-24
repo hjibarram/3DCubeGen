@@ -147,7 +147,6 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
 
     calib_path=os.path.join(CubeGen.__path__[0], 'megaratools')+'/auxiliary/'
     objs,stds,vphs=mtools.sort_megfiles(run_name,run_number,obser_path=obrun_path,path_redux=redux_path,calib_path=calib_path)
-    sys.exit()
     #/home/hjibarram/D14TB/GTC/GTC_Erika/GTC8-20BMEX_OB04/OB0004_copy4/
     for i in range(0, len(stds)):
         for j in range(0, len(vphs)):
