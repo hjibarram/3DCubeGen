@@ -601,7 +601,10 @@ def create_obsBIAS(data,redux_path='',ob_path=''):
         line='  - '+filelists[i]+'\n'
         f.write(line)
         if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-            call='cp '+ob_path+'bias/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+            if ptt.exists(ob_path+'bias/'+filelists[i]+'.gz' == True):
+                call='gunzip -c '+ob_path+'bias/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
+            else:
+                call='cp '+ob_path+'bias/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
             tools.sycall(call)
     f.close()
     
