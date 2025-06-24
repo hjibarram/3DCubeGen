@@ -152,7 +152,6 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
         for j in range(0, len(vphs)):
             vph=vphs[j]
             stdar_t=stds[i]
-            #rundrp(out_path,redux_ver,redux_path,sigm_s,pix_s,alph_s,flu16,name,stds[i],basename,vphs[j],fac_sizey,fac_sizex,aper_std)
             reduxL0=['obsid9'+vph]
             reduxL1=['obsid11'+vph]
             reduxL2=['obsid12'+vph]

@@ -1025,7 +1025,7 @@ def get_lamp(data,vph,calib_path='auxiliary/',redux_path=''):
     dat=np.array(data['IMAGE'])
     dat1=np.array(data['VPH'])
     dat2=np.array(data['OSFILT'])
-    #dat3=np.array(data['ThAr1on'])
+    dat4=np.array(data['ThAr1on'])
     #dat4=np.array(data['ThAr2on'])
     dat3=np.array(data['ThNe1on'])
     #dat6=np.array(data['ThAr3on'])
@@ -1035,12 +1035,14 @@ def get_lamp(data,vph,calib_path='auxiliary/',redux_path=''):
     vphs=dat1[nt]
     filt=dat2[nt]
     ThNe=dat3[nt]
+    ThAr=dat4[nt]
     filelists,uin=np.unique(filelists,return_index=True)
     vphs=vphs[uin]
     filt=filt[uin]
     ThNe=ThNe[uin]
+    ThAr=ThAr[uin]
     for i in range(0, len(filelists)):
-        if filt[i] == 'BLUE':
+        if filt[i] == 'BLUE' and ThAr[i] == 1:
             svt=True
         elif filt[i] == 'RED' and ThNe[i] == 1:
             svt=True
