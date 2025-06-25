@@ -166,14 +166,19 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
         path_data=''    
     calib_path=os.path.join(CubeGen.__path__[0], 'megaratools')+'/auxiliary/'
     objs,stds,vphs=mtools.sort_megfiles(run_name,run_number,obser_path=obrun_path,path_redux=redux_path,calib_path=calib_path)
+    namet=objs[0]
+    idstA=['9','10','14','15']
+    idstB=['11','13','16','17']
     print('Found the following objects: ',objs)
-    sys.exit()
     for i in range(0, len(stds)):
         for j in range(0, len(vphs)):
+            name=namet+'_'+stds[i]
+            idsA=idstA[i]
+            idsB=idstB[i]
             vph=vphs[j]
             stdar_t=stds[i]
-            reduxL0=['obsid9'+vph]
-            reduxL1=['obsid11'+vph]
+            reduxL0=['obsid'+idsA+vph]
+            reduxL1=['obsid'+idsB+vph]
             reduxL2=['obsid12'+vph]
             comand_base='numina run PATHWORK PATHDATA PWORKobsresult-NRVPH.yaml -r PWORKrequirements-STDVPH.yaml'.replace('PATHWORK',path_work).replace('PWORK',redux_dirT).replace('PATHDATA',path_data)
             dir_base='obsidNRVPH_results'
@@ -187,8 +192,8 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             call7='cp '+redux_dirT+dir_base.replace('NR','3').replace('VPH',vph)+'/master_wlcalib.json PWORKdata/master_wlcalibVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
             call8=comand_base.replace('NR','6').replace('VPH',vph).replace('STD',stdar_t)
             call9='cp '+redux_dirT+dir_base.replace('NR','6').replace('VPH',vph)+'/master_fiberflat.fits PWORKdata/master_fiberflatVPH.fits'.replace('VPH',vph).replace('PWORK',redux_dirT)
-            call10=comand_base.replace('NR','9').replace('DVPH','DVPHT').replace('VPH',vph).replace('STD',stdar_t)
-            call11=comand_base.replace('NR','11').replace('VPH',vph).replace('STD',stdar_t)
+            call10=comand_base.replace('NR',idsA).replace('DVPH','DVPHT').replace('VPH',vph).replace('STD',stdar_t)
+            call11=comand_base.replace('NR',idsB).replace('VPH',vph).replace('STD',stdar_t)
             call12=comand_base.replace('NR','12').replace('VPH',vph).replace('STD',stdar_t)
             call13='mkdir -p '+out_path+'/'+redux_ver+'/'
             call14='cp '+redux_dirT+'ifu/'+basename.replace('NAME','*').replace('.fits','_'+vph+'.fits')+'.gz '+out_path+'/'+redux_ver+'/'
