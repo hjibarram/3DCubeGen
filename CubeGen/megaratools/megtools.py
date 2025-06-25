@@ -188,20 +188,20 @@ def high_res_std(wav_i,res_i,wave,flux,flux1,path_data='',stdar_t='Feige32',vph=
     wavt0=wave[nt0]
     res_i=np.append(np.append(flutt1,flutt0),flutt2)
     wav_i=np.append(np.append(wavt1,wavt0),wavt2)
-    #Second line
-    #la1=6860#6884
-    #la2=6884#7120
-    #nt1=np.where((wav_i <= la1))
-    #nt2=np.where((wav_i >= la2))
-    #flutt1=res_i[nt1]
-    #flutt2=res_i[nt2]
-    #wavt1=wav_i[nt1]
-    #wavt2=wav_i[nt2]
-    #nt0=np.where((wave > la1) & (wave < la2))
-    #flutt0=flux1[nt0]
-    #wavt0=wave[nt0]
-    #res_i=np.append(np.append(flutt1,flutt0),flutt2)
-    #wav_i=np.append(np.append(wavt1,wavt0),wavt2)
+    #Third line
+    la1=7470#6884
+    la2=7500#7120
+    nt1=np.where((wav_i <= la1))
+    nt2=np.where((wav_i >= la2))
+    flutt1=res_i[nt1]
+    flutt2=res_i[nt2]
+    wavt1=wav_i[nt1]
+    wavt2=wav_i[nt2]
+    nt0=np.where((wave > la1) & (wave < la2))
+    flutt0=flux1[nt0]
+    wavt0=wave[nt0]
+    res_i=np.append(np.append(flutt1,flutt0),flutt2)
+    wav_i=np.append(np.append(wavt1,wavt0),wavt2)
     #First Atmospheric bands 
     la1=6860#7619#6860#6884
     la2=6950#7720#6950#7120
@@ -221,6 +221,38 @@ def high_res_std(wav_i,res_i,wave,flux,flux1,path_data='',stdar_t='Feige32',vph=
     #Second Atmospheric bands 
     la1=6950#8100#6950#7150#6884
     la2=7380#8350#7380#7120
+    nt1=np.where((wav_i <= la1))
+    nt2=np.where((wav_i >= la2))
+    wavt1=wav_i[nt1]
+    wavt2=wav_i[nt2]
+    nt0=np.where((wave > la1) & (wave < la2))
+    wavt0=wave[nt0]
+    wav_it=np.append(np.append(wavt1,wavt0),wavt2)
+    nt3=np.where((wav_i <= la1) | (wav_i >= la2))
+    flutt3=res_i[nt3]
+    wavt3=wav_i[nt3]
+    fluxft=interp1d(wavt3,flutt3,bounds_error=False,fill_value=0.)(wav_it)
+    res_i=fluxft
+    wav_i=wav_it
+    #Third Atmospheric bands 
+    la1=7550#8100#6950#7150#6884
+    la2=7800#8350#7380#7120
+    nt1=np.where((wav_i <= la1))
+    nt2=np.where((wav_i >= la2))
+    wavt1=wav_i[nt1]
+    wavt2=wav_i[nt2]
+    nt0=np.where((wave > la1) & (wave < la2))
+    wavt0=wave[nt0]
+    wav_it=np.append(np.append(wavt1,wavt0),wavt2)
+    nt3=np.where((wav_i <= la1) | (wav_i >= la2))
+    flutt3=res_i[nt3]
+    wavt3=wav_i[nt3]
+    fluxft=interp1d(wavt3,flutt3,bounds_error=False,fill_value=0.)(wav_it)
+    res_i=fluxft
+    wav_i=wav_it
+    #Forth Atmospheric bands 
+    la1=8100#6950#7150#6884
+    la2=8350#7380#7120
     nt1=np.where((wav_i <= la1))
     nt2=np.where((wav_i >= la2))
     wavt1=wav_i[nt1]
@@ -256,6 +288,7 @@ def gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data='data'
     resp_t=resp[nt]
     resp_t0=resp[nt]
     wave_t=wave[nt]
+    
     nt0=np.where((wave_t >= la1) & (wave_t <= la2))
     resp_t[nt0]=0
     nt1=np.where((wave_t >= lb1) & (wave_t <= lb2))
@@ -269,12 +302,15 @@ def gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data='data'
     resp_t1[nt1]=0
     resp_t1=resp_t1[nt2]
     resp_t1=interp1d(wave_tt,resp_t1,bounds_error=False,fill_value=0.)(wave_t)
-    #nt3=np.where((wave_t >= 6860) & (wave_t <= 7400))#6884-7400
-    #nt3=np.where((wave_t >= 8100) & (wave_t <= 8400))#6884-7400
+
+    nt3=np.where((wave_t >= 8100) & (wave_t <= 8400))#6884-7400
+    resp_t1[nt3]=resp_t0[nt3]
     nt3=np.where((wave_t >= 6860) & (wave_t <= 7400))#6884-7400
     resp_t1[nt3]=resp_t0[nt3]
     #nt3=np.where((wave_t >= 7617) & (wave_t <= 7720))#6884-7400
     nt3=np.where((wave_t >= 6860) & (wave_t <= 7400))#6884-7400
+    resp_t1[nt3]=resp_t0[nt3]
+    nt3=np.where((wave_t >= 7500) & (wave_t <= 7780))#6884-7400
     resp_t1[nt3]=resp_t0[nt3]
     resp[nt]=resp_t1#model
     s=resp
