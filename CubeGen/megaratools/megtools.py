@@ -616,6 +616,7 @@ def create_obsBIAS(data,redux_path='',ob_path=''):
             else:
                 print('cp '+ob_path+'bias/'+filelists[i]+' '+redux_path+'/data/'+filelists[i])
                 call='cp '+ob_path+'bias/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+            print(call)
             tools.sycall(call)
     f.close()
     
