@@ -173,7 +173,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
     for i in range(0, len(stds)):
         for j in range(0, len(vphs)):
             if len(stds) > 1:
-                name=namet+'_'+stds[i]
+                name=namet+'_'+stds[i]+'_'+vphs[j]
             else:
                 name=None
             idsA=idstA[i]
