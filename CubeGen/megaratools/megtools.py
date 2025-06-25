@@ -609,14 +609,11 @@ def create_obsBIAS(data,redux_path='',ob_path=''):
     for i in range(0, len(nt)):
         line='  - '+filelists[i]+'\n'
         f.write(line)
-        if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-            if ptt.exists(ob_path+'bias/'+filelists[i]+'.gz' == True):
-                print(ob_path+'bias/'+filelists[i]+'.gz')
+        if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
+            if ptt.exists(ob_path+'bias/'+filelists[i]+'.gz') == True:
                 call='gunzip -c '+ob_path+'bias/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
             else:
-                print('cp '+ob_path+'bias/'+filelists[i]+' '+redux_path+'/data/'+filelists[i])
                 call='cp '+ob_path+'bias/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
-            print(call)
             tools.sycall(call)
     f.close()
     
@@ -705,8 +702,8 @@ def create_obsTraceMap(data,vph,redux_path='',ob_path=''):
         if vphs[i] == vph:
             line='  - '+filelists[i]+'\n'
             f.write(line)
-            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz' == True):
+            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
+                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz') == True:
                     call='gunzip -c '+ob_path+'flat/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
                 else:
                     call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
@@ -744,8 +741,8 @@ def create_obsFiberFlatImage(data,vph,redux_path='',ob_path=''):
         if vphs[i] == vph:
             line='  - '+filelists[i]+'\n'
             f.write(line)
-            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz' == True):
+            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
+                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz') == True:
                     call='gunzip -c '+ob_path+'flat/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
                 else:
                     call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
@@ -783,8 +780,8 @@ def create_obsModelMap(data,vph,redux_path='',ob_path=''):
         if vphs[i] == vph:
             line='  - '+filelists[i]+'\n'
             f.write(line)
-            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz' == True):
+            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
+                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz') == True:
                     call='gunzip -c '+ob_path+'flat/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
                 else:
                     call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
@@ -837,8 +834,8 @@ def create_obsArcCalibration(data,vph,redux_path='',ob_path=''):
         if vphs[i] == vph and svt:
             line='  - '+filelists[i]+'\n'
             f.write(line)
-            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                if ptt.exists(ob_path+'arc/'+filelists[i]+'.gz' == True):
+            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
+                if ptt.exists(ob_path+'arc/'+filelists[i]+'.gz') == True:
                     call='gunzip -c '+ob_path+'arc/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
                 else:
                     call='cp '+ob_path+'arc/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
@@ -887,8 +884,8 @@ def create_obsLcbStdStar(data,vph,redux_path='',ob_path=''):
             if vphs[i] == vph and svt:
                 line='  - '+filelists[i]+'\n'
                 f.write(line)
-                if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                    if ptt.exists(ob_path+'stds/'+filelists[i]+'.gz' == True):
+                if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
+                    if ptt.exists(ob_path+'stds/'+filelists[i]+'.gz') == True:
                         call='gunzip -c '+ob_path+'stds/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
                     else:
                         call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
@@ -936,8 +933,8 @@ def create_obsLcbImageStd(data,vph,redux_path='',ob_path=''):
             if vphs[i] == vph and svt:
                 line='  - '+filelists[i]+'\n'
                 f.write(line)
-                if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                    if ptt.exists(ob_path+'stds/'+filelists[i]+'.gz' == True):
+                if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
+                    if ptt.exists(ob_path+'stds/'+filelists[i]+'.gz') == True:
                         call='gunzip -c '+ob_path+'stds/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
                     else:
                         call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
@@ -975,8 +972,8 @@ def create_obsLcbImage(data,vph,redux_path='',ob_path=''):
         if vphs[i] == vph:
             line='  - '+filelists[i]+'\n'
             f.write(line)
-            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
-                if ptt.exists(ob_path+'object/'+filelists[i]+'.gz' == True):
+            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
+                if ptt.exists(ob_path+'object/'+filelists[i]+'.gz') == True:
                     call='gunzip -c '+ob_path+'object/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
                 else:
                     call='cp '+ob_path+'object/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
@@ -1042,7 +1039,7 @@ def create_requirement(data,stds,vph,redux_path='',ob_path='',poly=False,calib_p
             f.write('    MegaraArcCalibration:\n')
             f.write('      polynomial_degree: 2\n')
         f.close()
-    if ptt.exists(redux_path+'/data/extintion_curve.txt' == False):
+    if ptt.exists(redux_path+'/data/extintion_curve.txt') == False:
         call='cp '+calib_path+'extintion_curve.txt '+redux_path+'/data/extintion_curve.txt'
         tools.sycall(call)
 
@@ -1095,7 +1092,7 @@ def get_lamp(data,vph,calib_path='auxiliary/',redux_path=''):
                 pathL='ThAr'
             file_name=vph+'_'+pathL+'.lis'
             pathT=calib_path+root_p+'/'+pathL+'/'+vph+'/'
-            if ptt.exists(redux_path+'/data/'+file_name == False):
+            if ptt.exists(redux_path+'/data/'+file_name) == False:
                 call='cp '+pathT+file_name+' '+redux_path+'/data/'+file_name
                 tools.sycall(call)
     return file_name
