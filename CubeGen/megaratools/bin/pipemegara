@@ -172,7 +172,10 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
     print('Found the following objects: ',objs)
     for i in range(0, len(stds)):
         for j in range(0, len(vphs)):
-            name=namet+'_'+stds[i]
+            if len(stds) > 1:
+                name=namet+'_'+stds[i]
+            else:
+                name=None
             idsA=idstA[i]
             idsB=idstB[i]
             vph=vphs[j]
