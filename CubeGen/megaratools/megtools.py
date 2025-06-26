@@ -741,7 +741,7 @@ def create_obsTraceMap(data,vph,redux_path='',ob_path=''):
             if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
                 if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz') == True:
                     call='gunzip -c '+ob_path+'flat/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
-                else:Add commentMore actions
+                else:
                     call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
