@@ -922,7 +922,7 @@ def create_obsLcbStdStar(data,vph,redux_path='',ob_path=''):
                 f.write(line)
                 if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
                     if ptt.exists(ob_path+'stds/'+filelists[i]+'.gz') == True:
-                        call='gunzip -c '+ob_path+'stds/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]Add commentMore actions
+                        call='gunzip -c '+ob_path+'stds/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
                     else:
                         call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                     tools.sycall(call)
@@ -969,7 +969,7 @@ def create_obsLcbImageStd(data,vph,redux_path='',ob_path=''):
             if vphs[i] == vph and svt:
                 line='  - '+filelists[i]+'\n'
                 f.write(line)
-                if ptt.exists(redux_path+'/data/'+filelists[i]) == False:Add commentMore actions
+                if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
                     if ptt.exists(ob_path+'stds/'+filelists[i]+'.gz') == True:
                         call='gunzip -c '+ob_path+'stds/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
                     else:
@@ -1008,7 +1008,7 @@ def create_obsLcbImage(data,vph,redux_path='',ob_path=''):
         if vphs[i] == vph:
             line='  - '+filelists[i]+'\n'
             f.write(line)
-            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:Add commentMore actions
+            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
                 if ptt.exists(ob_path+'object/'+filelists[i]+'.gz') == True:
                     call='gunzip -c '+ob_path+'object/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
                 else:
