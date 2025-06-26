@@ -263,7 +263,7 @@ def high_res_std(wav_i,res_i,wave,flux,flux1,path_data='',stdar_t='Feige32',vph=
     nt3=np.where((wav_i <= la1) | (wav_i >= la2))
     flutt3=res_i[nt3]
     wavt3=wav_i[nt3]
-    fluxft=interp1d(wavt3,flutt3,bounds_error=False,fill_value=0.)(wav_it)Add commentMore actions
+    fluxft=interp1d(wavt3,flutt3,bounds_error=False,fill_value=0.)(wav_it)
     res_i=fluxft
     wav_i=wav_it
     f=open(path_data+'/'+stdar_t+'_hr'+vph+'.dat','w')
