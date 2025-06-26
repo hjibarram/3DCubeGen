@@ -39,15 +39,6 @@ def id_str(id,n_z=2):
             idt='0'+str(id)
         else:
             idt=str(id)
-    elif n_z == 4:
-        if id < 10:
-            idt='000'+str(id)
-        elif id < 100:
-            idt='00'+str(id)
-        elif id < 1000:
-            idt='0'+str(id)    
-        else:
-            idt=str(id)
     return idt
 
 def megarafiber_pos(hdr,verbose=False,astmet=True):
@@ -188,20 +179,20 @@ def high_res_std(wav_i,res_i,wave,flux,flux1,path_data='',stdar_t='Feige32',vph=
     wavt0=wave[nt0]
     res_i=np.append(np.append(flutt1,flutt0),flutt2)
     wav_i=np.append(np.append(wavt1,wavt0),wavt2)
-    #Third line
-    la1=7470#6884
-    la2=7500#7120
-    nt1=np.where((wav_i <= la1))
-    nt2=np.where((wav_i >= la2))
-    flutt1=res_i[nt1]
-    flutt2=res_i[nt2]
-    wavt1=wav_i[nt1]
-    wavt2=wav_i[nt2]
-    nt0=np.where((wave > la1) & (wave < la2))
-    flutt0=flux1[nt0]
-    wavt0=wave[nt0]
-    res_i=np.append(np.append(flutt1,flutt0),flutt2)
-    wav_i=np.append(np.append(wavt1,wavt0),wavt2)
+    #Second line
+    #la1=6860#6884
+    #la2=6884#7120
+    #nt1=np.where((wav_i <= la1))
+    #nt2=np.where((wav_i >= la2))
+    #flutt1=res_i[nt1]
+    #flutt2=res_i[nt2]
+    #wavt1=wav_i[nt1]
+    #wavt2=wav_i[nt2]
+    #nt0=np.where((wave > la1) & (wave < la2))
+    #flutt0=flux1[nt0]
+    #wavt0=wave[nt0]
+    #res_i=np.append(np.append(flutt1,flutt0),flutt2)
+    #wav_i=np.append(np.append(wavt1,wavt0),wavt2)
     #First Atmospheric bands 
     la1=6860#7619#6860#6884
     la2=6950#7720#6950#7120
@@ -221,38 +212,6 @@ def high_res_std(wav_i,res_i,wave,flux,flux1,path_data='',stdar_t='Feige32',vph=
     #Second Atmospheric bands 
     la1=6950#8100#6950#7150#6884
     la2=7380#8350#7380#7120
-    nt1=np.where((wav_i <= la1))
-    nt2=np.where((wav_i >= la2))
-    wavt1=wav_i[nt1]
-    wavt2=wav_i[nt2]
-    nt0=np.where((wave > la1) & (wave < la2))
-    wavt0=wave[nt0]
-    wav_it=np.append(np.append(wavt1,wavt0),wavt2)
-    nt3=np.where((wav_i <= la1) | (wav_i >= la2))
-    flutt3=res_i[nt3]
-    wavt3=wav_i[nt3]
-    fluxft=interp1d(wavt3,flutt3,bounds_error=False,fill_value=0.)(wav_it)
-    res_i=fluxft
-    wav_i=wav_it
-    #Third Atmospheric bands 
-    la1=7550#8100#6950#7150#6884
-    la2=7800#8350#7380#7120
-    nt1=np.where((wav_i <= la1))
-    nt2=np.where((wav_i >= la2))
-    wavt1=wav_i[nt1]
-    wavt2=wav_i[nt2]
-    nt0=np.where((wave > la1) & (wave < la2))
-    wavt0=wave[nt0]
-    wav_it=np.append(np.append(wavt1,wavt0),wavt2)
-    nt3=np.where((wav_i <= la1) | (wav_i >= la2))
-    flutt3=res_i[nt3]
-    wavt3=wav_i[nt3]
-    fluxft=interp1d(wavt3,flutt3,bounds_error=False,fill_value=0.)(wav_it)
-    res_i=fluxft
-    wav_i=wav_it
-    #Forth Atmospheric bands 
-    la1=8100#6950#7150#6884
-    la2=8350#7380#7120
     nt1=np.where((wav_i <= la1))
     nt2=np.where((wav_i >= la2))
     wavt1=wav_i[nt1]
@@ -288,7 +247,6 @@ def gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data='data'
     resp_t=resp[nt]
     resp_t0=resp[nt]
     wave_t=wave[nt]
-    
     nt0=np.where((wave_t >= la1) & (wave_t <= la2))
     resp_t[nt0]=0
     nt1=np.where((wave_t >= lb1) & (wave_t <= lb2))
@@ -302,15 +260,12 @@ def gen_sensf(wav_i,wave,flux,res_f,at_ext,minwave,maxwave,hdr2,path_data='data'
     resp_t1[nt1]=0
     resp_t1=resp_t1[nt2]
     resp_t1=interp1d(wave_tt,resp_t1,bounds_error=False,fill_value=0.)(wave_t)
-
-    nt3=np.where((wave_t >= 8100) & (wave_t <= 8400))#6884-7400
-    resp_t1[nt3]=resp_t0[nt3]
+    #nt3=np.where((wave_t >= 6860) & (wave_t <= 7400))#6884-7400
+    #nt3=np.where((wave_t >= 8100) & (wave_t <= 8400))#6884-7400
     nt3=np.where((wave_t >= 6860) & (wave_t <= 7400))#6884-7400
     resp_t1[nt3]=resp_t0[nt3]
     #nt3=np.where((wave_t >= 7617) & (wave_t <= 7720))#6884-7400
     nt3=np.where((wave_t >= 6860) & (wave_t <= 7400))#6884-7400
-    resp_t1[nt3]=resp_t0[nt3]
-    nt3=np.where((wave_t >= 7500) & (wave_t <= 7780))#6884-7400
     resp_t1[nt3]=resp_t0[nt3]
     resp[nt]=resp_t1#model
     s=resp
@@ -337,10 +292,10 @@ def meg_spectra_outs(wave,flux,res_f,minwave,maxwave,vph='B',pathwork=''):
     plt.close()
     return factor
 
-def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',stdar_t='Feige32',verbose=True,path_data='data',pathwork='',path_ifu='ifu',r=4.0,dpix=0.35):
+def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',idp='9',stdar_t='Feige32',verbose=True,path_data='data',pathwork='',path_ifu='ifu',r=4.0,dpix=0.35):
     #r is Aperture radius
-    path_block9=pathwork+'obsid9'+vph+'_results/'
-    path_sensfits=pathwork+'obsid9'+vph+'_results/'
+    path_block9=pathwork+'obsid'+idp+vph+'_results/'
+    path_sensfits=pathwork+'obsid'+idp+vph+'_results/'
     if phase == 0:
         cube=False
         gen_hr=False
@@ -645,11 +600,8 @@ def create_obsBIAS(data,redux_path='',ob_path=''):
     for i in range(0, len(nt)):
         line='  - '+filelists[i]+'\n'
         f.write(line)
-        if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
-            if ptt.exists(ob_path+'bias/'+filelists[i]+'.gz') == True:
-                call='gunzip -c '+ob_path+'bias/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
-            else:
-                call='cp '+ob_path+'bias/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+        if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+            call='cp '+ob_path+'bias/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
             tools.sycall(call)
     f.close()
     
@@ -738,11 +690,8 @@ def create_obsTraceMap(data,vph,redux_path='',ob_path=''):
         if vphs[i] == vph:
             line='  - '+filelists[i]+'\n'
             f.write(line)
-            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
-                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz') == True:
-                    call='gunzip -c '+ob_path+'flat/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
-                else:
-                    call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
 
@@ -777,11 +726,8 @@ def create_obsFiberFlatImage(data,vph,redux_path='',ob_path=''):
         if vphs[i] == vph:
             line='  - '+filelists[i]+'\n'
             f.write(line)
-            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
-                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz') == True:
-                    call='gunzip -c '+ob_path+'flat/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
-                else:
-                    call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
 
@@ -816,11 +762,8 @@ def create_obsModelMap(data,vph,redux_path='',ob_path=''):
         if vphs[i] == vph:
             line='  - '+filelists[i]+'\n'
             f.write(line)
-            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
-                if ptt.exists(ob_path+'flat/'+filelists[i]+'.gz') == True:
-                    call='gunzip -c '+ob_path+'flat/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
-                else:
-                    call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                call='cp '+ob_path+'flat/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
 
@@ -870,11 +813,8 @@ def create_obsArcCalibration(data,vph,redux_path='',ob_path=''):
         if vphs[i] == vph and svt:
             line='  - '+filelists[i]+'\n'
             f.write(line)
-            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
-                if ptt.exists(ob_path+'arc/'+filelists[i]+'.gz') == True:
-                    call='gunzip -c '+ob_path+'arc/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
-                else:
-                    call='cp '+ob_path+'arc/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                call='cp '+ob_path+'arc/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
 
@@ -920,11 +860,8 @@ def create_obsLcbStdStar(data,vph,redux_path='',ob_path=''):
             if vphs[i] == vph and svt:
                 line='  - '+filelists[i]+'\n'
                 f.write(line)
-                if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
-                    if ptt.exists(ob_path+'stds/'+filelists[i]+'.gz') == True:
-                        call='gunzip -c '+ob_path+'stds/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
-                    else:
-                        call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                    call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                     tools.sycall(call)
         f.close()
 
@@ -969,11 +906,8 @@ def create_obsLcbImageStd(data,vph,redux_path='',ob_path=''):
             if vphs[i] == vph and svt:
                 line='  - '+filelists[i]+'\n'
                 f.write(line)
-                if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
-                    if ptt.exists(ob_path+'stds/'+filelists[i]+'.gz') == True:
-                        call='gunzip -c '+ob_path+'stds/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
-                    else:
-                        call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+                if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                    call='cp '+ob_path+'stds/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                     tools.sycall(call)
         f.close()
 
@@ -1008,11 +942,8 @@ def create_obsLcbImage(data,vph,redux_path='',ob_path=''):
         if vphs[i] == vph:
             line='  - '+filelists[i]+'\n'
             f.write(line)
-            if ptt.exists(redux_path+'/data/'+filelists[i]) == False:
-                if ptt.exists(ob_path+'object/'+filelists[i]+'.gz') == True:
-                    call='gunzip -c '+ob_path+'object/'+filelists[i]+'.gz > '+redux_path+'/data/'+filelists[i]
-                else:
-                    call='cp '+ob_path+'object/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
+            if ptt.exists(redux_path+'/data/'+filelists[i] == False):
+                call='cp '+ob_path+'object/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
 
@@ -1075,7 +1006,7 @@ def create_requirement(data,stds,vph,redux_path='',ob_path='',poly=False,calib_p
             f.write('    MegaraArcCalibration:\n')
             f.write('      polynomial_degree: 2\n')
         f.close()
-    if ptt.exists(redux_path+'/data/extintion_curve.txt') == False:
+    if ptt.exists(redux_path+'/data/extintion_curve.txt' == False):
         call='cp '+calib_path+'extintion_curve.txt '+redux_path+'/data/extintion_curve.txt'
         tools.sycall(call)
 
@@ -1128,7 +1059,7 @@ def get_lamp(data,vph,calib_path='auxiliary/',redux_path=''):
                 pathL='ThAr'
             file_name=vph+'_'+pathL+'.lis'
             pathT=calib_path+root_p+'/'+pathL+'/'+vph+'/'
-            if ptt.exists(redux_path+'/data/'+file_name) == False:
+            if ptt.exists(redux_path+'/data/'+file_name == False):
                 call='cp '+pathT+file_name+' '+redux_path+'/data/'+file_name
                 tools.sycall(call)
     return file_name
