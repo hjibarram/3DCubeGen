@@ -178,6 +178,12 @@ def get_apertures(file):
     th=np.array(th)
     return ra,dec,rad,l1,l2,th,colr,namet,typ
 
+def conv(xt,ke=2.5):
+    nsf=len(xt)
+    krn=ke
+    xf=filt1d(xt,ke)
+    return xf    
+
 def extract_spec1d(filename,outname,dir_cube='',out_dir='',sig=10,smoth=False,avgra=False,head=0,error=True,hdrE=1):
     file=dir_cube+filename
     [cube0, hdr0]=fits.getdata(file, head, header=True)
