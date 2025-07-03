@@ -5,6 +5,7 @@ from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from scipy.interpolate import interp1d
 from astropy.convolution import convolve,Gaussian2DKernel
+from scipy.ndimage import gaussian_filter1d as filt1d
 import CubeGen
 import CubeGen.tools.kernel as kernel 
 import os
