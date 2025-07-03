@@ -179,7 +179,7 @@ def get_apertures(file):
     return ra,dec,rad,l1,l2,th,colr,namet,typ
 
 def extract_spec1d(filename,outname,dir_cube='',out_dir='',sig=10,smoth=False,avgra=False,head=0,error=True,hdrE=1):
-    file=dir_cube_m+filename
+    file=dir_cube+filename
     [cube0, hdr0]=fits.getdata(file, head, header=True)
     if error:
         cube0E=fits.getdata(file, hdrE)
