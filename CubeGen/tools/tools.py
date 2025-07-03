@@ -225,6 +225,7 @@ def extract_spec1d(filename,outname,dir_cube='',out_dir='',sig=10,smoth=False,av
     h.update()
     hlist=fits.HDUList([h1])
     hlist.update_extend()
+    print('Writing file: ',file_out)
     hlist.writeto(file_out, overwrite=True)
     sycall('gzip -f '+file_out)         
 
