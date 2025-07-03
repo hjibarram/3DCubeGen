@@ -209,10 +209,10 @@ def extract_spec1d(filename,outname,dir_cube='',out_dir='',sig=10,smoth=False,av
     if smoth:
         flux=conv(flux,ke=sig)
     file_out=out_dir+outname+'.fits'
-    col1 = fits.Column(name='wave', format='D', array=wave)
-    col2 = fits.Column(name='flux', format='D', array=flux)
+    col1 = fits.Column(name='LAMBDA', format='D', array=wave)
+    col2 = fits.Column(name='FLUX', format='D', array=flux)
     if error:
-        col3 = fits.Column(name='fluxE', format='D', array=fluxE)
+        col3 = fits.Column(name='ERROR', format='D', array=fluxE)
     if error:
         coldefs = fits.ColDefs([col1, col2, col3])
     else:
