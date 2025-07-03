@@ -203,7 +203,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             call13='mkdir -p '+out_path+'/'+redux_ver+'/'
             call14='cp '+redux_dirT+'ifu/'+basename.replace('NAME','*').replace('.fits','_'+vph+'.fits')+'.gz '+out_path+'/'+redux_ver+'/'
             call15='mkdir -p '+out_path.replace('cubes','spec1d')+'/'+redux_ver+'/'
-            call16='cp '+redux_dirT+'ifu/'+'megSpec-'+name+'_'+vph+'.fits.gz '+out_path.replace('cubes','spec1d')+'/'+redux_ver+'/'
+            call16='cp '+redux_dirT+'ifu/megSpec-'+name+'_'+vph+'.fits.gz '+out_path.replace('cubes','spec1d')+'/'+redux_ver+'/'
             tools.sycall(call0)
             tools.sycall(call1)
             tools.sycall(call2)
@@ -246,7 +246,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             tools.sycall(call15)
             tools.sycall(call16)
     print('All cubes generated and saved in: ',out_path+'/'+redux_ver+'/')
-    
+
 if __name__ == "__main__":
     cli()
 #pipemegara runfulldrp --run_name GTC5-24AMEX --run_number '0003' --obrun_path /mnt/D14TB/GTC/GTC_Erika/GTC5-24AMEX_OB03/  --redux_path /mnt/D14TB/GTC/GTC_Erika/GTC5-24AMEX_OB03/reduxN --out_path /mnt/D14TB/GTC/GTC_Erika/redux/
