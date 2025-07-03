@@ -318,11 +318,14 @@ def get_narrwband(wave, lo=6563,dw=10.0,sig=1.0,alpha=1):
     y=y1*y2
     return y
 
-def sycallo(comand):
+def sycallo(comand,ott=False):
     out=os.popen(comand, 'r')
     line=out.readline()
     line=line.replace('\n','')
-    return line    
+    if ott:
+        return out
+    else:
+        return line    
 
 def band_spectra(wave_s,pdl_flux,k=5,zt=0):
     dir=os.path.join(CubeGen.__path__[0], 'legacy')+'/'
