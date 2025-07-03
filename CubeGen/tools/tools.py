@@ -2,6 +2,7 @@ import numpy as np
 from astropy.wcs import WCS
 from astropy.wcs.utils import skycoord_to_pixel
 from astropy.coordinates import SkyCoord
+from astropy.io import fits
 from scipy.interpolate import interp1d
 from astropy.convolution import convolve,Gaussian2DKernel
 import CubeGen
@@ -177,6 +178,56 @@ def get_apertures(file):
     th=np.array(th)
     return ra,dec,rad,l1,l2,th,colr,namet,typ
 
+def extract_spec1d(filename,outname,dir_cube='',out_dir='',sig=10,smoth=False,avgra=False,head=0,error=True,hdrE=1):
+    file=dir_cube_m+filename
+    [cube0, hdr0]=fits.getdata(file, head, header=True)
+    if error:
+        cube0E=fits.getdata(file, hdrE)
+    nz,nx,ny=cube0.shape
+    flux=np.zeros(nz)
+    if error:
+        fluxE=np.zeros(nz)
+    for i in range(0, nz):
+        tmp=cube0[i,:,:]
+        if error:
+            tmpE=cube0E[i,:,:]
+        if avgra:
+            if error:
+                fluxE=np.sqrt(np.nanmean(tmpE**2))
+            flux[i]=np.nanmean(tmp)
+        else:
+            if error:
+                fluxE[i]=np.sqrt(np.nansum(tmpE**2))
+            flux[i]=np.nansum(tmp)
+    crpix=hdr0["CRPIX3"]
+    try:
+        cdelt=hdr0["CD3_3"]
+    except:
+        cdelt=hdr0["CDELT3"]
+    crval=hdr0["CRVAL3"]
+    wave=(crval+cdelt*(np.arange(nz)+1-crpix))
+    if smoth:
+        flux=conv(flux,ke=sig)
+    file_out=out_dir+outname+'.fits'
+    col1 = fits.Column(name='wave', format='D', array=wave)
+    col2 = fits.Column(name='flux', format='D', array=flux)
+    if error:
+        col3 = fits.Column(name='fluxE', format='D', array=fluxE)
+    if error:
+        coldefs = fits.ColDefs([col1, col2, col3])
+    else:
+        coldefs = fits.ColDefs([col1, col2])
+    h1 = fits.BinTableHDU.from_columns(coldefs)    
+    h=h1.header
+    h['EXTNAME']='SPECTRA1D'
+    h['RA']=hdr0['CRVAL1']
+    h['DEC']=hdr0['CRVAL2']
+    h.update()
+    hlist=fits.HDUList([h1])
+    hlist.update_extend()
+    hlist.writeto(file_out, overwrite=True)
+    sycall('gzip -f '+file_out)         
+
 def extract_spec(spec,hdr,ra='',dec='',rad=1.5,pix=0.35,avgra=False):
     sky1=SkyCoord(ra+' '+dec,frame=FK5, unit=(u.hourangle,u.deg))
     val1=sky1.ra.deg
@@ -213,7 +264,6 @@ def extract_spec(spec,hdr,ra='',dec='',rad=1.5,pix=0.35,avgra=False):
         cdelt=hdr["CDELT3"]
     crval=hdr["CRVAL3"]
     wave_f=(crval+cdelt*(np.arange(nz)+1-crpix))*1e10
-    
     return wave_f,single_T,xpos,ypos
 
 def sycall(comand):
@@ -400,7 +450,6 @@ def cube_interpolB(cube,x,y):
     z=twoD_interpolB(x,y,x1,x2,x3,y1,y2,y3,z1,z2,z3)
     return z        
     
-
 def cube_interpol(cube,x,y):
     nz,nx,ny=cube.shape
     val_out=np.zeros(nz)

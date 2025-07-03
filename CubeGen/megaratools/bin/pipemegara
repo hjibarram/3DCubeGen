@@ -202,6 +202,8 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             call12=comand_base.replace('NR','12').replace('VPH',vph).replace('STD',stdar_t)
             call13='mkdir -p '+out_path+'/'+redux_ver+'/'
             call14='cp '+redux_dirT+'ifu/'+basename.replace('NAME','*').replace('.fits','_'+vph+'.fits')+'.gz '+out_path+'/'+redux_ver+'/'
+            call15='mkdir -p '+out_path.replace('cubes','spec1d')+'/'+redux_ver+'/'
+            call16='cp '+redux_dirT+'ifu/'+'megSpec-'+name+'_'+vph+'.fits.gz '+out_path.replace('cubes','spec1d')+'/'+redux_ver+'/'
             tools.sycall(call0)
             tools.sycall(call1)
             tools.sycall(call2)
@@ -237,9 +239,14 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             tools.sycall(call12)
             mcube.megmap_ifu(reduxL2,nameF=name,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
                 out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=varT+vph,basenameC=basename)
+            tools.extract_spec1d(basename.replace('NAME','*').replace('.fits','_'+vph+'.fits')+'.gz','megSpec-'+name+'_'+vph,dir_cube=redux_dirT+'ifu/',
+                out_dir=redux_dirT+'ifu/',avgra=False,head=0,error=False)
             tools.sycall(call13)
             tools.sycall(call14)
-            
+            tools.sycall(call15)
+            tools.sycall(call16)
+    print('All cubes generated and saved in: ',out_path+'/'+redux_ver+'/')
+    
 if __name__ == "__main__":
     cli()
 #pipemegara runfulldrp --run_name GTC5-24AMEX --run_number '0003' --obrun_path /mnt/D14TB/GTC/GTC_Erika/GTC5-24AMEX_OB03/  --redux_path /mnt/D14TB/GTC/GTC_Erika/GTC5-24AMEX_OB03/reduxN --out_path /mnt/D14TB/GTC/GTC_Erika/redux/
