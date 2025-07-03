@@ -217,15 +217,15 @@ def extract_spec1d(filename,outname,dir_cube='',out_dir='',sig=10,smoth=False,av
         coldefs = fits.ColDefs([col1, col2, col3])
     else:
         coldefs = fits.ColDefs([col1, col2])
+    h0 = fits.PrimaryHDU()    
     h1 = fits.BinTableHDU.from_columns(coldefs)    
-    h=h1.header
+    h=h0.header
     h['EXTNAME']='SPECTRA1D'
     h['RA']=hdr0['CRVAL1']
     h['DEC']=hdr0['CRVAL2']
     h.update()
-    hlist=fits.HDUList([h1])
+    hlist=fits.HDUList([h0,h1])
     hlist.update_extend()
-    print('Writing file: ',file_out)
     hlist.writeto(file_out, overwrite=True)
     sycall('gzip -f '+file_out)         
 
