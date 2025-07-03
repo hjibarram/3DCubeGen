@@ -185,8 +185,6 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             reduxL0=['obsid'+idsA+vph]
             reduxL1=['obsid'+idsB+vph]
             reduxL2=['obsid12'+vph]
-            tools.extract_spec1d(basename.replace('NAME',namet).replace('.fits','_'+varT+vph+'.fits')+'.gz','megSpec-'+namet+'_'+varT+vph,
-                dir_cube=redux_dirT+'ifu/',out_dir=redux_dirT+'ifu/',avgra=False,head=0,error=False)
             comand_base='numina run PATHWORK PATHDATA PWORKobsresult-NRVPH.yaml -r PWORKrequirements-STDVPH.yaml'.replace('PATHWORK',path_work).replace('PWORK',redux_dirT).replace('PATHDATA',path_data)
             dir_base='obsidNRVPH_results'
             call0=comand_base.replace('NRVPH','1').replace('VPH',vph).replace('STD',stdar_t)
