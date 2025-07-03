@@ -320,11 +320,11 @@ def get_narrwband(wave, lo=6563,dw=10.0,sig=1.0,alpha=1):
 
 def sycallo(comand,ott=False):
     out=os.popen(comand, 'r')
-    line=out.readline()
-    line=line.replace('\n','')
     if ott:
         return out
     else:
+        line=out.readline()
+        line=line.replace('\n','')
         return line    
 
 def band_spectra(wave_s,pdl_flux,k=5,zt=0):
