@@ -203,7 +203,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             call13='mkdir -p '+out_path+'/'+redux_ver+'/'
             call14='cp '+redux_dirT+'ifu/'+basename.replace('NAME','*').replace('.fits','_'+vph+'.fits')+'.gz '+out_path+'/'+redux_ver+'/'
             call15='mkdir -p '+out_path.replace('cubes','spec1d')+'/'+redux_ver+'/'
-            call16='cp '+redux_dirT+'ifu/megSpec-'+name+'_'+vph+'.fits.gz '+out_path.replace('cubes','spec1d')+'/'+redux_ver+'/'
+            call16='cp '+redux_dirT+'ifu/megSpec-*_'+vph+'.fits.gz '+out_path.replace('cubes','spec1d')+'/'+redux_ver+'/'
             tools.sycall(call0)
             tools.sycall(call1)
             tools.sycall(call2)
