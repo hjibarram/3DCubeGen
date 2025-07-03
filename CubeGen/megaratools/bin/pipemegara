@@ -239,8 +239,8 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             tools.sycall(call12)
             mcube.megmap_ifu(reduxL2,nameF=name,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
                 out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=varT+vph,basenameC=basename)
-            tools.extract_spec1d(basename.replace('NAME',namet).replace('.fits','_'+varT+vph+'.fits')+'.gz','megSpec-'+name+'_'+vph,dir_cube=redux_dirT+'ifu/',
-                out_dir=redux_dirT+'ifu/',avgra=False,head=0,error=False)
+            tools.extract_spec1d(basename.replace('NAME',namet).replace('.fits','_'+varT+vph+'.fits')+'.gz','megSpec-'+namet+'_'+varT+vph,
+                dir_cube=redux_dirT+'ifu/',out_dir=redux_dirT+'ifu/',avgra=False,head=0,error=False)
             tools.sycall(call13)
             tools.sycall(call14)
             tools.sycall(call15)
