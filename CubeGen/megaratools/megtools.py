@@ -603,7 +603,7 @@ def read_obs(name,path=''):
         if 'Arcs' in line and img != 1000:
             typ='Arcs'
             img=ct
-        if 'Spectrophotometric standard' in line and img != 1000:
+        if (('Spectrophotometric standard' in line) or ('Stds' in line)) and img != 1000:
             typ='SPTD'
             img=ct
         if ct >=  img+2:
@@ -686,6 +686,31 @@ def get_std(data):
         for i in range(0, len(std)):
             std[i]=std[i].replace('SPSTD_','')
         return std
+    else:
+        return None
+
+def get_exptime(data):
+    """
+    Returns the exposure time from the observation file data.
+    Parameters:
+    data (dic): Dictionary from the observation file data.
+
+    Returns:
+    float: The exposure time in seconds.
+    """
+    nt=np.where(np.array(data['Type']) == 'IMAGE')[0]
+    dat=np.array(data['EXPTIME'])
+    dat1=np.array(data['VPH'])
+    exptime=dat[nt]
+    vph=dat1[nt]
+    if len(exptime) > 0:
+        vphu=np.unique(vph)
+        exptimeT= np.zeros(len(vphu))
+        for j in range(0, len(vphu)):
+            for i in range(0, len(exptime)):
+                if vph[i] == vphu[j]:
+                    exptimeT[j]=exptime[i]+exptimeT[j]
+        return vphu,exptimeT
     else:
         return None
 
@@ -1183,6 +1208,7 @@ def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/
     obj_list=get_obj(data)
     vph_list=get_vph(data)
     std_list=get_std(data)
+    vphext,exp_list=get_exptime(data)
     print('Creating MegaraBiasImage file')
     create_obsBIAS(data,redux_path=path_redux,ob_path=ob_path)
     for i in range(0, len(vph_list)):
@@ -1209,4 +1235,4 @@ def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/
     for i in range(0, len(vph_list)):
         print('Creating Requirement files for VPH: ', vph_list[i])
         create_requirement(data,std_list,vph_list[i],redux_path=path_redux,ob_path=ob_path,calib_path=calib_path)
-    return obj_list,std_list,vph_list
+    return obj_list,std_list,vph_list,vphext,exp_list

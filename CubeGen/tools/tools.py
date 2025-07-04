@@ -185,7 +185,7 @@ def conv(xt,ke=2.5):
     xf=filt1d(xt,ke)
     return xf    
 
-def extract_spec1d(filename,outname,dir_cube='',out_dir='',sig=10,smoth=False,avgra=False,head=0,error=True,hdrE=1):
+def extract_spec1d(filename,outname,dir_cube='',out_dir='',sig=10,smoth=False,avgra=False,head=0,error=True,hdrE=1,headerInfo={}):
     file=dir_cube+filename
     [cube0, hdr0]=fits.getdata(file, head, header=True)
     if error:
@@ -227,6 +227,12 @@ def extract_spec1d(filename,outname,dir_cube='',out_dir='',sig=10,smoth=False,av
     h0 = fits.PrimaryHDU()    
     h1 = fits.BinTableHDU.from_columns(coldefs)    
     h=h0.header
+    if len(headerInfo) > 0:
+        keysN=list(headerInfo.keys())
+        for key in keysN:
+            if key not in h:
+                h[key]=headerInfo[key]
+                #h.comments[key]=headerInfo.get('comments', 'No comment provided')
     h['EXTNAME']='SPECTRA1D'
     h['RA']=hdr0['CRVAL1']
     h['DEC']=hdr0['CRVAL2']

@@ -165,7 +165,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
         redux_dirT=''
         path_data=''    
     calib_path=os.path.join(CubeGen.__path__[0], 'megaratools')+'/auxiliary/'
-    objs,stds,vphs=mtools.sort_megfiles(run_name,run_number,obser_path=obrun_path,path_redux=redux_path,calib_path=calib_path)
+    objs,stds,vphs,vphe,expT=mtools.sort_megfiles(run_name,run_number,obser_path=obrun_path,path_redux=redux_path,calib_path=calib_path)
     namet=objs[0]
     idstA=['9','10','14','15']
     idstB=['11','13','16','17']
@@ -178,6 +178,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             else:
                 varT=''
                 #name=None
+            ntE=np.where(vphe == vphs[j])[0]
             idsA=idstA[i]
             idsB=idstB[i]
             vph=vphs[j]
@@ -185,6 +186,22 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             reduxL0=['obsid'+idsA+vph]
             reduxL1=['obsid'+idsB+vph]
             reduxL2=['obsid12'+vph]
+            headerInfo={'VPH':vph,
+                        'STD':stdar_t,
+                        'TEXPTIME':expT[ntE][0],
+                        'RUN_NAME':run_name,
+                        'RUN_NUMBER':run_number,
+                        'OUT_PATH':out_path,
+                        'REDUX_VER':redux_ver,
+                        'SIGMA_S':sigm_s,
+                        'PIX_S':pix_s,
+                        'ALPH_S':alph_s,
+                        'FLU16':flu16,
+                        'NAME':name,
+                        'BASENAME':basename.replace('NAME',namet).replace('.fits','_'+varT+vph+'.fits'),
+                        'FAC_SIZEY':fac_sizey,
+                        'FAC_SIZEX':fac_sizex,
+                        'APER_STD':aper_std}
             comand_base='numina run PATHWORK PATHDATA PWORKobsresult-NRVPH.yaml -r PWORKrequirements-STDVPH.yaml'.replace('PATHWORK',path_work).replace('PWORK',redux_dirT).replace('PATHDATA',path_data)
             dir_base='obsidNRVPH_results'
             call0=comand_base.replace('NRVPH','1').replace('VPH',vph).replace('STD',stdar_t)
@@ -238,9 +255,9 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
                 path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
             tools.sycall(call12)
             mcube.megmap_ifu(reduxL2,nameF=name,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
-                out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=varT+vph,basenameC=basename)
+                out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=varT+vph,basenameC=basename,headerInfo=headerInfo)
             tools.extract_spec1d(basename.replace('NAME',namet).replace('.fits','_'+varT+vph+'.fits')+'.gz','megSpec-'+namet+'_'+varT+vph,
-                dir_cube=redux_dirT+'ifu/',out_dir=redux_dirT+'ifu/',avgra=False,head=0,error=False)
+                dir_cube=redux_dirT+'ifu/',out_dir=redux_dirT+'ifu/',avgra=False,head=0,error=False,headerInfo=headerInfo)
             tools.sycall(call13)
             tools.sycall(call14)
             tools.sycall(call15)
