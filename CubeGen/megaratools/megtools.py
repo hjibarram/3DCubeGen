@@ -612,7 +612,10 @@ def read_obs(name,path=''):
             if len(data)+1 == nh:
                 for it in range(0, nh-1):
                     try:
-                        val=float(data[it])
+                        if it == 3:
+                            val=data[it].replace(' ','')
+                        else:
+                            val=float(data[it])
                     except:
                         val=data[it].replace(' ','')
                     dic[head[it]].extend([val])
