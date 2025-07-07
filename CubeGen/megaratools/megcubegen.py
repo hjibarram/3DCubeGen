@@ -231,7 +231,7 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
     hlist.update_extend()
     tools.sycall('mkdir -p '+out_path)
     if nameF:
-        file=out_path+basenameC.replace('NAME',nameF)
+        file=out_path+basenameC.replace('NAME',nameF+'_'+vph)
     else:
         file=out_path+basenameC.replace('NAME',outf)
     out_fit=file
