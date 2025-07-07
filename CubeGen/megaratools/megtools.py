@@ -852,7 +852,7 @@ def create_obsModelMap(data,vph,redux_path='',ob_path=''):
                 tools.sycall(call)
     f.close()
 
-def create_obsArcCalibration(data,vph,redux_path='',ob_path=''):
+def create_obsArcCalibration(data,vph,redux_path='',ob_path='',forceAr=False):
     """
     Creates a ArcCalibration observation file with the given name and path.
     Parameters:
@@ -872,16 +872,19 @@ def create_obsArcCalibration(data,vph,redux_path='',ob_path=''):
     dat2=np.array(data['OSFILT'])
     dat3=np.array(data['ThNe1on'])
     dat4=np.array(data['ThAr1on'])
+    dat5=np.array(data['ThAr3on'])
     filelists=dat[nt]
     vphs=dat1[nt]
     filt=dat2[nt]
     ThNe=dat3[nt]
     ThAr=dat4[nt]
+    ThAr3=dat5[nt]
     filelists,uin=np.unique(filelists,return_index=True)
     vphs=vphs[uin]
     filt=filt[uin]
     ThNe=ThNe[uin]
     ThAr=ThAr[uin]
+    ThAr3=ThAr3[uin]
     file=redux_path+'/obsresult-3VPH.yaml'.replace('VPH',vph)
     f=open(file,'w')
     f.write('id: 3VPH\n'.replace('VPH',vph))
@@ -895,6 +898,14 @@ def create_obsArcCalibration(data,vph,redux_path='',ob_path=''):
             svt=True
         else:
             svt=False
+        if forceAr:
+            if filt[i] == 'BLUE' and ThAr[i] == 1:
+                svt=True
+            elif filt[i] == 'RED' and ThAr3[i] == 1:
+                svt=True
+            else:
+                svt=False
+
         if vphs[i] == vph and svt:
             line='  - '+filelists[i]+'\n'
             f.write(line)
@@ -1191,7 +1202,7 @@ def get_stdfile(std,redux_path='',calib_path='auxiliary/'):
         tools.sycall(call2)
     return
 
-def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/'):
+def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/',forceAr=False):
     """
     Sorts the Megara files based on the observation file and creates necessary files.
     Parameters:
@@ -1216,7 +1227,7 @@ def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/
         create_obsTraceMap(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
     for i in range(0, len(vph_list)):
         print('Creating MegaraArcCalibration files for VPH: ', vph_list[i])
-        create_obsArcCalibration(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
+        create_obsArcCalibration(data,vph_list[i],redux_path=path_redux,ob_path=ob_path,forceAr=forceAr)
     for i in range(0, len(vph_list)):
         print('Creating MegaraFiberFlatImage files for VPH: ', vph_list[i])
         create_obsFiberFlatImage(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
