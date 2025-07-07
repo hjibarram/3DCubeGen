@@ -168,7 +168,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
         path_data=''    
     calib_path=os.path.join(CubeGen.__path__[0], 'megaratools')+'/auxiliary/'
     objs,stds,vphs,vphe,expT=mtools.sort_megfiles(run_name,run_number,obser_path=obrun_path,path_redux=redux_path,calib_path=calib_path,forceAr=forcear)
-    if not None in name:
+    if name:
         namet=name
     else:
         namet=objs[0]
