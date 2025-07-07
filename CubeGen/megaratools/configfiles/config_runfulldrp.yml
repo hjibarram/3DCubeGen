@@ -18,4 +18,4 @@ run_drp:
     fac_sizey: 1.0 #Factor of the FoV in Y, default 1
     fac_sizex: 1.0 #Factor of the FoV in X, default 1
     aper_std: 4.0 #Aperture radius for spectrofotometric calibration, default 4 arcsec
-    forceAr: False #Force the use of the ThAr3 arclamp in the reduction
+    forcear: False #Force the use of the ThAr3 arclamp in the reduction

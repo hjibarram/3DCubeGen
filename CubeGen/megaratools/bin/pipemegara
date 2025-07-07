@@ -129,9 +129,9 @@ cli.add_command(rundrp)
 @click.option('-i', '--fac_sizex', type=float, default=1.0, help='factor of the FoV in X, default 1')
 @click.option('-u', '--aper_std', type=float, default=4.0, help='aperture radius for spectrofotometric calibration, default 4 arcsec')
 @click.option('-c', '--config_file', type=str, default='', help='name of the config file')
-@click.option('-e', '--forceAr', is_flag=True, default=False, help='force the use of the ThAr3 arclamp in the reduction')
+@click.option('-e', '--forcear', is_flag=True, default=False, help='force the use of the ThAr3 arclamp in the reduction')
 
-def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm_s,pix_s,alph_s,flu16,name,basename,fac_sizey,fac_sizex,aper_std,config_file,forceAr):
+def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm_s,pix_s,alph_s,flu16,name,basename,fac_sizey,fac_sizex,aper_std,config_file,forcear):
 
     data=tools.read_config_file(config_file)
     if data:
@@ -152,7 +152,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             fac_sizey=data['run_drp'][0]['fac_sizey']
             fac_sizex=data['run_drp'][0]['fac_sizex']
             aper_std=data['run_drp'][0]['aper_std']
-            forceAr=data['run_drp'][0]['forceAr']
+            forcear=data['run_drp'][0]['forcear']
 
     if pix_s == 0:
         pix_s=sigm_s
@@ -167,7 +167,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
         redux_dirT=''
         path_data=''    
     calib_path=os.path.join(CubeGen.__path__[0], 'megaratools')+'/auxiliary/'
-    objs,stds,vphs,vphe,expT=mtools.sort_megfiles(run_name,run_number,obser_path=obrun_path,path_redux=redux_path,calib_path=calib_path,forceAr=forceAr)
+    objs,stds,vphs,vphe,expT=mtools.sort_megfiles(run_name,run_number,obser_path=obrun_path,path_redux=redux_path,calib_path=calib_path,forceAr=forcear)
     namet=objs[0]
     idstA=['9','10','14','15']
     idstB=['11','13','16','17']
