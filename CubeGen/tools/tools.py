@@ -507,7 +507,7 @@ def interpolate_matrix(matrix_input,nt=4,ne=2,verbose=False,smoth=True):
     ny1=int(ny*nt)
     matrix_new=np.zeros([nx1,ny1])
     if verbose:
-        pbar=tqdm(total=ny1)
+        pbar=tqdm(total=nx1)
     dxt=(nx-ne*2)/float(nx1)
     dyt=(ny-ne*2)/float(ny1)
     xpos=ne
