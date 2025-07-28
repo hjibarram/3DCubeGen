@@ -405,8 +405,8 @@ def twoD_interpolB(x,y,x1,x2,x3,y1,y2,y3,z1,z2,z3):
     return z        
     
 def map_interpolB(cube,x,y,nxt=10,nyt=10):
-    xpos0=np.int(np.round(x))
-    ypos0=np.int(np.round(y))
+    xpos0=int(np.round(x))
+    ypos0=int(np.round(y))
     map=cube[xpos0-nxt:xpos0+nxt,ypos0-nyt:ypos0+nyt]
     nx,ny=map.shape
     rp=np.zeros([nx,ny])
