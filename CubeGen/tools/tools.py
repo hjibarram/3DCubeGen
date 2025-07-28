@@ -501,22 +501,39 @@ def extract_segm(hdr,l1=12,l2=12,ra='',dec='',dx=0):
     
     return xpos00,xpos11,ypos00-dx,ypos11-dx
 
-def interpolate_matrix(matrix_input,nt=4,ne=2,verbose=False,smoth=True):
+def interpolate_matrix(matrix_input,nt=4,ne=2,verbose=False,smoth=True,dx=0,dy=0,bval=0,zero=False):
     nx,ny=matrix_input.shape
     nx1=int(nx*nt)
     ny1=int(ny*nt)
     matrix_new=np.zeros([nx1,ny1])
     if verbose:
         pbar=tqdm(total=nx1)
-    dxt=(nx-ne*2)/float(nx1)
-    dyt=(ny-ne*2)/float(ny1)
-    xpos=ne
+    if zero:
+        dxt=(nx)/float(nx1)
+        dyt=(ny)/float(ny1)
+        xpos=0
+    else:
+        dxt=(nx-ne*2)/float(nx1)
+        dyt=(ny-ne*2)/float(ny1)
+        xpos=ne
     for i in range(0, nx1):
         xpos=xpos+dxt
-        ypos=ne
+        if zero:
+            ypos=0
+        else:
+            ypos=ne
         for j in range(0, ny1):
             ypos=ypos+dyt
-            val=map_interpolB(matrix_input,xpos,ypos,nxt=ne,nyt=ne)
+            if xpos-dx/nt-ne < 0:
+                val=bval
+            elif xpos-dx/nt-ne >= nx:
+                val=bval
+            elif ypos-dy/nt-ne < 0:
+                val=bval
+            elif ypos-dy/nt-ne >= ny:
+                val=bval
+            else:
+                val=map_interpolB(matrix_input,xpos-dx/nt,ypos-dy/nt,nxt=ne,nyt=ne)
             matrix_new[i,j]=val 
         if verbose:
             pbar.update(1)
