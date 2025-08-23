@@ -2,40 +2,53 @@ import numpy as np
 from scipy.interpolate import interp1d
 from astropy.io import fits
 from astropy.wcs import WCS
+from astropy.coordinates import EarthLocation
+from astropy.coordinates import SkyCoord
+import astropy.units as u
 import CubeGen.tools.tools as tools
-import CubeGen.megaratools.megtools as mtools
+import CubeGen.virustools.virustools as vtools
 import CubeGen.megaratools.megkernel as mkernel
 
-def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),headerInfo={},fac_sizeX=1.0,fac_sizeY=1.0,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',vph='R',scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits'):
-    """
-    Generate a cube from MEGARA IFU data.
+def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,flu16=True,spec_range=(None,None),headerInfo={},fac_sizeX=1.0,fac_sizeY=1.0,fibA=4.16,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',scp=112.36748321030637,basename='NAME_abscal_HST.fits',base_nameWCS='NAME_wcs.txt',basenameC='vpCube-NAME.fits'):
+"""
+    Generate a cube from VIRUSP IFU data.
     
-    This function reads MEGARA IFU data, processes it, and generates a cube with the specified wavelength range.
+    This function reads VIRUS IFU data, processes it, and generates a cube with the specified wavelength range.
     It handles multiple observations and applies ADR corrections.
     
     Returns:
         None
     """
     try:
-        nlt=len(reduxL)
+        nlt=len(nameL)
     except:
         nlt=1
     data_0=[]
     hdr_0=[]
-    hdr_1=[]
     for ii in range(0, nlt):
-        file=redux_dir+reduxL[ii]+'_results/'+basename
-        [rss, hdr]=fits.getdata(file,0, header=True)
-        [erss, hdr1]=fits.getdata(file,1, header=True)
+        file=redux_dir+basename.replace('NAME',nameL[ii])
+        [rss, hdr]=fits.getdata(file,hdrs, header=True)
+        [erss, hdr1]=fits.getdata(file,hdre, header=True)
         print('Processing '+hdr['OBJECT'])
         n_fib,ny0=rss.shape
         if ii == 0:
-            outf=hdr['OBJECT']+'_'+vph
-            x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1)
+            outf=hdr['OBJECT']
+            fib_idt,x_ifu,y_ifu=vtools.read_vpwcs(nameL[ii],path_data=redux_dir,base_name=base_nameWCS)
             crval=hdr['CRVAL1']
             cdelt=hdr['CDELT1']
             crpix=hdr['CRPIX1']
-            vel=mtools.get_radvel(hdr)
+            observatory=hdr['OBSERVAT']
+            obs=EarthLocation.of_site(observatory)
+            hdr['LONGITUD']=obs.lon.deg
+            hdr['LATITUDE']=obs.lat.deg
+            hdr['HEIGHT']=obs.height.to_value()
+            coord = SkyCoord(hdr['RA'], hdr['DEC'], frame="icrs")
+            hdr['DECDEG']=coord.dec.deg
+            hdr['RADEG']=coord.ra.deg
+            if radvel:
+                vel=mtools.get_radvel(hdr)
+            else:
+            	vel=0
             crval=crval/(1+vel)
             cdelt=cdelt/(1+vel)
             wave0=crval+np.arange(ny0)*cdelt
@@ -53,8 +66,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
                     print('The wave Range is not well defined')  
                     return
             else:
-                wave_2=np.round(np.nanmax(wave0)-90)
-                wave_1=np.round(np.nanmin(wave0)+90)
+                wave_2=np.round(np.nanmax(wave0)-dlt)
+                wave_1=np.round(np.nanmin(wave0)+dlt)
                 nt=np.where((wave0 >= wave_1) & (wave0 <= wave_2))[0]
                 wave0=wave0[nt]
                 rss=rss[:,nt]
@@ -83,11 +96,22 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
             hdr['CRVAL1']=crval
             hdr['CDELT1']=cdelt
         else:
-            x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1)
-            crvalt=hdr['CRVAL1']
-            cdeltt=hdr['CDELT1']
+            fib_idt,x_ifu,y_ifu=vtools.read_vpwcs(nameL[ii],path_data=redux_dir,base_name=base_nameWCS)
+            crval=hdr['CRVAL1']
+            cdelt=hdr['CDELT1']
             crpix=hdr['CRPIX1']
-            vel=mtools.get_radvel(hdr)
+            observatory=hdr['OBSERVAT']
+            obs=EarthLocation.of_site(observatory)
+            hdr['LONGITUD']=obs.lon.deg
+            hdr['LATITUDE']=obs.lat.deg
+            hdr['HEIGHT']=obs.height.to_value()
+            coord = SkyCoord(hdr['RA'], hdr['DEC'], frame="icrs")
+            hdr['DECDEG']=coord.dec.deg
+            hdr['RADEG']=coord.ra.deg
+            if radvel:
+                vel=mtools.get_radvel(hdr)
+            else:
+            	vel=0
             crvalt=crvalt/(1+vel)
             cdeltt=cdeltt/(1+vel)
             wave=crvalt+np.arange(ny0)*cdeltt
@@ -109,15 +133,12 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
             hdr['CDELT1']=cdelt
         data_0.extend([rss])
         hdr_0.extend([hdr])
-        hdr_1.extend([hdr1])
     yot=(np.amax(y_ifu_V[:,0])+np.amin(y_ifu_V[:,0]))/2.0
     xot=(np.amax(x_ifu_V[:,0])+np.amin(x_ifu_V[:,0]))/2.0
     x_ifu_V=x_ifu_V-xot
     y_ifu_V=y_ifu_V-yot
     nw=len(wave0)
     ns=len(x_ifu_V[:,0])
-    #pix_s=0.35
-    fibA=0.000336666666666667/2*3600.0#
     thet=0.0
     nlx=int(round((np.amax([np.amax(x_ifu_V[:,0]),-np.amin(x_ifu_V[:,0])])+1)*2/pix_s))
     nly=int(round((np.amax([np.amax(y_ifu_V[:,0]),-np.amin(y_ifu_V[:,0])])+1)*2/pix_s))
@@ -138,8 +159,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
 
     ifu=np.zeros([nw,nly,nlx])
     ifuE=np.ones([nw,nly,nlx])
-    ifu_1=np.ones([nw,nly,nlx])
-    ifu_m=np.zeros([nw,nly,nlx])
+    #ifu_1=np.ones([nw,nly,nlx])
+    #ifu_m=np.zeros([nw,nly,nlx])
     xo=-nlx/2*pix_s
     yo=-nly/2*pix_s
     xi=xo
@@ -154,21 +175,16 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
         yi=yo
         yf=yo
         ifu,ifuE=mkernel.kernel_int(ifu,ifuE,spec_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yi,yf,xi,xf,nw,nly,i,erroF=False)
-    if flu16:
-        ifu=ifu/1e-16
-        ifuE=ifuE/1e-16
+    #if flu16:
+    #    ifu=ifu/1e-16
+    #    ifuE=ifuE/1e-16
     h1=fits.PrimaryHDU(ifu)
     h2=fits.ImageHDU(ifuE)
-    h3=fits.ImageHDU(ifu_1)
-    h4=fits.ImageHDU(ifu_m)
-    head_list=[h1,h2,h3,h4]
-    for ii in range(0, len(reduxL)):
+    head_list=[h1,h2]
+    for ii in range(0, len(nameL)):
         ifu_1=data_0[ii]
-        ifu_m=[0]
         hdr_t=hdr_0[ii]
-        hdr1_t=hdr_1[ii]
         h3=fits.ImageHDU(ifu_1)
-        h4=fits.ImageHDU(ifu_m)
         ht=h3.header
         keys=list(hdr_t.keys())
         for i in range(0, len(keys)):
@@ -176,16 +192,7 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
                 ht[keys[i]]=hdr_t[keys[i]]
                 ht.comments[keys[i]]=hdr_t.comments[keys[i]]
         ht.update()
-        ht1=h4.header
-        keys=list(hdr1_t.keys())
-        for i in range(0, len(keys)):
-            if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]: 
-                ht1[keys[i]]=hdr1_t[keys[i]]
-                ht1.comments[keys[i]]=hdr1_t.comments[keys[i]]
-        ht1['EXTNAME'] ='FIBERS_'+str(ii) 
-        ht1.update()
         head_list.extend([h3])
-        head_list.extend([h4])
     dx=0
     dy=0
     h=h1.header
@@ -231,9 +238,9 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
     h['EQUINOX']=2000.00
     h['IFUCON']=(str(int(ns))+' ','NFibers')
     if flu16:
-        h["BUNIT"]='10^-16 erg/s/cm^2/A'
+        h["BUNIT"]='1E-16 erg/s/cm^2/A'
     else:
-        h["BUNIT"]='erg/s/cm^2/A'
+    	h["BUNIT"]='erg/s/cm^2'
     h.update() 
     hlist=fits.HDUList(head_list)
     hlist.update_extend()

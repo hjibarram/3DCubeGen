@@ -91,7 +91,7 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
     y_ifu_V=y_ifu_V-yot
     nw=len(wave0)
     ns=len(x_ifu_V)
-    pix_s=0.35
+    #pix_s=0.35
     fibA=0.000336666666666667/2*3600.0#
     thet=0.0
     nlx=int(round((np.amax([np.amax(x_ifu_V),-np.amin(x_ifu_V)])+1)*2/pix_s))
