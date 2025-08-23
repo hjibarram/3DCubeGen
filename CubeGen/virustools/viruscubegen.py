@@ -43,7 +43,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             hdr['LATITUDE']=obs.lat.deg
             hdr['HEIGHT']=obs.height.to_value()
             print(hdr['RA'], hdr['DEC'])
-            coord = SkyCoord(hdr['RA'], hdr['DEC'], frame="icrs")
+            coord = SkyCoord(hdr['RA'], hdr['DEC'], frame="icrs", unit=(u.hourangle, u.deg))
             hdr['DECDEG']=coord.dec.deg
             hdr['RADEG']=coord.ra.deg
             if radvel:
@@ -106,7 +106,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             hdr['LONGITUD']=obs.lon.deg
             hdr['LATITUDE']=obs.lat.deg
             hdr['HEIGHT']=obs.height.to_value()
-            coord = SkyCoord(hdr['RA'], hdr['DEC'], frame="icrs")
+            coord = SkyCoord(hdr['RA'], hdr['DEC'], frame="icrs", unit=(u.hourangle, u.deg))
             hdr['DECDEG']=coord.dec.deg
             hdr['RADEG']=coord.ra.deg
             if radvel:
