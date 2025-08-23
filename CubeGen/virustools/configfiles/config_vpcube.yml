@@ -1,6 +1,6 @@
 --- 
 # config file to create a single VP cube
-virusP:
+vpcube:
   # Single cube generation
   - survey_type: virusP #Cube Survey Type
     name_list: [Name1,Name2] #list of input observation pointings
