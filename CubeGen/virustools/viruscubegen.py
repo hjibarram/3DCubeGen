@@ -218,8 +218,14 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
                 h.comments[keys[i]]=hdr.comments[keys[i]]
             except:
             	continue
-    del h["CDELT1"]
-    del h["CDELT2"]
+    try:
+        del h["CDELT1"]
+    except:
+        continue
+    try:
+        del h["CDELT2"]
+    except:
+        continue
     if len(headerInfo) > 0:
         keysN=list(headerInfo.keys())
         for key in keysN:
