@@ -17,7 +17,7 @@ vpcube:
     basename: NAME_abscal_HST.fits #base name of the RSS file
     basenameC: vpCube-NAME.fits #base name of the final output cube file
     errors: True #activate or deactivate the error estimation
-    fac_sizey: 1.1 #factor of the FoV in Y
-    fac_sizex: 1.1 #factor of the FoV in X
+    fac_sizeY: 1.1 #factor of the FoV in Y
+    fac_sizeX: 1.1 #factor of the FoV in X
     radvel: True #activate the heliocentric correction 
 ...
