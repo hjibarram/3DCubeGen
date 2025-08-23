@@ -4,6 +4,7 @@ from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.coordinates import EarthLocation
 from astropy.coordinates import SkyCoord
+from astropy.time import Time
 import astropy.units as u
 import CubeGen.tools.tools as tools
 import CubeGen.virustools.virustools as vtools
@@ -46,6 +47,9 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             coord = SkyCoord(hdr['RA'], hdr['DEC'], frame="icrs", unit=(u.hourangle, u.deg))
             hdr['DECDEG']=coord.dec.deg
             hdr['RADEG']=coord.ra.deg
+            datetime_str = f"{hdr['DATE-OBS']} {hdr['UT']}"
+            time=Time(datetime_str, format="isot", scale="utc")
+            hdr['MJD-OBS']= time.mjd
             if radvel:
                 vel=mtools.get_radvel(hdr)
             else:
@@ -109,6 +113,9 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             coord = SkyCoord(hdr['RA'], hdr['DEC'], frame="icrs", unit=(u.hourangle, u.deg))
             hdr['DECDEG']=coord.dec.deg
             hdr['RADEG']=coord.ra.deg
+            datetime_str = f"{hdr['DATE-OBS']} {hdr['UT']}"
+            time=Time(datetime_str, format="isot", scale="utc")
+            hdr['MJD-OBS']= time.mjd
             if radvel:
                 vel=mtools.get_radvel(hdr)
             else:
