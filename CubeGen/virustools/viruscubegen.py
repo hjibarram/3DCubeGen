@@ -7,6 +7,7 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 import CubeGen.tools.tools as tools
 import CubeGen.virustools.virustools as vtools
+import CubeGen.megaratools.megtools as mtools
 import CubeGen.megaratools.megkernel as mkernel
 
 def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,flu16=True,spec_range=(None,None),headerInfo={},fac_sizeX=1.0,fac_sizeY=1.0,fibA=4.16,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',basename='NAME_abscal_HST.fits',base_nameWCS='NAME_wcs.txt',basenameC='vpCube-NAME.fits'):
