@@ -236,6 +236,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
                     #h.comments[key]=headerInfo.get('comments', 'No comment provided')
                 except:
                     continue
+    print(xot,yot)
     h["NAXIS"]=3
     h["NAXIS3"]=nw 
     h["NAXIS1"]=nlx
