@@ -127,7 +127,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             crvalt=crvalt/(1+vel)
             cdeltt=cdeltt/(1+vel)
             wave=crvalt+np.arange(ny0)*cdeltt
-            R2,R=get_adr(hdr,wave0,repss=False)
+            R2,R=mtools.get_adr(hdr,wave0,repss=False)
             Rt=np.zeros([2,ny0])
             Rt[0,:]=0
             Rt[1,:]=R
