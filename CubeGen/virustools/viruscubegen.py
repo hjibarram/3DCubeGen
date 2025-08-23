@@ -200,8 +200,11 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
         keys=list(hdr_t.keys())
         for i in range(0, len(keys)):
             if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]: 
-                ht[keys[i]]=hdr_t[keys[i]]
-                ht.comments[keys[i]]=hdr_t.comments[keys[i]]
+                try:
+                    ht[keys[i]]=hdr_t[keys[i]]
+                    ht.comments[keys[i]]=hdr_t.comments[keys[i]]
+                except:
+                    continue
         ht.update()
         head_list.extend([h3])
     dx=0
