@@ -213,16 +213,22 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
     keys=list(hdr.keys())
     for i in range(0, len(keys)):
         if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
-            h[keys[i]]=hdr[keys[i]]
-            h.comments[keys[i]]=hdr.comments[keys[i]]
+            try:
+                h[keys[i]]=hdr[keys[i]]
+                h.comments[keys[i]]=hdr.comments[keys[i]]
+            except:
+            	continue
     del h["CDELT1"]
     del h["CDELT2"]
     if len(headerInfo) > 0:
         keysN=list(headerInfo.keys())
         for key in keysN:
             if key not in h:
-                h[key]=headerInfo[key]
-                #h.comments[key]=headerInfo.get('comments', 'No comment provided')
+                try:
+                    h[key]=headerInfo[key]
+                    #h.comments[key]=headerInfo.get('comments', 'No comment provided')
+                except:
+                    continue
     h["NAXIS"]=3
     h["NAXIS3"]=nw 
     h["NAXIS1"]=nlx
