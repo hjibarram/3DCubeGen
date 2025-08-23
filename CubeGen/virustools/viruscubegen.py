@@ -50,6 +50,8 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             datetime_str = f"{hdr['DATE-OBS']} {hdr['UT']}"
             time=Time(datetime_str, format="iso", scale="utc")
             hdr['MJD-OBS']= time.mjd
+            hdr["PRESSURE"]=585 # Pressure in mmHg of Macdonal Observatory
+            hdr["TAMBIENT"]= 7.0 # Ambient temperature in Celsius
             if radvel:
                 vel=mtools.get_radvel(hdr,repss=False)
             else:
@@ -116,6 +118,8 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             datetime_str = f"{hdr['DATE-OBS']} {hdr['UT']}"
             time=Time(datetime_str, format="iso", scale="utc")
             hdr['MJD-OBS']= time.mjd
+            hdr["PRESSURE"]=585 # Pressure in mmHg of Macdonal Observatory
+            hdr["TAMBIENT"]=7.0 # Ambient temperature in Celsius
             if radvel:
                 vel=mtools.get_radvel(hdr,repss=False)
             else:
