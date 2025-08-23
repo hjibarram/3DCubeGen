@@ -139,7 +139,6 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
                     rss_ef[n_fib0*ii+i,:]=interp1d(wave,erss[fib,:],kind='linear',bounds_error=False)(wave0)
                 x_ifu_V[n_fib0*ii+i,:]=-R_adr[0,:]+x_ifu[i]
                 y_ifu_V[n_fib0*ii+i,:]=-R_adr[1,:]+y_ifu[i]
-            nt=np.where((wave1 >= wave_1) & (wave1 <= wave_2))
             rss=rss_f[n_fib0*ii:n_fib0*(ii+1),:]
             hdr['CRVAL1']=crval
             hdr['CDELT1']=cdelt

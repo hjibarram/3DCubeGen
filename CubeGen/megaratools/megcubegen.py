@@ -103,7 +103,7 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
                     rss_ef[n_fib0*ii+i,:]=interp1d(wave,erss[fib,:],kind='linear',bounds_error=False)(wave0)
                 x_ifu_V[n_fib0*ii+i,:]=-R_adr[0,:]+x_ifu[i]
                 y_ifu_V[n_fib0*ii+i,:]=-R_adr[1,:]+y_ifu[i]
-            nt=np.where((wave1 >= wave_1) & (wave1 <= wave_2))
+            #nt=np.where((wave1 >= wave_1) & (wave1 <= wave_2))
             rss=rss_f[n_fib0*ii:n_fib0*(ii+1),:]
             hdr['CRVAL1']=crval
             hdr['CDELT1']=cdelt
