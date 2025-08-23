@@ -104,8 +104,8 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             hdr['CDELT1']=cdelt
         else:
             fib_idt,x_ifu,y_ifu=vtools.read_vpwcs(nameL[ii],path_data=redux_dir,base_name=base_nameWCS)
-            crval=hdr['CRVAL1']
-            cdelt=hdr['CDELT1']
+            crvalt=hdr['CRVAL1']
+            cdeltt=hdr['CDELT1']
             crpix=hdr['CRPIX1']
             observatory=hdr['OBSERVAT']
             obs=EarthLocation.of_site(observatory)
