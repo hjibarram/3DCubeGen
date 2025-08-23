@@ -6,7 +6,7 @@ from cloup.constraints import mutually_exclusive, RequireExactly, IsSet, If
 import numpy as np
 import os
 import CubeGen
-from CubeGen.virustools.vpcubegen import virusmap_ifu
+from CubeGen.virustools.viruscubegen import virusmap_ifu
 #import CubeGen.megaratools.megtools as mtools
 #import CubeGen.megaratools.megcubegen as mcube
 #import CubeGen.megaratools.megmapgen as mmap
