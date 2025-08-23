@@ -43,7 +43,7 @@ def cli():
 
 def vpcube(config_file,name_list,out_path,redux_dir,sigm_s,pix_s,alph_s,flu16,namef,fibA,spec_range,base_nameWCS,basename,basenameC,errors,fac_sizey,fac_sizex,radvel,coord_cen):
 
-data=tools.read_config_file(config_file)
+    data=tools.read_config_file(config_file)
     if data:
         typeF=data['vpcube'][0]['survey_type']
         if 'virusP' in typeF:
