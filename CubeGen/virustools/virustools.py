@@ -1,9 +1,9 @@
 import numpy as np
 
 def read_vpwcs(name,path_data='data',base_name='NAME_wcs.txt',hdrid='#'):
-	fibid=[]
-	ra=[]
-	dec=[]
+    fibid=[]
+    ra=[]
+    dec=[]
     file=path_data+base_name.replace('NAME',name)
     f=open(file,'r')
     for line in f:
