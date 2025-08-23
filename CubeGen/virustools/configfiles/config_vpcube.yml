@@ -6,7 +6,7 @@ virusP:
     name_list: [Name1,Name2] #list of input observation pointings
     out_path: out_cubes/ #path of the output cube files
     redux_dir: '' #path of the redux RSP dir
-    fibA: 4.16 #Fiber diameter of VirusP, default value 4.16 arcsec
+    fib: 4.16 #Fiber diameter of VirusP, default value 4.16 arcsec
     sigm_s: 4.16 #smoth kernel size used to reconstruct the cube, default is the fiber diameter size
     pix_s: 0.0 #spaxel size used to reconstruct the cube, default set to 0 to fix it to 0.75*sigm_s
     alph_s: 2.0 #kernel "shape" factor, a value equal of 2 returns a Gaussian kerner, larger than 2 returns a sharper kernel
