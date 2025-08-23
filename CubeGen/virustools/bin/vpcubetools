@@ -41,7 +41,7 @@ def cli():
 @click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
 @click.option('-k', '--radvel', is_flag=True, default=True,help='activate the heliocentric correction')
 
-def vpcube(config_file,name_list,out_path,redux_dir,sigm_s,pix_s,alph_s,flu16,namef,fib,spec_range,base_namewcs,basename,basenamec,errors,fac_sizey,fac_sizex,radvel,coord_cen):
+def vpcube(config_file,name_list,out_path,redux_dir,sigm_s,pix_s,alph_s,flu16,namef,fib,spec_range,base_namewcs,basename,basenamec,errors,fac_sizey,fac_sizex,radvel):
 
     data=tools.read_config_file(config_file)
     if data:
