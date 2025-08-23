@@ -448,9 +448,12 @@ def wavelength_virus(header):
     wave = np.array([wstart + i*wave_pixel for i in range(npix)])
     return wave,ref_pixel,coord_ref_pixel,wave_pixel
 
-def get_adr(hdr,wave,lo=5000.0):
+def get_adr(hdr,wave,lo=5000.0,repss=True):
     mjd=hdr["MJD-OBS"]
-    lng=hdr["LONGITUD"].replace("+","-")
+    if repss:
+        lng=hdr["LONGITUD"].replace("+","-")
+    else:
+        lng=hdr["LONGITUD"]
     lat=hdr["LATITUDE"]
     hig=hdr["HEIGHT"]
     Presure=hdr["PRESSURE"]
@@ -472,10 +475,13 @@ def get_adr(hdr,wave,lo=5000.0):
     R2=np.array([[np.cos(pa*np.pi/180.0),-np.sin(pa*np.pi/180.0)],[np.sin(pa*np.pi/180.0),np.cos(pa*np.pi/180.0)]])
     return R2,R
 
-def get_radvel(hdr):
+def get_radvel(hdr,repss=True):
     import astropy.units as u
     mjd=hdr["MJD-OBS"]
-    lng=hdr["LONGITUD"].replace("+","-")
+    if repss:
+        lng=hdr["LONGITUD"].replace("+","-")
+    else:
+        lng=hdr["LONGITUD"]
     lat=hdr["LATITUDE"]
     hig=hdr["HEIGHT"]
     Tai=hdr["DATE-OBS"]
@@ -603,7 +609,7 @@ def read_obs(name,path=''):
         if 'Arcs' in line and img != 1000:
             typ='Arcs'
             img=ct
-        if (('Spectrophotometric standard' in line) or ('Stds' in line)) and img != 1000:
+        if 'Spectrophotometric standard' in line and img != 1000:
             typ='SPTD'
             img=ct
         if ct >=  img+2:
@@ -612,10 +618,7 @@ def read_obs(name,path=''):
             if len(data)+1 == nh:
                 for it in range(0, nh-1):
                     try:
-                        if it == 3:
-                            val=data[it].replace(' ','')
-                        else:
-                            val=float(data[it])
+                        val=float(data[it])
                     except:
                         val=data[it].replace(' ','')
                     dic[head[it]].extend([val])
@@ -686,31 +689,6 @@ def get_std(data):
         for i in range(0, len(std)):
             std[i]=std[i].replace('SPSTD_','')
         return std
-    else:
-        return None
-
-def get_exptime(data):
-    """
-    Returns the exposure time from the observation file data.
-    Parameters:
-    data (dic): Dictionary from the observation file data.
-
-    Returns:
-    float: The exposure time in seconds.
-    """
-    nt=np.where(np.array(data['Type']) == 'IMAGE')[0]
-    dat=np.array(data['EXPTIME'])
-    dat1=np.array(data['VPH'])
-    exptime=dat[nt]
-    vph=dat1[nt]
-    if len(exptime) > 0:
-        vphu=np.unique(vph)
-        exptimeT= np.zeros(len(vphu))
-        for j in range(0, len(vphu)):
-            for i in range(0, len(exptime)):
-                if vph[i] == vphu[j]:
-                    exptimeT[j]=exptime[i]+exptimeT[j]
-        return vphu,exptimeT
     else:
         return None
 
@@ -852,7 +830,7 @@ def create_obsModelMap(data,vph,redux_path='',ob_path=''):
                 tools.sycall(call)
     f.close()
 
-def create_obsArcCalibration(data,vph,redux_path='',ob_path='',forceAr=False):
+def create_obsArcCalibration(data,vph,redux_path='',ob_path=''):
     """
     Creates a ArcCalibration observation file with the given name and path.
     Parameters:
@@ -872,19 +850,16 @@ def create_obsArcCalibration(data,vph,redux_path='',ob_path='',forceAr=False):
     dat2=np.array(data['OSFILT'])
     dat3=np.array(data['ThNe1on'])
     dat4=np.array(data['ThAr1on'])
-    dat5=np.array(data['ThAr3on'])
     filelists=dat[nt]
     vphs=dat1[nt]
     filt=dat2[nt]
     ThNe=dat3[nt]
     ThAr=dat4[nt]
-    ThAr3=dat5[nt]
     filelists,uin=np.unique(filelists,return_index=True)
     vphs=vphs[uin]
     filt=filt[uin]
     ThNe=ThNe[uin]
     ThAr=ThAr[uin]
-    ThAr3=ThAr3[uin]
     file=redux_path+'/obsresult-3VPH.yaml'.replace('VPH',vph)
     f=open(file,'w')
     f.write('id: 3VPH\n'.replace('VPH',vph))
@@ -898,14 +873,6 @@ def create_obsArcCalibration(data,vph,redux_path='',ob_path='',forceAr=False):
             svt=True
         else:
             svt=False
-        if forceAr:
-            if filt[i] == 'BLUE' and ThAr[i] == 1:
-                svt=True
-            elif filt[i] == 'RED' and ThAr3[i] == 1:
-                svt=True
-            else:
-                svt=False
-
         if vphs[i] == vph and svt:
             line='  - '+filelists[i]+'\n'
             f.write(line)
@@ -1202,7 +1169,7 @@ def get_stdfile(std,redux_path='',calib_path='auxiliary/'):
         tools.sycall(call2)
     return
 
-def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/',forceAr=False):
+def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/'):
     """
     Sorts the Megara files based on the observation file and creates necessary files.
     Parameters:
@@ -1219,7 +1186,6 @@ def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/
     obj_list=get_obj(data)
     vph_list=get_vph(data)
     std_list=get_std(data)
-    vphext,exp_list=get_exptime(data)
     print('Creating MegaraBiasImage file')
     create_obsBIAS(data,redux_path=path_redux,ob_path=ob_path)
     for i in range(0, len(vph_list)):
@@ -1227,7 +1193,7 @@ def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/
         create_obsTraceMap(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
     for i in range(0, len(vph_list)):
         print('Creating MegaraArcCalibration files for VPH: ', vph_list[i])
-        create_obsArcCalibration(data,vph_list[i],redux_path=path_redux,ob_path=ob_path,forceAr=forceAr)
+        create_obsArcCalibration(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
     for i in range(0, len(vph_list)):
         print('Creating MegaraFiberFlatImage files for VPH: ', vph_list[i])
         create_obsFiberFlatImage(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
@@ -1246,4 +1212,4 @@ def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/
     for i in range(0, len(vph_list)):
         print('Creating Requirement files for VPH: ', vph_list[i])
         create_requirement(data,std_list,vph_list[i],redux_path=path_redux,ob_path=ob_path,calib_path=calib_path)
-    return obj_list,std_list,vph_list,vphext,exp_list
+    return obj_list,std_list,vph_list

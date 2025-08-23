@@ -51,7 +51,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             time=Time(datetime_str, format="iso", scale="utc")
             hdr['MJD-OBS']= time.mjd
             if radvel:
-                vel=mtools.get_radvel(hdr)
+                vel=mtools.get_radvel(hdr,repss=False)
             else:
             	vel=0
             crval=crval/(1+vel)
@@ -86,7 +86,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             rss_f=np.zeros([n_fib0*nlt,ny0])
             x_ifu_V=np.zeros([n_fib0*nlt,ny0])
             y_ifu_V=np.zeros([n_fib0*nlt,ny0])
-            R2,R=mtools.get_adr(hdr,wave0)
+            R2,R=mtools.get_adr(hdr,wave0,repss=False)
             Rt=np.zeros([2,ny0])
             Rt[0,:]=0
             Rt[1,:]=R
@@ -117,13 +117,13 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             time=Time(datetime_str, format="iso", scale="utc")
             hdr['MJD-OBS']= time.mjd
             if radvel:
-                vel=mtools.get_radvel(hdr)
+                vel=mtools.get_radvel(hdr,repss=False)
             else:
             	vel=0
             crvalt=crvalt/(1+vel)
             cdeltt=cdeltt/(1+vel)
             wave=crvalt+np.arange(ny0)*cdeltt
-            R2,R=get_adr(hdr,wave0)
+            R2,R=get_adr(hdr,wave0,repss=False)
             Rt=np.zeros([2,ny0])
             Rt[0,:]=0
             Rt[1,:]=R
