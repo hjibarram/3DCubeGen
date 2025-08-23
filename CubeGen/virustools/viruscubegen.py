@@ -34,7 +34,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
         print('Processing '+hdr['OBJECT'])
         n_fib,ny=rss.shape
         if ii == 0:
-        	n_fib,ny0=rss.shape
+            n_fib,ny0=rss.shape
             outf=hdr['OBJECT']
             fib_idt,x_ifu,y_ifu=vtools.read_vpwcs(nameL[ii],path_data=redux_dir,base_name=base_nameWCS)
             crval=hdr['CRVAL1']
