@@ -239,7 +239,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
     h["NAXIS3"]=nw 
     h["NAXIS1"]=nlx
     h["NAXIS2"]=nly
-    h["NDITER"]=(len(reduxL),'Number of dither observations')
+    h["NDITER"]=(len(nameL),'Number of dither observations')
     h["BUNIT"]= ('1E-16 erg/s/cm^2/A','Unit of pixel value ' )
     h["OBJECT"]=hdr_0[0]['OBJECT']
     h["CRVAL1"]=xot/3600.0#hdr1['CRVAL1']
