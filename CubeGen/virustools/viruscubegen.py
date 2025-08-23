@@ -272,7 +272,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
     hlist.update_extend()
     tools.sycall('mkdir -p '+out_path)
     if nameF:
-        file=out_path+basenameC.replace('NAME',nameF+'_'+vph)
+        file=out_path+basenameC.replace('NAME',nameF)
     else:
         file=out_path+basenameC.replace('NAME',outf)
     out_fit=file
