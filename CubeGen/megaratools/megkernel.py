@@ -7,7 +7,7 @@ def kernel_int(ifu,ifuE,spec_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yi,yf,
         radiT=sigm_s*4#/2.0
     else:
         radiT=fibA*3.5/2.0
-    print("Kernel radius: ", radiT)
+    print("Kernel radius: ", radiT, sigm_s, fibA)
     for j in range(0, nl):
         yi=yf
         yf=yf+pix_s
