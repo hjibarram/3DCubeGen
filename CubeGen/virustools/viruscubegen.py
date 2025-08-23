@@ -48,6 +48,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             hdr['DECDEG']=coord.dec.deg
             hdr['RADEG']=coord.ra.deg
             datetime_str = f"{hdr['DATE-OBS']} {hdr['UT']}"
+            print("Date-Obs: ", datetime_str)
             time=Time(datetime_str, format="isot", scale="utc")
             hdr['MJD-OBS']= time.mjd
             if radvel:
