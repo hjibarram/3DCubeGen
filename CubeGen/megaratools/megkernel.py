@@ -3,8 +3,8 @@ import numpy as np
 
 #spec_ifu,specE_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nl,npros,nproc,erroF
 def kernel_int(ifu,ifuE,spec_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yi,yf,xi,xf,nw,nl,i,erroF=False):
-    if sigm_s > fibA*3.5:#*2:
-        radiT=sigm_s*4.0#/2.0
+    if sigm_s > fibA*3.5/2.0/3.0:#*2: #If the kernel is larger than 3.5*2*fibA, then use the sigm_s*3 as a radius
+        radiT=sigm_s*3.0#/2.0
     else:
         radiT=fibA*3.5/2.0
     for j in range(0, nl):
