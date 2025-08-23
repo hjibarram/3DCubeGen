@@ -13,6 +13,7 @@ vpcube:
     flu16: True #keyword to return a cube with units of 10^{-16} erg/s/cm2/A, if False, the units are erg/s/cm2/A
     nameF: NameF #output root name of the data cube
     spec_range: [0,0] #optional, spectral range for the output cube, set to [0,0] to use the full spectral range
+    pbars: True #activate or deactivate the progress bar
     base_nameWCS: NAME_wcs.txt #base name of the WCS file
     basename: NAME_abscal_HST.fits #base name of the RSS file
     basenameC: vpCube-NAME.fits #base name of the final output cube file

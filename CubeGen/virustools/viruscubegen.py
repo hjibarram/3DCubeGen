@@ -10,8 +10,10 @@ import CubeGen.tools.tools as tools
 import CubeGen.virustools.virustools as vtools
 import CubeGen.megaratools.megtools as mtools
 import CubeGen.megaratools.megkernel as mkernel
+from tqdm.notebook import tqdm
+from tqdm import tqdm as tqdmT
 
-def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,flu16=True,spec_range=(None,None),headerInfo={},fac_sizeX=1.0,fac_sizeY=1.0,fibA=4.16,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',basename='NAME_abscal_HST.fits',base_nameWCS='NAME_wcs.txt',basenameC='vpCube-NAME.fits'):
+def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,dlt=10,hdrs=0,hdre=1,errors=False,flu16=True,spec_range=(None,None),headerInfo={},fac_sizeX=1.0,fac_sizeY=1.0,fibA=4.16,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',basename='NAME_abscal_HST.fits',base_nameWCS='NAME_wcs.txt',basenameC='vpCube-NAME.fits'):
     """
     Generate a cube from VIRUSP IFU data.
     
@@ -171,8 +173,6 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
 
     ifu=np.zeros([nw,nly,nlx])
     ifuE=np.ones([nw,nly,nlx])
-    #ifu_1=np.ones([nw,nly,nlx])
-    #ifu_m=np.zeros([nw,nly,nlx])
     xo=-nlx/2*pix_s
     yo=-nly/2*pix_s
     xi=xo
@@ -181,15 +181,25 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
     spec_ifu=rss_f*facto
     if errors:
         specE_ifu=rss_ef*facto 
+    if pbars:
+        if notebook:
+            pbar=tqdm(total=nlx)
+        else:     
+            pbar=tqdmT(total=nlx)    
     for i in range(0, nlx):
         xi=xf
         xf=xf+pix_s
         yi=yo
         yf=yo
         ifu,ifuE=mkernel.kernel_int(ifu,ifuE,spec_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yi,yf,xi,xf,nw,nly,i,erroF=False)
-    #if flu16:
-    #    ifu=ifu/1e-16
-    #    ifuE=ifuE/1e-16
+        if pbars:
+            pbar.update(1)
+    if pbars:
+        pbar.close()
+
+    if flu16 == False:
+        ifu=ifu*1e-16
+        ifuE=ifuE*1e-16
     h1=fits.PrimaryHDU(ifu)
     h2=fits.ImageHDU(ifuE)
     head_list=[h1,h2]
