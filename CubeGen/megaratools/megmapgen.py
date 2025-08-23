@@ -79,7 +79,7 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
             x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1)
             wave=hdr['CRVAL1']+np.arange(ny0)*hdr['CDELT1']
             for i in range(0, len(x_ifu)):
-                fib=np.int(fib_idt[i])-1
+                fib=int(fib_idt[i])-1
                 rss_f[nfib0*ii+i]=np.nansum(interp1d(wave,rss[fib,:],kind='linear',bounds_error=False)(wave0))
                 if errors:
                     rss_ef[nfib0*ii+i]=np.sqrt(np.nansum(interp1d(wave,erss[fib,:],kind='linear',bounds_error=False)(wave0)**2))

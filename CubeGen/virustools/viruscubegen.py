@@ -133,7 +133,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             Rt[1,:]=R
             R_adr=np.dot(R2,Rt)
             for i in range(0, len(x_ifu)):
-                fib=np.int(fib_idt[i])-1
+                fib=int(fib_idt[i])-1
                 rss_f[n_fib0*ii+i,:]=interp1d(wave,rss[fib,:],kind='linear',bounds_error=False)(wave0)
                 if errors:
                     rss_ef[n_fib0*ii+i,:]=interp1d(wave,erss[fib,:],kind='linear',bounds_error=False)(wave0)
