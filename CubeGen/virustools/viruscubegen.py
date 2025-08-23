@@ -32,8 +32,9 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
         [rss, hdr]=fits.getdata(file,hdrs, header=True)
         [erss, hdr1]=fits.getdata(file,hdre, header=True)
         print('Processing '+hdr['OBJECT'])
-        n_fib,ny0=rss.shape
+        n_fib,ny=rss.shape
         if ii == 0:
+        	n_fib,ny0=rss.shape
             outf=hdr['OBJECT']
             fib_idt,x_ifu,y_ifu=vtools.read_vpwcs(nameL[ii],path_data=redux_dir,base_name=base_nameWCS)
             crval=hdr['CRVAL1']
@@ -126,7 +127,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,dlt=10,hdrs=0,hdre=1,errors=False,
             	vel=0
             crvalt=crvalt/(1+vel)
             cdeltt=cdeltt/(1+vel)
-            wave=crvalt+np.arange(ny0)*cdeltt
+            wave=crvalt+np.arange(ny)*cdeltt
             R2,R=mtools.get_adr(hdr,wave0,repss=False)
             Rt=np.zeros([2,ny0])
             Rt[0,:]=0
