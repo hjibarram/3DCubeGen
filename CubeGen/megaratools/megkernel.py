@@ -16,8 +16,7 @@ def kernel_int(ifu,ifuE,spec_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yi,yf,
         Wgt=np.zeros(nw)
         for k in range(0, len(x_ifu_V[:,0])):
             Rsp=np.sqrt((x_ifu_V[k,:]-(xf+xi)/2.0)**2.0+(y_ifu_V[k,:]-(yf+yi)/2.0)**2.0)
-            ntp=np.where((Rsp <= (radiT)) & np.isfinite(spec_ifu[k,:]) & (spec_ifu[k,:] > 0))
-                
+            ntp=np.where((Rsp <= (radiT)) & np.isfinite(spec_ifu[k,:]) & (spec_ifu[k,:] > 0))                
             Wg=np.zeros(nw)
             if len(ntp[0]) > 0:   
                 Wg[ntp]=np.exp(-(Rsp[ntp]/sigm_s)**alph_s/2.0)
