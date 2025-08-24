@@ -214,7 +214,6 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
         ifu=ifu*1e-16
         ifuE=ifuE*1e-16
     new_header = wt.to_header()   
-    print(new_header) 
     h1=fits.PrimaryHDU(ifu,header=new_header)
     h2=fits.ImageHDU(ifuE)
     head_list=[h1,h2]
@@ -237,21 +236,13 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
     dy=0
     h=h1.header
     keys=list(hdr.keys())
-    for i in range(0, len(keys)):
-        if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
-            try:
-                h[keys[i]]=hdr[keys[i]]
-                h.comments[keys[i]]=hdr.comments[keys[i]]
-            except:
-            	continue
-    #try:
-    #    del h["CDELT1"]
-    #except:
-    #    continue
-    #try:
-    #    del h["CDELT2"]
-    #except:
-    #    continue
+    #for i in range(0, len(keys)):
+    #    if not "COMMENT" in  keys[i] and not 'HISTORY' in keys[i]:
+    #        try:
+    #            h[keys[i]]=hdr[keys[i]]
+    #            h.comments[keys[i]]=hdr.comments[keys[i]]
+    #        except:
+    #        	continue
     if len(headerInfo) > 0:
         keysN=list(headerInfo.keys())
         for key in keysN:
