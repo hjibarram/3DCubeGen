@@ -75,8 +75,8 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
             wt1.wcs.ctype = ["RA---TAN", "DEC--TAN"]
             wt1.wcs.radesys = 'ICRS'
             #wt1.wcs.equinox = 'J2000'#2024.8    
-        	ny0=ny
-        	crpix0=crpix0
+            ny0=ny
+            crpix0=crpix0
             crval0=crval/(1+vel)
             cdelt0=cdelt/(1+vel)
             wave0=crval0+cdelt0*(np.arange(ny0)+1-crpix0)
