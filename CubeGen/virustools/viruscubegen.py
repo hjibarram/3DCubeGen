@@ -63,7 +63,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
         ra_fib=newcoord.ra.deg*3600.0
         dec_fib=newcoord.dec.deg*3600.0	
         if ii == 0:
-        	ra0t=coord_ast[0]
+            ra0t=coord_ast[0]
             dec0t=coord_ast[1]
             if ra0t == 0 and dec0t == 0:
                 ra0t=np.mean(ra_fib)/3600.0
