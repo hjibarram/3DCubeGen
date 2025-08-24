@@ -76,7 +76,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
             wt1.wcs.radesys = 'ICRS'
             #wt1.wcs.equinox = 'J2000'#2024.8    
             ny0=ny
-            crpix0=crpix0
+            crpix0=crpix
             crval0=crval/(1+vel)
             cdelt0=cdelt/(1+vel)
             wave0=crval0+cdelt0*(np.arange(ny0)+1-crpix0)
@@ -129,7 +129,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
         else:
             crval=crval/(1+vel)
             cdelt=cdelt/(1+vel)
-            wave=crval+np.arange(ny)*cdelt
+            wave=crval+cdelt*(np.arange(ny)+1-crpix)
             R2,R=mtools.get_adr(hdr,wave0,repss=False)
             Rt=np.zeros([2,ny0])
             Rt[0,:]=0
