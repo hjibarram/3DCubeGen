@@ -4,8 +4,11 @@ from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.coordinates import EarthLocation
 from astropy.coordinates import SkyCoord
+from astropy.coordinates import ICRS, Galactic, FK4, FK5
 from astropy.time import Time
-import astropy.units as u
+from astropy import units as u
+from astropy.wcs.utils import skycoord_to_pixel
+from astropy.wcs.utils import pixel_to_skycoord
 import CubeGen.tools.tools as tools
 import CubeGen.virustools.virustools as vtools
 import CubeGen.megaratools.megtools as mtools
