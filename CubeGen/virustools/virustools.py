@@ -10,7 +10,7 @@ def read_vpwcs(name,path_data='data',base_name='NAME_wcs.txt',hdrid='#'):
         if not hdrid in line:
             data=line.replace('\n','').split(' ')
             data=list(filter(None,data))
-            fibid.extend([int(data[0])])
+            fibid.extend([int(data[0])-1])
             ra.extend([float(data[1])*3600.0])
             dec.extend([float(data[2])*3600.0])
     f.close()
