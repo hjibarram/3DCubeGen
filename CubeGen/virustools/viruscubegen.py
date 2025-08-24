@@ -71,7 +71,6 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
             if ra0t == 0 and dec0t == 0:
                 ra0t=np.mean(ra_fib)/3600.0
                 dec0t=np.mean(dec_fib)/3600.0
-            print(ra0t,dec0t)
             wt1 = WCS(naxis=2)    
             wt1.wcs.crpix = [100, 100]
             wt1.wcs.cdelt = np.array([pix_s/3600.0, pix_s/3600.0])
@@ -214,7 +213,8 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
     if flu16 == False:
         ifu=ifu*1e-16
         ifuE=ifuE*1e-16
-    new_header = wt.to_header()    
+    new_header = wt.to_header()   
+    print(new_header) 
     h1=fits.PrimaryHDU(ifu,header=new_header)
     h2=fits.ImageHDU(ifuE)
     head_list=[h1,h2]
