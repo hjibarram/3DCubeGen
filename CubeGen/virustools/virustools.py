@@ -3,7 +3,7 @@ from astropy.wcs.utils import skycoord_to_pixel
 from astropy.wcs.utils import pixel_to_skycoord
 from astropy.wcs import WCS
 
-def read_vpwcs(name,path_data='data',base_name='NAME_wcs.txt',hdrid='#'):
+def read_vpwcs(name,path_data='',base_name='NAME_wcs.txt',hdrid='#'):
     fibid=[]
     ra=[]
     dec=[]
@@ -22,13 +22,13 @@ def read_vpwcs(name,path_data='data',base_name='NAME_wcs.txt',hdrid='#'):
     dec=np.array(dec)
     return fibid,ra,dec
 
-def astrometry_recal(name,path_data='data',base_name='NAME_wcs.txt',dra=0,ddec=0,pix_s=0.5,fsc=1.0,returnt=False):
+def astrometry_recal(name,path_data='',base_name='NAME_wcs.txt',dra=0,ddec=0,pix_s=0.5,fsc=1.0,returnt=False):
     """
     Recalculate the astrometry for the fibers based on the provided RA and Dec offsets.
     Returns:
         tuple: Updated fiber IDs, RA offsets, and Dec offsets.
     """
-    fibid,ra,dec=read_vpwcs(name,path_data=path_data,base_name=base_name)
+    fibid,ra_fib,dec_fib=read_vpwcs(name,path_data=path_data,base_name=base_name)
     ra0t=np.mean(ra_fib)/3600.0-dra
     dec0t=np.mean(dec_fib)/3600.0-ddec
     wt1 = WCS(naxis=2)    
