@@ -40,8 +40,9 @@ def cli():
 @click.option('-u', '--fac_sizey', type=float, default=1.1, help='factor of the FoV in Y')
 @click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
 @click.option('-k', '--radvel', is_flag=True, default=True,help='activate the heliocentric correction')
+@click.option('-k', '--adrcor', is_flag=True, default=True,help='activate the ADR correction')
 
-def vpcube(config_file,name_list,out_path,redux_dir,sigm_s,pix_s,alph_s,flu16,namef,fib,pbars,spec_range,base_namewcs,basename,basenamec,errors,fac_sizey,fac_sizex,radvel):
+def vpcube(config_file,name_list,out_path,redux_dir,sigm_s,pix_s,alph_s,flu16,namef,fib,pbars,spec_range,base_namewcs,basename,basenamec,errors,fac_sizey,fac_sizex,radvel,adrcor):
 
     data=tools.read_config_file(config_file)
     if data:
@@ -49,7 +50,7 @@ def vpcube(config_file,name_list,out_path,redux_dir,sigm_s,pix_s,alph_s,flu16,na
         if 'virusP' in typeF:
             name_list=data['vpcube'][0]['name_list']
             out_path=data['vpcube'][0]['out_path']
-            #redux_ver=data['vpcube'][0]['redux_ver']
+            adrcor=data['vpcube'][0]['adrcor']
             redux_dir=data['vpcube'][0]['redux_dir']
             sigm_s=data['vpcube'][0]['sigm_s']
             pix_s=data['vpcube'][0]['pix_s']
@@ -83,7 +84,7 @@ def vpcube(config_file,name_list,out_path,redux_dir,sigm_s,pix_s,alph_s,flu16,na
     virusmap_ifu(name_list,nameF=namef,radvel=radvel,dlt=0,hdrs=0,hdre=1,errors=errors,flu16=flu16,
         spec_range=spec_range,headerInfo=headerInfo,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
         fibA=fib,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,out_path=out_path,redux_dir=redux_dir,
-        basename=basename,base_nameWCS=base_namewcs,basenameC=basenamec,pbars=pbars,notebook=notebook)
+        basename=basename,base_nameWCS=base_namewcs,basenameC=basenamec,pbars=pbars,notebook=notebook,adrcor=adrcor)
     
 cli.add_command(vpcube)
 

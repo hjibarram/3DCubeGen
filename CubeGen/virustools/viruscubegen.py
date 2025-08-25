@@ -16,7 +16,7 @@ import CubeGen.megaratools.megkernel as mkernel
 from tqdm.notebook import tqdm
 from tqdm import tqdm as tqdmT
 
-def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast=[0,0],dlt=10,hdrs=0,hdre=1,errors=False,flu16=True,spec_range=(None,None),headerInfo={},fac_sizeX=1.0,fac_sizeY=1.0,fibA=4.16,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',basename='NAME_abscal_HST.fits',base_nameWCS='NAME_wcs.txt',basenameC='vpCube-NAME.fits'):
+def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,adrcor=True,notebook=True,coord_ast=[0,0],dlt=10,hdrs=0,hdre=1,errors=False,flu16=True,spec_range=(None,None),headerInfo={},fac_sizeX=1.0,fac_sizeY=1.0,fibA=4.16,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',basename='NAME_abscal_HST.fits',base_nameWCS='NAME_wcs.txt',basenameC='vpCube-NAME.fits'):
     """
     Generate a cube from VIRUSP IFU data.
     
@@ -125,11 +125,14 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
                 rss_f[n_fib0*ii+i,:]=interp1d(wave,rss[fib_idt[i],:],kind='linear',bounds_error=False)(wave0)
                 if errors:
                     rss_ef[n_fib0*ii+i,:]=interp1d(wave,erss[fib_idt[i],:],kind='linear',bounds_error=False)(wave0)
-        R2,R=mtools.get_adr(hdr,wave0,repss=False)
         Rt=np.zeros([2,ny0])
-        Rt[0,:]=0
-        Rt[1,:]=R
-        R_adr=np.dot(R2,Rt)        
+        #Rt[0,:]=0
+        if adrcor:
+            R2,R=mtools.get_adr(hdr,wave0,repss=False)
+            Rt[1,:]=R
+            R_adr=np.dot(R2,Rt)
+        else:
+            R_adr=Rt
         for k in range(0, ny0):
             x_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=ra_fib-R_adr[0,k]
             y_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=dec_fib-R_adr[1,k]

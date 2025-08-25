@@ -21,4 +21,5 @@ vpcube:
     fac_sizeY: 1.1 #factor of the FoV in Y
     fac_sizeX: 1.1 #factor of the FoV in X
     radvel: True #activate the heliocentric correction 
+    adrcor: True #activate the ADR correction
 ...
