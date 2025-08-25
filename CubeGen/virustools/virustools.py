@@ -9,6 +9,7 @@ def read_vpwcs(name,path_data='',base_name='NAME_wcs.txt',hdrid='#'):
     ra=[]
     dec=[]
     file=path_data+base_name.replace('NAME',name)
+    print(file)
     f=open(file,'r')
     for line in f:
         if not hdrid in line:
