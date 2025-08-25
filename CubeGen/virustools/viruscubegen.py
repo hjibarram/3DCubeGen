@@ -124,13 +124,11 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
             R_adr=np.dot(R2,Rt)
             for k in range(0, ny0):
                 x_ifu_V[n_fib0*(nlt-1-ii):n_fib0*((nlt-1-ii)+1),k]=ra_fib-R_adr[0,k]
-                #x_ifu_V[0:n_fib0,k]=ra_fib-R_adr[0,k]
                 y_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=dec_fib-R_adr[1,k]
-                #sky_coord = SkyCoord(ra=(ra_fib-R_adr[0,k])/3600.0, dec=(dec_fib-R_adr[1,k])/3600.0, frame="icrs", unit="deg")
-                #x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
-                #x_ifu_pix[0:n_fib0,k]=x_pixel
-                #y_ifu_pix[0:n_fib0,k]=y_pixel
-        #'''        
+                sky_coord = SkyCoord(ra=(ra_fib-R_adr[0,k])/3600.0, dec=(dec_fib-R_adr[1,k])/3600.0, frame="icrs", unit="deg")
+                x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
+                x_ifu_pix[n_fib0*(nlt-1-ii):n_fib0*((nlt-1-ii)+1),k]=x_pixel
+                y_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=y_pixel
         else:
             crval=crval/(1+vel)
             cdelt=cdelt/(1+vel)
@@ -146,20 +144,18 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
                     rss_ef[n_fib0*ii+i,:]=interp1d(wave,erss[fib_idt[i],:],kind='linear',bounds_error=False)(wave0)
             for k in range(0, ny0):
                 x_ifu_V[n_fib0*(nlt-1-ii):n_fib0*((nlt-1-ii)+1),k]=ra_fib-R_adr[0,k]
-                #x_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=ra_fib-R_adr[0,k]
                 y_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=dec_fib-R_adr[1,k]
-                #sky_coord = SkyCoord(ra=(ra_fib-R_adr[0,k])/3600.0, dec=(dec_fib-R_adr[1,k])/3600.0, frame="icrs", unit="deg")
-                #x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
-                #x_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=x_pixel
-                #y_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=y_pixel
-        #'''        
+                sky_coord = SkyCoord(ra=(ra_fib-R_adr[0,k])/3600.0, dec=(dec_fib-R_adr[1,k])/3600.0, frame="icrs", unit="deg")
+                x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
+                x_ifu_pix[n_fib0*(nlt-1-ii):n_fib0*((nlt-1-ii)+1),k]=x_pixel
+                y_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=y_pixel
         rssN=rss_f[n_fib0*ii:n_fib0*(ii+1),:]
         hdr['CRVAL1']=crval0
         hdr['CDELT1']=cdelt0
         data_0.extend([rssN])
         hdr_0.extend([hdr])
-    #y_ifu_V=y_ifu_pix*pix_s
-    #x_ifu_V=x_ifu_pix*pix_s    
+    y_ifu_V=y_ifu_pix*pix_s
+    x_ifu_V=x_ifu_pix*pix_s    
     yot=(np.amax(y_ifu_V[:,0])+np.amin(y_ifu_V[:,0]))/2.0
     xot=(np.amax(x_ifu_V[:,0])+np.amin(x_ifu_V[:,0]))/2.0
     skycor = pixel_to_skycoord(xot/pix_s,yot/pix_s,wt1)
