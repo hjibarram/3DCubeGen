@@ -154,8 +154,8 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
         hdr['CDELT1']=cdelt0
         data_0.extend([rssN])
         hdr_0.extend([hdr])
-    y_ifu_V=y_ifu_pix*pix_s
-    x_ifu_V=x_ifu_pix*pix_s    
+    #y_ifu_V=y_ifu_pix*pix_s
+    #x_ifu_V=x_ifu_pix*pix_s    
     yot=(np.amax(y_ifu_V[:,0])+np.amin(y_ifu_V[:,0]))/2.0
     xot=(np.amax(x_ifu_V[:,0])+np.amin(x_ifu_V[:,0]))/2.0
     skycor = pixel_to_skycoord(xot/pix_s,yot/pix_s,wt1)
