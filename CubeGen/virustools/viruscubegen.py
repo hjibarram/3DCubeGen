@@ -274,7 +274,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
     h['CUNIT2']='deg     '
     h['RADECSYS']='ICRS    '
     h['SYSTEM']='ICRS     '
-    h['EQUINOX']=2000.00
+    h['EQUINOX']=2000.00 
     '''
     h["CD2_2"]=h["CDELT2"]
     h["CD1_1"]=h["CDELT1"]
