@@ -59,12 +59,12 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
             vel=mtools.get_radvel(hdr,repss=False)
         else:
         	vel=0
-        #equinox=Time(2024.8, format='jyear')
-        #equinox_J2000 = Time('J2000')
-        #coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg')
-        #newcoord = coord.transform_to('icrs')
-        #ra_fib=newcoord.ra.deg*3600.0
-        #dec_fib=newcoord.dec.deg*3600.0	
+        equinox=Time(2024.8, format='jyear')
+        equinox_J2000 = Time('J2000')
+        coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg')
+        newcoord = coord.transform_to('icrs')
+        ra_fib=newcoord.ra.deg*3600.0
+        dec_fib=newcoord.dec.deg*3600.0	
         if ii == 0:
             ra0t=coord_ast[0]
             dec0t=coord_ast[1]
