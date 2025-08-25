@@ -23,14 +23,13 @@ def read_vpwcs(name,path_data='data',base_name='NAME_wcs.txt',hdrid='#'):
     return fibid,ra,dec
 
 def astrometry_recal(name,path_data='data',base_name='NAME_wcs.txt',dra=0,ddec=0,pix_s=0.5,fsc=1.0,returnt=False):
-	"""
-	Recalculate the astrometry for the fibers based on the provided RA and Dec offsets.
-
-	Returns:
-		tuple: Updated fiber IDs, RA offsets, and Dec offsets.
-	"""
-	fibid,ra,dec=read_vpwcs(name,path_data=path_data,base_name=base_name)
-	ra0t=np.mean(ra_fib)/3600.0-dra
+    """
+    Recalculate the astrometry for the fibers based on the provided RA and Dec offsets.
+    Returns:
+        tuple: Updated fiber IDs, RA offsets, and Dec offsets.
+    """
+    fibid,ra,dec=read_vpwcs(name,path_data=path_data,base_name=base_name)
+    ra0t=np.mean(ra_fib)/3600.0-dra
     dec0t=np.mean(dec_fib)/3600.0-ddec
     wt1 = WCS(naxis=2)    
     wt1.wcs.crpix = [1, 1]
@@ -39,9 +38,9 @@ def astrometry_recal(name,path_data='data',base_name='NAME_wcs.txt',dra=0,ddec=0
     wt1.wcs.ctype = ["RA---TAN", "DEC--TAN"]
     wt1.wcs.radesys = 'ICRS'
     x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
-	x_pixel=x_pixel*fsc
-	y_pixel=y_pixel*fsc
-	skycor = pixel_to_skycoord(x_pixel,y_pixel,wt1)
+    x_pixel=x_pixel*fsc
+    y_pixel=y_pixel*fsc
+    skycor = pixel_to_skycoord(x_pixel,y_pixel,wt1)
     ran=skycor.ra.value
     decn=skycor.dec.value
     if returnt == False:
@@ -50,6 +49,6 @@ def astrometry_recal(name,path_data='data',base_name='NAME_wcs.txt',dra=0,ddec=0
             f.write(f'{fibid[i]+1} {ran[i]} {decn[i]}\n')
         f.close()
     else:
-    	decn=decn*3600.0
-    	ran=ran*3600.0
-	    return fibid,ran,decn
+        decn=decn*3600.0
+        ran=ran*3600.0
+        return fibid,ran,decn
