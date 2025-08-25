@@ -131,11 +131,12 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
         Rt[1,:]=R
         R_adr=np.dot(R2,Rt)        
         for k in range(0, ny0):
-            x_ifu_V[n_fib0*(nlt-1-ii):n_fib0*((nlt-1-ii)+1),k]=ra_fib-R_adr[0,k]
+            x_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=ra_fib-R_adr[0,k]
             y_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=dec_fib-R_adr[1,k]
             sky_coord = SkyCoord(ra=(ra_fib-R_adr[0,k])/3600.0, dec=(dec_fib-R_adr[1,k])/3600.0, frame="icrs", unit="deg")
             x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
-            x_ifu_pix[n_fib0*(nlt-1-ii):n_fib0*((nlt-1-ii)+1),k]=x_pixel
+            x_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=x_pixel
+            #x_ifu_pix[n_fib0*(nlt-1-ii):n_fib0*((nlt-1-ii)+1),k]=x_pixel
             y_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=y_pixel
         rssN=rss_f[n_fib0*ii:n_fib0*(ii+1),:]
         hdr['CRVAL1']=crval0
