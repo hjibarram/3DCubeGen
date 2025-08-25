@@ -129,7 +129,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
                 #x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
                 #x_ifu_pix[0:n_fib0,k]=x_pixel
                 #y_ifu_pix[0:n_fib0,k]=y_pixel
-        '''        
+        #'''        
         else:
             crval=crval/(1+vel)
             cdelt=cdelt/(1+vel)
@@ -146,11 +146,11 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
             for k in range(0, ny0):
                 x_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=ra_fib-R_adr[0,k]
                 y_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=dec_fib-R_adr[1,k]
-                sky_coord = SkyCoord(ra=(ra_fib-R_adr[0,k])/3600.0, dec=(dec_fib-R_adr[1,k])/3600.0, frame="icrs", unit="deg")
-                x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
-                x_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=x_pixel
-                y_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=y_pixel
-        '''        
+                #sky_coord = SkyCoord(ra=(ra_fib-R_adr[0,k])/3600.0, dec=(dec_fib-R_adr[1,k])/3600.0, frame="icrs", unit="deg")
+                #x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
+                #x_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=x_pixel
+                #y_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=y_pixel
+        #'''        
         rssN=rss_f[n_fib0*ii:n_fib0*(ii+1),:]
         hdr['CRVAL1']=crval0
         hdr['CDELT1']=cdelt0
