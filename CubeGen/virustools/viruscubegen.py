@@ -59,12 +59,12 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
             vel=mtools.get_radvel(hdr,repss=False)
         else:
         	vel=0
-        equinox=Time(2024.8, format='jyear')
-        equinox_J2000 = Time('J2000')
-        coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg')
-        newcoord = coord.transform_to('icrs')
-        ra_fib=newcoord.ra.deg*3600.0
-        dec_fib=newcoord.dec.deg*3600.0	
+        #equinox=Time(2024.8, format='jyear')
+        #equinox_J2000 = Time('J2000')
+        #coord = SkyCoord(ra=ra_fib/3600.0, dec=dec_fib/3600.0, frame='fk5', equinox=equinox_J2000, unit='deg')
+        #newcoord = coord.transform_to('icrs')
+        #ra_fib=newcoord.ra.deg*3600.0
+        #dec_fib=newcoord.dec.deg*3600.0	
         if ii == 0:
             ra0t=coord_ast[0]
             dec0t=coord_ast[1]
@@ -147,8 +147,8 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
                 y_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=dec_fib-R_adr[1,k]
                 sky_coord = SkyCoord(ra=(ra_fib-R_adr[0,k])/3600.0, dec=(dec_fib-R_adr[1,k])/3600.0, frame="icrs", unit="deg")
                 x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
-                x_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=x_pixel
-                y_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=y_pixel
+                #x_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=x_pixel
+                #y_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=y_pixel
         rssN=rss_f[n_fib0*ii:n_fib0*(ii+1),:]
         hdr['CRVAL1']=crval0
         hdr['CDELT1']=cdelt0
