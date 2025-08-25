@@ -259,6 +259,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
     h["NDITER"]=(len(nameL),'Number of dither observations')
     h["BUNIT"]= ('1E-16 erg/s/cm^2/A','Unit of pixel value ' )
     h["OBJECT"]=hdr_0[0]['OBJECT']
+    h["WCSAXES"]=3
     '''
     h["CRVAL1"]=xot/3600.0#hdr1['CRVAL1']
     h["CD1_1"]=-np.cos(thet*np.pi/180.)*pix_s/3600.
