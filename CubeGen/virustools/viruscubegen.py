@@ -116,21 +116,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
             x_ifu_V=np.zeros([n_fib0*nlt,ny0])
             y_ifu_V=np.zeros([n_fib0*nlt,ny0])
             x_ifu_pix=np.zeros([n_fib0*nlt,ny0])
-            y_ifu_pix=np.zeros([n_fib0*nlt,ny0])
-            '''
-            R2,R=mtools.get_adr(hdr,wave0,repss=False)
-            Rt=np.zeros([2,ny0])
-            Rt[0,:]=0
-            Rt[1,:]=R
-            R_adr=np.dot(R2,Rt)
-            for k in range(0, ny0):
-                x_ifu_V[n_fib0*(nlt-1-ii):n_fib0*((nlt-1-ii)+1),k]=ra_fib-R_adr[0,k]
-                y_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=dec_fib-R_adr[1,k]
-                sky_coord = SkyCoord(ra=(ra_fib-R_adr[0,k])/3600.0, dec=(dec_fib-R_adr[1,k])/3600.0, frame="icrs", unit="deg")
-                x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
-                x_ifu_pix[n_fib0*(nlt-1-ii):n_fib0*((nlt-1-ii)+1),k]=x_pixel
-                y_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=y_pixel
-            '''    
+            y_ifu_pix=np.zeros([n_fib0*nlt,ny0])  
         else:
             crval=crval/(1+vel)
             cdelt=cdelt/(1+vel)
@@ -206,7 +192,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
         xf=xf+pix_s
         yi=yo
         yf=yo
-        ifu,ifuE=mkernel.kernel_int(ifu,ifuE,spec_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yi,yf,xi,xf,nw,nly,i,erroF=False)
+        ifu,ifuE=mkernel.kernel_int(ifu,ifuE,spec_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yi,yf,xi,xf,nw,nly,i,erroF=errors)
         if pbars:
             pbar.update(1)
     if pbars:
