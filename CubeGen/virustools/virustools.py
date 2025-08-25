@@ -2,6 +2,7 @@ import numpy as np
 from astropy.wcs.utils import skycoord_to_pixel
 from astropy.wcs.utils import pixel_to_skycoord
 from astropy.wcs import WCS
+from astropy.coordinates import SkyCoord
 
 def read_vpwcs(name,path_data='',base_name='NAME_wcs.txt',hdrid='#'):
     fibid=[]
