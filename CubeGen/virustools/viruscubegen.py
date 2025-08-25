@@ -149,7 +149,7 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
                 x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
                 x_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=x_pixel
                 y_ifu_pix[n_fib0*ii:n_fib0*(ii+1),k]=y_pixel
-            rssN=rss_f[n_fib0*ii:n_fib0*(ii+1),:]
+        rssN=rss_f[n_fib0*ii:n_fib0*(ii+1),:]
         hdr['CRVAL1']=crval0
         hdr['CDELT1']=cdelt0
         data_0.extend([rssN])
