@@ -138,10 +138,10 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
             Rt[0,:]=0
             Rt[1,:]=R
             R_adr=np.dot(R2,Rt)
-            for i in range(0, n_fib0):
-                rss_f[n_fib0*ii+i,:]=interp1d(wave,rss[fib_idt[i],:],kind='linear',bounds_error=False)(wave0)
-                if errors:
-                    rss_ef[n_fib0*ii+i,:]=interp1d(wave,erss[fib_idt[i],:],kind='linear',bounds_error=False)(wave0)
+            #for i in range(0, n_fib0):
+            #    rss_f[n_fib0*ii+i,:]=interp1d(wave,rss[fib_idt[i],:],kind='linear',bounds_error=False)(wave0)
+            #    if errors:
+            #        rss_ef[n_fib0*ii+i,:]=interp1d(wave,erss[fib_idt[i],:],kind='linear',bounds_error=False)(wave0)
             for k in range(0, ny0):
                 x_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=ra_fib-R_adr[0,k]
                 y_ifu_V[n_fib0*ii:n_fib0*(ii+1),k]=dec_fib-R_adr[1,k]
@@ -154,8 +154,8 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
         hdr['CDELT1']=cdelt0
         data_0.extend([rssN])
         hdr_0.extend([hdr])
-    #y_ifu_V=y_ifu_pix*pix_s
-    #x_ifu_V=x_ifu_pix*pix_s    
+    y_ifu_V=y_ifu_pix*pix_s
+    x_ifu_V=x_ifu_pix*pix_s    
     yot=(np.amax(y_ifu_V[:,0])+np.amin(y_ifu_V[:,0]))/2.0
     xot=(np.amax(x_ifu_V[:,0])+np.amin(x_ifu_V[:,0]))/2.0
     skycor = pixel_to_skycoord(xot/pix_s,yot/pix_s,wt1)
