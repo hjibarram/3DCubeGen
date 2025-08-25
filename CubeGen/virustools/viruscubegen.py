@@ -198,7 +198,8 @@ def virusmap_ifu(nameL,nameF=None,radvel=True,pbars=True,notebook=True,coord_ast
             pbar.update(1)
     if pbars:
         pbar.close()
-
+    ifu=ifu[:,:,::-1]
+    ifuE=ifuE[:,:,::-1]
     if flu16 == False:
         ifu=ifu*1e-16
         ifuE=ifuE*1e-16
