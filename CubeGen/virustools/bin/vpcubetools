@@ -38,9 +38,9 @@ def cli():
 @click.option('-h', '--basenamec', type=str, default='vpCube-NAME.fits', help='base name of the final output cube file')
 @click.option('-e', '--errors', is_flag=True, default=True,help='activate or deactivate the error estimation')
 @click.option('-u', '--fac_sizey', type=float, default=1.1, help='factor of the FoV in Y')
-@click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
+@click.option('-x', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
 @click.option('-k', '--radvel', is_flag=True, default=True,help='activate the heliocentric correction')
-@click.option('-k', '--adrcor', is_flag=True, default=True,help='activate the ADR correction')
+@click.option('-z', '--adrcor', is_flag=True, default=True,help='activate the ADR correction')
 
 def vpcube(config_file,name_list,out_path,redux_dir,sigm_s,pix_s,alph_s,flu16,namef,fib,pbars,spec_range,base_namewcs,basename,basenamec,errors,fac_sizey,fac_sizex,radvel,adrcor):
 

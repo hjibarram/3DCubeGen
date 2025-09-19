@@ -31,7 +31,7 @@ def cli():
 @click.option('-y', '--vph', type=str, default='LR-R', help='VPH name of the observation')
 @click.option('-u', '--fac_sizey', type=float, default=1.0, help='factor of the FoV in Y, default 1')
 @click.option('-i', '--fac_sizex', type=float, default=1.0, help='factor of the FoV in X, default 1')
-@click.option('-i', '--fac_sizex', type=float, default=1.0, help='factor of the FoV in X, default 1')
+#@click.option('-i', '--fac_sizex', type=float, default=1.0, help='factor of the FoV in X, default 1')
 @click.option('-u', '--aper_std', type=float, default=4.0, help='aperture radius for spectrofotometric calibration, default 4 arcsec')
 #@click.option('-c', '--config_file', type=str, default='', help='name of the config file')
 #@click.option('-e', '--errors', is_flag=True, default=True,help='activate or deactivate the error estimation')
