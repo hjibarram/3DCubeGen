@@ -180,6 +180,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             #    spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
             #    alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
             #    tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook)
+            print(cube2rss)
             if cube2rss:
                 rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook)
         else:
