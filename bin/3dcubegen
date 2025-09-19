@@ -147,6 +147,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             nsp==data['pipecube'][0]['nsp']
             cube2rss==data['pipecube'][0]['cube2rss']
             out_pathrss==data['pipecube'][0]['out_pathrss']
+            print(cube2rss)
         else:
             print('Error: The config file is not for LVM data')
             return
