@@ -40,6 +40,30 @@ def median_a(x,lw=5,lower=10000,wave=[]):
         x_n=x1
     return x_n
 
+def get_list(fname='LV.fits',path='',path_outl=''):
+    hdu_list = fits.open(path+fname)
+    table_hdu = hdu_list[1]
+    table_data = table_hdu.data
+    target=table_data.field('target')
+    tile=table_data.field('TILE')
+    mjd=table_data.field('MJD')
+    expn=table_data.field('EXPN')
+    ra=table_data.field('RA')
+    dec=table_data.field('DEC')
+    target_u=np.unique(target)
+    for i in range(0, len(target_u)):
+        nt=np.where(target == target_u[i])
+        tile_t=tile[nt]
+        mjd_t=mjd[nt]
+        expn_t=expn[nt]
+        ra_t=ra[nt]
+        dec_t=dec[nt]
+        file_out=path_outl+target_u[i]
+        f=open(file_out,'w')
+        f.write('#TILE,MJD,EXPN,RA,DEC\n')
+        for j in range(0, len(tile_t)):
+            f.write(str(tile_t[j])+','+str(mjd_t[j])+','+"{:0>8}".format(expn_t[j])+','+str(ra_t[j])+','+str(dec_t[j])+'\n')
+        f.close()
 
 def read_explist(fname='Orion',path=''):
     ft=open(path+fname,'r')
