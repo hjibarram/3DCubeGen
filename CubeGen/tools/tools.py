@@ -105,10 +105,10 @@ def get_LocalVolumelist(version='1.2.0.dev0',pathI='',pathB='',outpath='',basena
     hlist.update_extend()
     hlist.writeto(outpath+'/'+basename_out.replace('VERSION',version), overwrite=True)
 
-def check_cf_files(redux_dir='',version=''):
+def check_cf_files(redux_dir='',version='',outpath=''):
     sycall('ls '+redux_dir+'/'+version+'/ > list_temp')
     f=open('list_temp','r')
-    f0=open('redux_files_VERSION.csv'.replace('VERSION',version),'w')
+    f0=open(outpath+'redux_files_VERSION.csv'.replace('VERSION',version),'w')
     f0.write('RA , DEC, EXPN, MJD , TILE \n')
     for line in f:
         data=line.replace('\n','').replace(redux_dir+'/'+version,'')
@@ -142,7 +142,11 @@ def check_cf_files(redux_dir='',version=''):
                                 except:
                                     print(file)
                                     #sycall('rm '+file)                                
-    f0.close()    
+    f0.close()
+    sycall('rm list_temp')
+    sycall('rm list_temp2')
+    sycall('rm list_temp3')
+    sycall('rm list_temp4')  
 
 def get_list(fname='LV.fits',path='',path_outl=''):
     hdu_list = fits.open(path+fname)
