@@ -59,6 +59,7 @@ def get_list(fname='LV.fits',path='',path_outl=''):
         ra_t=ra[nt]
         dec_t=dec[nt]
         file_out=path_outl+target_u[i]
+        sycall('mkdir -p '+path_outl)
         f=open(file_out,'w')
         f.write('#TILE,MJD,EXPN,RA,DEC\n')
         for j in range(0, len(tile_t)):
