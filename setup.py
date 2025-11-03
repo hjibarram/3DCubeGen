@@ -14,6 +14,18 @@ def version(fn):
 #   with open('README.md') as f:
 #       return f.read()
 
+def collect_package_data(package, data_dirs):
+    paths = []
+    for data_dir in data_dirs:
+        base_path = os.path.join(package, data_dir)
+        if os.path.isdir(base_path):
+            for root, _, files in os.walk(base_path):
+                for file in files:
+                    full_path = os.path.join(root, file)
+                    rel_path = os.path.relpath(full_path, package)
+                    paths.append(rel_path)
+    return paths
+
 requirements = [
     'astropy',
     'matplotlib',
@@ -27,16 +39,24 @@ requirements = [
 #    'scikit-image',
 ]
 
-DATA_DIRNAME = 'legacy'
+#DATA_DIRNAME = 'legacy'
+#DATA_DIRS = ['legacy', 'megaratools/auxiliary']#megaradrp-calibrations-2018.1
+DATA_DIRS = ['legacy','megaratools/auxiliary']#,'megaratools/auxiliary/megaradrp-calibrations-2018.1/LinesCatalog',
+#'megaratools/auxiliary/esostandars']
 SCRIPTS_DIRNAME = 'bin'
 VERSION_FILE = 'CubeGen/common/constants.py'
 
 all_packages = find_packages()
 packages_data = {
-    package: [f'{DATA_DIRNAME}/*']+[f'{os.path.join(DATA_DIRNAME, sub)}/*' for root, subs, files in os.walk(os.path.join(package, DATA_DIRNAME)) for sub in subs]
-    for package in all_packages if os.path.isdir(os.path.join(package, DATA_DIRNAME))
+    package: collect_package_data(package, DATA_DIRS)
+    for package in all_packages
+    if any(os.path.isdir(os.path.join(package, data_dir)) for data_dir in DATA_DIRS)
 }
-scripts = ["bin/3dcubegen"]
+#packages_data = {
+#    package: [f'{DATA_DIRNAME}/*']+[f'{os.path.join(DATA_DIRNAME, sub)}/*' for root, subs, files in os.walk(os.path.join(package, DATA_DIRNAME)) for sub in subs]
+#    for package in all_packages if os.path.isdir(os.path.join(package, DATA_DIRNAME))
+#}
+scripts = ['bin/3dcubegen','CubeGen/megaratools/bin/pipemegara','CubeGen/virustools/bin/vpcubetools']
 #    os.path.join(SCRIPTS_DIRNAME, script_name)
 #    for script_name in os.listdir(SCRIPTS_DIRNAME) if script_name.endswith('.py')
 #]

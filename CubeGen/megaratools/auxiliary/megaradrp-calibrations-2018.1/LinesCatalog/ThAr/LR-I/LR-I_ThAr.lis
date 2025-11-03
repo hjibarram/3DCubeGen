@@ -1,0 +1,62 @@
+# LR-I Nico's version
+# Some wavelengths were initially extracted from:
+# http://iraf.noao.edu/specatlas/thar_photron/thar_photron.html
+# but they were refined using:
+# http://physics.nist.gov/PhysRefData/ASD/lines_form.html
+#------------------------------------------------------------------------------
+7272.9360  1   2000 # ArI from NIST
+7311.7160  0     35 # ArI from NIST
+7316.005   0     25 # ArI from NIST
+7353.293   0     70 # ArI from NIST    
+7372.1180  0    200 # ArI from NIST
+7383.9800  1  10000 # ArI from NIST
+7392.9800  0     20 # ArI from NIST
+7412.3370  0     15 # ArI from NIST
+7425.2940  0     10 # ArI from NIST
+7435.3680  0     25 # ArI from NIST
+7471.1640  0      0 # ArI from NIST
+7484.3300  0      0 # ArI from NIST
+7503.8690  1  20000 # ArI from NIST
+7514.6520  1  15000 # ArI from NIST
+7585.7575  0   6100 # ThI from NIST (weighted mean of two lines)
+7589.3152  0     72 # ArII from NIST
+7618.0419  0      1 # ArII from NIST
+7628.8820  0      0 # ArI from NIST
+7635.1060  1  25000 # ArI from NIST
+7647.3793  0  15000 # ThI from NIST
+7670.0570  0      0 # ArI from NIST
+7724.0400  1      0 # pseudo weighted mean of the next two (blended) lines
+#7723.7600  1  15000 # ArI from NIST
+#7724.2070  1  10000 # ArI from NIST
+7798.3579  0   3300 # ThI from NIST
+7817.7699  0  13000 # ThI from NIST
+7847.5394  0  15000 # ThI from NIST
+7886.2831  0   2700 # ThI from NIST
+7891.0750  0     10 # ArI from NIST
+7948.1760  1  20000 # ArI from NIST
+7978.9732  0  27000 # ThI from NIST
+8006.1560  1  20000 # ArI from NIST
+8014.7850  1  25000 # ArI from NIST
+8046.1180  0      0 # ArI from NIST
+8053.3080  0      7 # ArI from NIST
+8093.6240  0   4400 # ThI from NIST
+8103.6920  1  20000 # ArI from NIST
+8115.3110  1  35000 # ArI from NIST
+8143.1382  0  12000 # ThI from NIST
+8169.7868  0   3000 # ThI from NIST
+8186.9116  0  12000 # ThI from NIST
+8252.3938  0   4200 # ThI from NIST
+8264.5220  1  10000 # ArI from NIST
+8330.4495  0  26000 # ThI from NIST
+8384.7300  0      0 # ArI from NIST
+8392.2700  0     20 # ArI from NIST
+8408.2100  1  15000 # ArI from NIST
+8416.7269  0  21000 # ThI from NIST
+8424.6480  1  20000 # ArI from NIST
+8446.5115  0  16000 # ThI from NIST
+8478.3578  0  15000 # ThI from NIST
+8521.4420  1  15000 # ArI from NIST
+8573.1204  0   7500 # ThI from NIST
+8605.7760  0      7 # ArI from NIST
+8620.4600  0      0 # ArI from NIST
+8667.9440  1   4500 # ArI from NIST

@@ -1,0 +1,58 @@
+#MR-RI Nico's version
+# Some wavelengths were initially extrated from:
+# http://iraf.noao.edu/specatlas/thar_photron/thar_photron.html
+# but they were refined using:
+# http://physics.nist.gov/PhysRefData/ASD/lines_form.html
+#------------------------------------------------------------------------------
+6727.4582   4400 # ThI from NIST
+6752.8340    150 # ArI from NIST
+6756.4527   9700 # ThI from NIST
+6766.6120     15 # ArI from NIST
+6778.3123   3800 # ThI from NIST
+6780.2880      0 # ThI from NIST, w.mean of 6780.1251 and 6780.4130
+6788.8403   1900 # ThI from NIST
+6791.2350   1800 # ThI from NIST
+6824.6774   2300 # ThI from NIST
+6827.2490      0 # ArI from NIST
+6829.0354   4400 # ThI from NIST
+6834.9245   9800 # ThI from NIST
+6861.2689    112 # ArII from NIST
+6871.2890    150 # ArI from NIST
+6874.7528   2900 # ThI from NIST
+6879.5820      5 # ArI from NIST
+6886.9561      0 # interpolated with R5-findarc (several blended lines!)
+6888.1740     10 # ArI from NIST
+6894.6587      0 # interpolated with R5-findarc
+6911.2262  25000 # ThI from NIST
+6937.6640     50 # ArI from NIST
+6943.6105  14000 # ThI from NIST
+6951.4780      7 # ArI from NIST
+6960.2500      7 # ArI from NIST
+6965.4310  10000 # ArI from NIST
+6989.6552  31000 # ThI from NIST
+7000.8036   7800 # ThI from NIST
+7018.5674   9800 # ThI from NIST
+7030.2510    150 # ArI from NIST
+7060.6537   3800 # ThI from NIST
+7067.2180  10000 # ArI from NIST
+7068.7360    100 # ArI from NIST
+7084.1690  12000 # ThI from NIST
+7107.4780     25 # ArI from NIST
+7124.5605   8300 # ThI from NIST
+7125.8200     25 # ArI from NIST
+7147.0420   1000 # ArI from NIST
+7158.8390     15 # ArI from NIST
+7168.8950  30000 # ThI from NIST
+7206.9800     70 # ArI from NIST
+7272.9360   2000 # ArI from NIST
+7284.9031   4500 # ThI from NIST
+7311.7160     35 # ArI from NIST
+7316.0050     25 # ArI from NIST
+7353.2930     70 # ArI from NIST
+7372.1180    200 # ArI from NIST
+7383.9800  10000 # ArI from NIST
+7392.9800     20 # ArI from NIST
+7412.3370     15 # ArI from NIST
+7425.2940     10 # ArI from NIST
+7428.9402   7900 # ThI from NIST
+7435.3680     25 # ArI from NIST

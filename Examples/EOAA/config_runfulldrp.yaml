@@ -1,0 +1,21 @@
+--- 
+# config file to run the full pipeline for MEGARA data
+run_drp:
+  # Pipe MEGARA data
+  - pipe_type: FULL #Pipeline Type
+    run_name: GTC5-21AMEX #Name of the observtion run to reduce, example "GTC5-24A"
+    run_number: '0003' #Number of the observation run, in string format, example "0001"
+    out_path: out_cubes #Path of the output cube files, defaul "out_cubes"
+    redux_ver: 1.1.1.dev0 #The DRP reduction version of the MEGARA data
+    redux_path: redux/GTC5-21AMEX/ #Path of the redux dir, default set to " " to local files
+    obrun_path: Data/GTC5-21AMEX/ #Path of the observation run dir, default set to " " to local files
+    sigm_s: 0.35 #Smoth kernel size used to reconstruct the cube, default 0.35 arcsec
+    pix_s: 0.0 #Spaxel size used to reconstruct the cube, default set to 0 to fix it to sigm_s'
+    alph_s: 2.0 #Kernel "shape" factor, a value equal of 2 returns a Gaussian kerner, larger than 2 returns a sharper kernel
+    flu16: True #Keyword to return a cube with units of 10^{-16} erg/s/cm2/A, if False, the units are erg/s/cm2/A
+    name: None #Optional output root name of the data cube
+    basename: megCube-NAME.fits #basename of the final data cube, default megCube-NAME.fits, not remove NAME
+    fac_sizey: 1.0 #Factor of the FoV in Y, default 1
+    fac_sizex: 1.0 #Factor of the FoV in X, default 1
+    aper_std: 4.0 #Aperture radius for spectrofotometric calibration, default 4 arcsec
+    forcear: True #Force the use of the ThAr3 arclamp in the reduction

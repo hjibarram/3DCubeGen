@@ -2,8 +2,10 @@ import numpy as np
 from astropy.wcs import WCS
 from astropy.wcs.utils import skycoord_to_pixel
 from astropy.coordinates import SkyCoord
+from astropy.io import fits
 from scipy.interpolate import interp1d
 from astropy.convolution import convolve,Gaussian2DKernel
+from scipy.ndimage import gaussian_filter1d as filt1d
 import CubeGen
 import CubeGen.tools.kernel as kernel 
 import os
@@ -38,6 +40,139 @@ def median_a(x,lw=5,lower=10000,wave=[]):
         x_n=x1
     return x_n
 
+def get_LocalVolumelist(version='1.2.0.dev0',pathI='',pathB='',outpath='',basename_out='LV_VERSION.fits'):
+    file2=pathB+'lv_beta-0.fits'
+    hdu_list = fits.open(file2)
+    table_hdu = hdu_list[1]
+    table_data = table_hdu.data
+    target=table_data.field('target')
+    tileid=table_data.field('tile_id')
+    file1=pathI+'redux_files_VERSION.csv'.replace('VERSION',version)
+    ft=open(file1,'r')
+    tile=[]
+    expn=[]
+    mjd=[]
+    ra=[]
+    dec=[]
+    for line in ft:
+        if not '#' in line: 
+            if not 'TILE' in line:
+                data=line.replace('\n','').replace(' ','').split(',')
+                data=list(filter(None,data))
+                if len(data) == 5:
+                    ra.extend([data[0]])
+                    dec.extend([data[1]])
+                    expn.extend([data[2]])
+                    mjd.extend([data[3]])
+                    tile.extend([data[4]])
+    tile=np.array(tile)
+    expn=np.array(expn)
+    mjd=np.array(mjd)
+    ra=np.array(ra)
+    dec=np.array(dec)
+    ft.close()
+    tile_n=[]
+    expn_n=[]
+    mjd_n=[]
+    ra_n=[]
+    dec_n=[]
+    target_n=[]
+    for i in range(0, len(tile)):
+        for j in range(0, len(tileid)):
+            if tileid[j]==int(tile[i]):
+                target_n.extend([target[j]])
+                tile_n.extend([int(tile[i])])
+                expn_n.extend([int(expn[i])])
+                mjd_n.extend([int(mjd[i])])
+                ra_n.extend([float(ra[i])])
+                dec_n.extend([float(dec[i])])
+    tile_n=np.array(tile_n)
+    expn_n=np.array(expn_n)
+    mjd_n=np.array(mjd_n)
+    ra_n=np.array(ra_n)
+    dec_n=np.array(dec_n)
+    target_n=np.array(target_n)
+    h1=fits.PrimaryHDU()
+    col1 = fits.Column(name='TILE', format='K', array=tile_n)
+    col2 = fits.Column(name='MJD', format='K', array=mjd_n)
+    col3 = fits.Column(name='EXPN', format='K', array=expn_n)
+    col4 = fits.Column(name='RA', format='D', array=ra_n)
+    col5 = fits.Column(name='DEC', format='D', array=dec_n)
+    col6 = fits.Column(name='TARGET', format='12A', array=target_n)
+    coldefs = fits.ColDefs([col1, col2, col3, col4, col5, col6])
+    h2 = fits.BinTableHDU.from_columns(coldefs)
+    hlist=fits.HDUList([h1,h2])
+    hlist.update_extend()
+    hlist.writeto(outpath+'/'+basename_out.replace('VERSION',version), overwrite=True)
+
+def check_cf_files(redux_dir='',version='',outpath=''):
+    sycall('ls '+redux_dir+'/'+version+'/ > list_temp')
+    f=open('list_temp','r')
+    f0=open(outpath+'redux_files_VERSION.csv'.replace('VERSION',version),'w')
+    f0.write('RA , DEC, EXPN, MJD , TILE \n')
+    for line in f:
+        data=line.replace('\n','').replace(redux_dir+'/'+version,'')
+        if 'XX' in data:
+            ft1=data
+            path=redux_dir+'/'+version+'/'+ft1+'/'
+            sycall('ls '+redux_dir+'/'+version+'/'+ft1+'/ > list_temp2')
+            f1=open('list_temp2','r')
+            for linet in f1:
+                datat=linet.replace('\n','').replace(redux_dir+'/'+version+'/'+ft1,'')
+                ft2=datat
+                path2=redux_dir+'/'+version+'/'+ft1+'/'
+                sycall('ls '+redux_dir+'/'+version+'/'+ft1+'/'+ft2+'/ > list_temp3')
+                f2=open('list_temp3','r')
+                for linet1 in f2:
+                    datat1=linet1.replace('\n','').replace(redux_dir+'/'+version+'/'+ft1+'/'+ft2,'')
+                    if '60' in datat1:
+                        ft3=datat1
+                        sycall('ls '+redux_dir+'/'+version+'/'+ft1+'/'+ft2+'/'+ft3+'/ > list_temp4')
+                        f3=open('list_temp4','r')
+                        for linet2 in f3:
+                            datat2=linet2.replace('\n','').replace(redux_dir+'/'+version+'/'+ft1+'/'+ft2+'/'+ft3,'')
+                            if 'lvmCF' in datat2:
+                                ft4=datat2
+                                file=redux_dir+'/'+version+'/'+ft1+'/'+ft2+'/'+ft3+'/'+ft4
+                                try:
+                                    hdr1=fits.getheader(file,0)
+                                    rac=hdr1["POSCIRA"]
+                                    dec=hdr1["POSCIDE"]
+                                    f0.write(str(rac).replace('None','')+' , '+str(dec).replace('None','')+' , '+ft4.replace('lvmCFrame-','').replace('.fits','')+' , '+ft3+' , '+ft2+' \n')
+                                except:
+                                    print(file)
+                                    #sycall('rm '+file)                                
+    f0.close()
+    sycall('rm list_temp')
+    sycall('rm list_temp2')
+    sycall('rm list_temp3')
+    sycall('rm list_temp4')  
+
+def get_list(fname='LV.fits',path='',path_outl=''):
+    hdu_list = fits.open(path+fname)
+    table_hdu = hdu_list[1]
+    table_data = table_hdu.data
+    target=table_data.field('target')
+    tile=table_data.field('TILE')
+    mjd=table_data.field('MJD')
+    expn=table_data.field('EXPN')
+    ra=table_data.field('RA')
+    dec=table_data.field('DEC')
+    target_u=np.unique(target)
+    for i in range(0, len(target_u)):
+        nt=np.where(target == target_u[i])
+        tile_t=tile[nt]
+        mjd_t=mjd[nt]
+        expn_t=expn[nt]
+        ra_t=ra[nt]
+        dec_t=dec[nt]
+        file_out=path_outl+target_u[i]
+        sycall('mkdir -p '+path_outl)
+        f=open(file_out,'w')
+        f.write('#TILE,MJD,EXPN,RA,DEC\n')
+        for j in range(0, len(tile_t)):
+            f.write(str(tile_t[j])+','+str(mjd_t[j])+','+"{:0>8}".format(expn_t[j])+','+str(ra_t[j])+','+str(dec_t[j])+'\n')
+        f.close()
 
 def read_explist(fname='Orion',path=''):
     ft=open(path+fname,'r')
@@ -177,6 +312,69 @@ def get_apertures(file):
     th=np.array(th)
     return ra,dec,rad,l1,l2,th,colr,namet,typ
 
+def conv(xt,ke=2.5):
+    nsf=len(xt)
+    krn=ke
+    xf=filt1d(xt,ke)
+    return xf    
+
+def extract_spec1d(filename,outname,dir_cube='',out_dir='',sig=10,smoth=False,avgra=False,head=0,error=True,hdrE=1,headerInfo={}):
+    file=dir_cube+filename
+    [cube0, hdr0]=fits.getdata(file, head, header=True)
+    if error:
+        cube0E=fits.getdata(file, hdrE)
+    nz,nx,ny=cube0.shape
+    flux=np.zeros(nz)
+    if error:
+        fluxE=np.zeros(nz)
+    for i in range(0, nz):
+        tmp=cube0[i,:,:]
+        if error:
+            tmpE=cube0E[i,:,:]
+        if avgra:
+            if error:
+                fluxE=np.sqrt(np.nanmean(tmpE**2))
+            flux[i]=np.nanmean(tmp)
+        else:
+            if error:
+                fluxE[i]=np.sqrt(np.nansum(tmpE**2))
+            flux[i]=np.nansum(tmp)
+    crpix=hdr0["CRPIX3"]
+    try:
+        cdelt=hdr0["CD3_3"]
+    except:
+        cdelt=hdr0["CDELT3"]
+    crval=hdr0["CRVAL3"]
+    wave=(crval+cdelt*(np.arange(nz)+1-crpix))
+    if smoth:
+        flux=conv(flux,ke=sig)
+    file_out=out_dir+outname+'.fits'
+    col1 = fits.Column(name='LAMBDA', format='D', array=wave)
+    col2 = fits.Column(name='FLUX', format='D', array=flux)
+    if error:
+        col3 = fits.Column(name='ERROR', format='D', array=fluxE)
+    if error:
+        coldefs = fits.ColDefs([col1, col2, col3])
+    else:
+        coldefs = fits.ColDefs([col1, col2])
+    h0 = fits.PrimaryHDU()    
+    h1 = fits.BinTableHDU.from_columns(coldefs)    
+    h=h0.header
+    if len(headerInfo) > 0:
+        keysN=list(headerInfo.keys())
+        for key in keysN:
+            if key not in h:
+                h[key]=headerInfo[key]
+                #h.comments[key]=headerInfo.get('comments', 'No comment provided')
+    h['EXTNAME']='SPECTRA1D'
+    h['RA']=hdr0['CRVAL1']
+    h['DEC']=hdr0['CRVAL2']
+    h.update()
+    hlist=fits.HDUList([h0,h1])
+    hlist.update_extend()
+    hlist.writeto(file_out, overwrite=True)
+    sycall('gzip -f '+file_out)         
+
 def extract_spec(spec,hdr,ra='',dec='',rad=1.5,pix=0.35,avgra=False):
     sky1=SkyCoord(ra+' '+dec,frame=FK5, unit=(u.hourangle,u.deg))
     val1=sky1.ra.deg
@@ -213,7 +411,6 @@ def extract_spec(spec,hdr,ra='',dec='',rad=1.5,pix=0.35,avgra=False):
         cdelt=hdr["CDELT3"]
     crval=hdr["CRVAL3"]
     wave_f=(crval+cdelt*(np.arange(nz)+1-crpix))*1e10
-    
     return wave_f,single_T,xpos,ypos
 
 def sycall(comand):
@@ -259,6 +456,15 @@ def get_narrwband(wave, lo=6563,dw=10.0,sig=1.0,alpha=1):
     y2=(1+np.exp(((wave-(lo+dw/2))/sig)))**(-alpha) 
     y=y1*y2
     return y
+
+def sycallo(comand,ott=False):
+    out=os.popen(comand, 'r')
+    if ott:
+        return out
+    else:
+        line=out.readline()
+        line=line.replace('\n','')
+        return line    
 
 def band_spectra(wave_s,pdl_flux,k=5,zt=0):
     dir=os.path.join(CubeGen.__path__[0], 'legacy')+'/'
@@ -332,8 +538,8 @@ def twoD_interpolB(x,y,x1,x2,x3,y1,y2,y3,z1,z2,z3):
     return z        
     
 def map_interpolB(cube,x,y,nxt=10,nyt=10):
-    xpos0=np.int(np.round(x))
-    ypos0=np.int(np.round(y))
+    xpos0=int(np.round(x))
+    ypos0=int(np.round(y))
     map=cube[xpos0-nxt:xpos0+nxt,ypos0-nyt:ypos0+nyt]
     nx,ny=map.shape
     rp=np.zeros([nx,ny])
@@ -394,7 +600,6 @@ def cube_interpolB(cube,x,y):
     z=twoD_interpolB(x,y,x1,x2,x3,y1,y2,y3,z1,z2,z3)
     return z        
     
-
 def cube_interpol(cube,x,y):
     nz,nx,ny=cube.shape
     val_out=np.zeros(nz)
@@ -429,22 +634,39 @@ def extract_segm(hdr,l1=12,l2=12,ra='',dec='',dx=0):
     
     return xpos00,xpos11,ypos00-dx,ypos11-dx
 
-def interpolate_matrix(matrix_input,nt=4,ne=2,verbose=False,smoth=True):
+def interpolate_matrix(matrix_input,nt=4,ne=2,verbose=False,smoth=True,dx=0,dy=0,bval=0,zero=False):
     nx,ny=matrix_input.shape
     nx1=int(nx*nt)
     ny1=int(ny*nt)
     matrix_new=np.zeros([nx1,ny1])
     if verbose:
-        pbar=tqdm(total=ny1)
-    dxt=(nx-ne*2)/float(nx1)
-    dyt=(ny-ne*2)/float(ny1)
-    xpos=ne
+        pbar=tqdm(total=nx1)
+    if zero:
+        dxt=(nx)/float(nx1)
+        dyt=(ny)/float(ny1)
+        xpos=0
+    else:
+        dxt=(nx-ne*2)/float(nx1)
+        dyt=(ny-ne*2)/float(ny1)
+        xpos=ne
     for i in range(0, nx1):
         xpos=xpos+dxt
-        ypos=ne
+        if zero:
+            ypos=0
+        else:
+            ypos=ne
         for j in range(0, ny1):
             ypos=ypos+dyt
-            val=map_interpolB(matrix_input,xpos,ypos,nxt=ne,nyt=ne)
+            if xpos-dx/nt-ne < 0:
+                val=bval
+            elif xpos-dx/nt-ne >= nx:
+                val=bval
+            elif ypos-dy/nt-ne < 0:
+                val=bval
+            elif ypos-dy/nt-ne >= ny:
+                val=bval
+            else:
+                val=map_interpolB(matrix_input,xpos-dx/nt,ypos-dy/nt,nxt=ne,nyt=ne)
             matrix_new[i,j]=val 
         if verbose:
             pbar.update(1)

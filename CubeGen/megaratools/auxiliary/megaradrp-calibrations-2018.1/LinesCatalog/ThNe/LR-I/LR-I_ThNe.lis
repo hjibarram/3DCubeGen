@@ -1,0 +1,63 @@
+# LR-I Nico's version
+# ThI wavelengths have been extrated from:
+# http://iraf.noao.edu/specatlas/thar_photron/thar_photron.html
+# (Ar lines from that list have been removed).
+# Ne wavelengths were initially identified in:
+# http://www.ctio.noao.edu/noao/sites/default/files/instruments/spectrographs/hydne.dat
+# but then they were refined using:
+# http://physics.nist.gov/PhysRefData/ASD/lines_form.html
+#------------------------------------------------------------------------------
+#7000.8036 2.00  ThI
+#7018.5675 2.00  ThI
+#7060.6538 2.00  ThI
+#7084.1690 2.00  ThI
+#7124.5607 2.00  ThI
+#7168.8952 2.00  ThI
+7173.9380 0.00  # NeI from NIST
+#7208.0063 2.00  ThI
+#7218.0542 2.00  ThI
+7245.1665  0.0  # NeI from NIST
+#7385.5006 2.00  ThI
+#7428.9405 2.00  ThI
+7438.8981  0.0  # NeI from NIST
+7472.4383  0.0  # NeI from NIST (weak)
+7488.8712  0.0  # NeI from NIST
+7535.7739  0.0  # NeI from NIST
+7544.0439  0.0  # NeI from NIST
+#7567.7417 2.00  ThI
+#7585.7922 2.00  ThI
+#7647.3794 2.00  ThI
+#7817.7669 2.00  ThI
+7936.9957  0.0  # NeI from NIST (weak and close to next one)
+7943.1805  0.0  # NeI from NIST
+#7978.9731 2.00  ThI
+8082.4576  0.0  # NeI from NIST
+8118.5495  0.0  # NeI from NIST (weak)
+8128.9110  0.0  # NeI from NIST (too weak and close to the next one)
+8136.4061  0.0  # NeI from NIST
+8259.3795  0.0  # NeI from NIST (very weak)
+8266.0769  0.0  # NeI from NIST (very weak)
+8300.3248  0.0  # NeI from NIST (very weak)
+#8330.4494 2.00  ThI
+8365.7464  0.0  # NeI from NIST (weak)
+8377.6070  0.0  # NeI from NIST
+#8416.7269 2.00  ThI
+8418.4265  0.0  # NeI from NIST
+#8446.5116 2.00  ThI
+#8463.3569  0.0  # NeI from NIST (weak)
+#8478.3580 2.00  ThI
+8495.3591  0.0  # NeI from NIST( weak)
+8544.6952  0.0  # NeI from NIST (very weak)
+8571.3535  0.0  # NeI from NIST (very weak)
+8582.9031  0.0  # NeI from NIST (very weak)
+8591.2583  0.0  # NeI from NIST
+8634.6472  0.0  # NeI from NIST
+8647.0412  0.0  # NeI from NIST (weak)
+8654.3828  0.0  # NeI from NIST
+8679.4936  0.0  # NeI from NIST (almost blended to next one)
+8681.9216  0.0  # NeI from NIST (almost blended to previous one)
+8704.1122  0.0  # NeI from NIST (weak)
+8771.6575  0.0  # NeI from NIST
+8780.6223  0.0  # NeI from NIST
+8783.7539  0.0  # NeI from NIST
+#8967.6403 2.00  ThI

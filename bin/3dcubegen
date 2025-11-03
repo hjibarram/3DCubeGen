@@ -38,7 +38,7 @@ def cli():
 @click.option('-u', '--fac_sizey', type=float, default=1.1, help='factor of the FoV in Y')
 @click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
 @click.option('-k', '--cent', is_flag=True, default=False,help='activate the centering of the FoV')
-@click.option('-i', '--coord_cen', type=list, default=[0,0], help='central coordinates ra, dec in degrees')
+@click.option('-x', '--coord_cen', type=list, default=[0,0], help='central coordinates ra, dec in degrees')
 @click.option('-h', '--pathf', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
 
 def sincube(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,namef,use_slitmap,pbars,spec_range,path_sas,basename,errors,fac_sizey,fac_sizex,cent,coord_cen,pathf):
@@ -110,7 +110,7 @@ cli.add_command(sincube)
 @click.option('-u', '--fac_sizey', type=float, default=1.1, help='factor of the FoV in Y')
 @click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
 @click.option('-k', '--cent', is_flag=True, default=False,help='activate the centering of the FoV')
-@click.option('-i', '--coord_cenl', type=list, default=[[0,0]], help='list of central coordinates ra, dec in degrees')
+@click.option('-j', '--coord_cenl', type=list, default=[[0,0]], help='list of central coordinates ra, dec in degrees')
 @click.option('-h', '--pathf', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
 @click.option('-l', '--mergecube', is_flag=True, default=False,help='activate the cube merge script')
 @click.option('-p', '--nsp', type=int, default=0, help='number of spatial slides in nxn for the merged cube, set nsp to 0 or 1 to deactivate')
@@ -143,10 +143,10 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             cent=data['pipecube'][0]['cent']
             coord_cenl=data['pipecube'][0]['coord_cenL']
             pathf=data['pipecube'][0]['pathF']
-            mergecube==data['pipecube'][0]['mergecube']
-            nsp==data['pipecube'][0]['nsp']
-            cube2rss==data['pipecube'][0]['cube2rss']
-            out_pathrss==data['pipecube'][0]['out_pathrss']
+            mergecube=data['pipecube'][0]['mergecube']
+            nsp=data['pipecube'][0]['nsp']
+            cube2rss=data['pipecube'][0]['cube2rss']
+            out_pathrss=data['pipecube'][0]['out_pathrss']
         else:
             print('Error: The config file is not for LVM data')
             return
@@ -154,6 +154,8 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
         path_sas=os.environ['SAS_BASE_DIR']+'/'
     except:
         path_sas=path_sas+'/'
+    out_pathrss=out_pathrss+redux_ver+'/'
+    out_path=out_path+redux_ver+'/'
 
     sigm_s,pix_s=tools.kernel_pipe(type=type)
     alph_s=2.0
@@ -235,7 +237,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
 @click.option('-u', '--fac_sizey', type=float, default=1.1, help='factor of the FoV in Y')
 @click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
 @click.option('-k', '--cent', is_flag=True, default=False,help='activate the centering of the FoV')
-@click.option('-i', '--coord_cen', type=list, default=[0,0], help='central coordinates ra, dec in degrees')
+@click.option('-x', '--coord_cen', type=list, default=[0,0], help='central coordinates ra, dec in degrees')
 @click.option('-h', '--pathf', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
 @click.option('-z', '--redshift', type=float, default=0.0, help='redshift of the target')
 @click.option('-q', '--photoband', type=str, default='2',help='list (comma separated) of photometric id of the band to generate: 0-OII,1-OIII,2-Halpha,3-SII,4-g,5-r,6-i. Default 2')
@@ -343,7 +345,7 @@ def sinmap(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,namef,us
 @click.option('-u', '--fac_sizey', type=float, default=1.1, help='factor of the FoV in Y')
 @click.option('-i', '--fac_sizex', type=float, default=1.1, help='factor of the FoV in X')
 @click.option('-k', '--cent', is_flag=True, default=False,help='activate the centering of the FoV')
-@click.option('-i', '--coord_cenl', type=list, default=[[0,0]], help='list of central coordinates ra, dec in degrees')
+@click.option('-x', '--coord_cenl', type=list, default=[[0,0]], help='list of central coordinates ra, dec in degrees')
 @click.option('-h', '--pathf', type=str, default='', help='path of the list of mjd, explist and tiles of the targets')
 @click.option('-z', '--redshift', type=float, default=0.0, help='redshift of the target')
 @click.option('-g', '--deconv', is_flag=True, default=False,help='activate the deconvolution of the map')
@@ -384,6 +386,7 @@ def pipemap(config_file,out_path,redux_ver,redux_dir,type,namel,use_slitmap,pbar
         path_sas=os.environ['SAS_BASE_DIR']+'/'
     except:
         path_sas=path_sas+'/'
+    out_path=out_path+redux_ver+'/'
 
     sigm_s,pix_s=tools.kernel_pipe(type=type)
     alph_s=2.0

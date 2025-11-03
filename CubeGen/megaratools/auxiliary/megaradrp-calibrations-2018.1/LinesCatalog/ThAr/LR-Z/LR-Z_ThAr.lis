@@ -1,0 +1,35 @@
+#LR-Z Nico's version
+# Some wavelengths have been extrated from:
+# http://iraf.noao.edu/specatlas/thar_photron/thar_photron.html
+#------------------------------------------------------------------------------
+8053.3085 0.0 # ArI (from Photron) weak line
+8103.6931 0.0 # ArI (from Photron)
+8115.3110 0.0 # ArI (from Photron)
+8143.1380 0.0 # ThI (from Photron) weak line
+8186.9113 0.0 # ThI (from Photron) weak line
+#8252.3936 0.0 # ThI (from Photron) weak line (problematic: too close to 8264.5)
+8264.5225 0.0 # ArI (from Photron)
+8320.8554 0.0 # ThI (from Photron) weak line
+8330.4494 0.0 # ThI (from Photron) weak line
+8384.7240 0.0 # ArI (from Photron) weak line
+8408.2096 0.0 # ArI (from Photron)
+8416.7269 0.0 # ThI (from Photron) weak line
+8424.6475 0.0 # ArI (from Photron)
+8446.5116 0.0 # ThI (from Photron) weak line
+8478.3580 0.0 # ThI (from Photron) weak line
+8521.4422 0.0 # ArI (from Photron)
+8573.1205 0.0 # ThI (from Photron) weak line
+8605.7762 0.0 # ArI (from Photron) weak line
+8620.4602 0.0 # ArI (from Photron) weak line
+8667.9442 0.0 # ArI (from Photron)
+8761.6862 0.0 # ArI (from Photron) weak line
+8967.6403 0.0 # ThI (from Photron) weak line
+9048.2501 0.0 # ThI (from Photron) weak line
+9122.9674 0.0 # ThI (from Photron)
+9194.6385 0.0 # ArI (from Photron) weak line
+9224.4992 0.0 # ArI (from Photron)
+9291.5313 0.0 # ArI (from Photron) weak line
+9354.2198 0.0 # ArI (from Photron) weak line
+9399.0891 0.0 # ThI (from Photron) weak line
+9497.1891 0.0 # ThI (from Photron) weak line
+9657.7863 0.0 # ArI (from Photron)
