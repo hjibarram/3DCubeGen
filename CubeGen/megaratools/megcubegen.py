@@ -91,8 +91,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
             crvalt=crvalt/(1+vel)
             cdeltt=cdeltt/(1+vel)
             wave=crvalt+np.arange(ny0)*cdeltt
-            R2,R=mtools.get_adr(hdr,wave)
-            Rt=np.zeros([2,ny0])
+            R2,R=mtools.get_adr(hdr,wave0)
+            Rt=np.zeros([2,len(wave0)])
             Rt[0,:]=0
             Rt[1,:]=R
             R_adr=np.dot(R2,Rt)
