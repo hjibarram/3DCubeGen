@@ -1,0 +1,58 @@
+--- 
+# Input line config
+lines:
+  - name: OIII5007 #name of the line, Example of unconstrained line
+    wave: 5008.22  #central wavelenght 
+  - name: OIII4960 #name of the line, Example of constrained line
+    wave: 4960.36  #central wavelenght 
+    fac_Name: OIII5007 #Name of the amplitude of the line to be constrained with
+    fac: 3.0 #1/x factor of proportionality
+    fwh_Name: OIII5007 #Name of the FWHM of the line to be constrained with
+    fwhF: 1.0 # factor of proportionality
+    vel_Name: OIII5007 #Name of the velocity shift of the line to be constrained with
+    velF: 1.0 # factor of proportionality
+  - name: Hbeta #name of the line, Example of only velocity and FWHM constrained line
+    wave: 4862.68  #central wavelenght
+    fwh_Name: OIII5007 #Name of the FWHM of the line to be constrained with
+    fwhF: 1.0 # factor of proportionality
+    vel_Name: OIII5007 #Name of the velocity shift of the line to be constrained with
+    velF: 1.0 # factor of proportionality
+continum:
+  - region: Hbeta
+    wave1: 5035.0
+    wave2: 5055.0
+priors:
+  Ao0: 0.04 #initial amplitud value of the narrow line
+  As0: 5017.8 #maximum amplitud limit of the narrow line
+  Ai0: 0.0 #minimum amplitud limit of the narrow line
+  Ao1: 0.09 #initial amplitud value of the 2dnarrow line 
+  As1: 5017.8 #maximum amplitud limit of the 2dnarrow line
+  Ai1: 0.0 #minimum amplitud limit of the 2dnarrow line
+  Ao2: 0.04 #initial amplitud value of the 3dnarrow line
+  As2: 5017.8 #maximum amplitud limit of the 3dnarrow line
+  Ai2: 0.0 #minimum amplitud limit of the 3dnarrow line
+  fwhmo0: 150.0 #initial fwhm value of the narrow line
+  fwhms0: 800.0 #maximum fwhm limit of the narrow line
+  fwhmi0: 50.0 #minimum fwhm limit of the narrow line
+  fwhmo1: 150.0 #initial fwhm value of the 2dnarrow line
+  fwhms1: 800.0 #maximum fwhm limit of the 2dnarrow line
+  fwhmi1: 50.0 #minimum fwhm limit of the 2dnarrow line
+  fwhmo2: 150.0 #initial fwhm value of the 3dnarrow line
+  fwhms2: 800.0 #maximum fwhm limit of the 3dnarrow line
+  fwhmi2: 50.0 #minimum fwhm limit of the 3dnarrow line
+  dvo0: -20.0 #initial velocity value of the narrow line
+  dvs0: 700.0 #maximum velocity limit of the narrow line
+  dvi0: -1000.0 #minimum velocity limit of the narrow line
+  dvo1: -20.0 #initial velocity value of the 2dnarrow line
+  dvs1: 1000.0 #maximum velocity limit of the 2dnarrow line
+  dvi1: -1000.0 #minimum velocity limit of the 2dnarrow line0
+  dvo2: -20.0 #initial velocity value of the 3dnarrow line
+  dvs2: 1000.0 #maximum velocity limit of the 3dnarrow line
+  dvi2: -1000.0 #minimum velocity limit of the 3dnarrow line
+  P1o: 0.01
+  P1s: 1000.0
+  P1i: 0.0
+  P2o: 1
+  P2s: 10
+  P2i: -4
+...
