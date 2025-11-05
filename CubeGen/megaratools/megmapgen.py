@@ -64,7 +64,7 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
                 ny0=len(wave0)
             n_fib0=len(x_ifu)
             if errors:
-                rss_ef=np.zeros([nfib0*nlt])
+                rss_ef=np.zeros([n_fib0*nlt])
             rss_f=np.zeros([n_fib0*nlt])
             x_ifu_V=np.zeros([n_fib0*nlt])
             y_ifu_V=np.zeros([n_fib0*nlt])
@@ -80,11 +80,11 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
             wave=hdr['CRVAL1']+np.arange(ny0)*hdr['CDELT1']
             for i in range(0, len(x_ifu)):
                 fib=int(fib_idt[i])-1
-                rss_f[nfib0*ii+i]=np.nansum(interp1d(wave,rss[fib,:],kind='linear',bounds_error=False)(wave0))
+                rss_f[n_fib0*ii+i]=np.nansum(interp1d(wave,rss[fib,:],kind='linear',bounds_error=False)(wave0))
                 if errors:
-                    rss_ef[nfib0*ii+i]=np.sqrt(np.nansum(interp1d(wave,erss[fib,:],kind='linear',bounds_error=False)(wave0)**2))
-                x_ifu_V[nfib0*ii+i]=x_ifu[i]
-                y_ifu_V[nfib0*ii+i]=y_ifu[i]
+                    rss_ef[n_fib0*ii+i]=np.sqrt(np.nansum(interp1d(wave,erss[fib,:],kind='linear',bounds_error=False)(wave0)**2))
+                x_ifu_V[n_fib0*ii+i]=x_ifu[i]
+                y_ifu_V[n_fib0*ii+i]=y_ifu[i]
     yot=(np.amax(y_ifu_V)+np.amin(y_ifu_V))/2.0
     xot=(np.amax(x_ifu_V)+np.amin(x_ifu_V))/2.0
     x_ifu_V=x_ifu_V-xot
