@@ -115,9 +115,9 @@ def map_ifu(expnumL,nameF=None,notebook=True,ofvel=[[0,0,0],[0,0,0],[0,0,0]],use
                 if wave_1 < np.nanmax(wave0) and wave_2 > wave_1:# and wave_2 < np.nanmax(wave0):
                     nt=np.where((wave0 >= wave_1) & (wave0 <= wave_2))[0]
                     wave0=wave0[nt]
-                    rss=rss[:,nt]
-                    if errors:
-                        erss=erss[:,nt]
+                    #rss=rss[:,nt]
+                    #if errors:
+                    #    erss=erss[:,nt]
                     crval0=np.nanmin(wave0)
                     ny0=len(wave0)
                 else:
