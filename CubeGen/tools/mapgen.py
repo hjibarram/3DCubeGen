@@ -153,6 +153,8 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
                 x_ifu_pix[nfib0*i:nfib0*(i+1)]=x_pixel
                 y_ifu_pix[nfib0*i:nfib0*(i+1)]=y_pixel
+                if np.nanmax(x_pixel) > 200:
+                    print(file)
         if pbars:
             pbar.update(1)     
     if pbars:
