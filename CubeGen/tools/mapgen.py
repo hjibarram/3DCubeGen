@@ -68,7 +68,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         ra_fib=new_ra_fib[nt]
         dec_fib=new_dec_fib[nt]
         Std_id=Std_id[nt]
-        if np.abs(np.nanmean(ra_fib/3600.)) < 1:
+        if np.abs(np.nanmean(ra_fib/3600.)) < 2:
             print(file)
         if use_slitmap == False:
             agcam_coadd = agcam_dir+'/'+mjd[i % len(mjd)]+'/coadds/'+'lvm.sci.coadd_s'+expnum+'.fits'
@@ -100,7 +100,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 wt1.wcs.ctype = ["RA---TAN", "DEC--TAN"]
                 wt1.wcs.radesys = 'ICRS'
                 #wt1.wcs.equinox = 'J2000'#2024.8
-        '''    
+    
             if use_slitmap == False:
                 rac0=rac
                 dec0=dec
@@ -154,9 +154,8 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
                 x_ifu_pix[nfib0*i:nfib0*(i+1)]=x_pixel
                 y_ifu_pix[nfib0*i:nfib0*(i+1)]=y_pixel
-                #if np.nanmax(x_pixel) > 150:
-                #    print(file)
-        '''        
+                if np.nanmax(x_pixel) > 150:
+                    print(file,'optionB')        
         if pbars:
             pbar.update(1)     
     if pbars:
