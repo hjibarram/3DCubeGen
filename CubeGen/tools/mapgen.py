@@ -68,7 +68,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         ra_fib=new_ra_fib[nt]
         dec_fib=new_dec_fib[nt]
         Std_id=Std_id[nt]
-        if np.abs(np.nanmean(ra_fib)) < 1:
+        if np.abs(np.nanmean(ra_fib/3600.)) < 1:
             print(file)
         if use_slitmap == False:
             agcam_coadd = agcam_dir+'/'+mjd[i % len(mjd)]+'/coadds/'+'lvm.sci.coadd_s'+expnum+'.fits'
