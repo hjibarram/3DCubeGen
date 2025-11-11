@@ -113,12 +113,12 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
             rss_fm=np.zeros([nfib0*nlt])
             rss_efm=np.zeros([nfib0*nlt])
             for j in range(0, nfib0):
-                val1,val2,val3,nam=tools.band_spectra(wave0,rss[Std_id[j],:],k=ki,zt=zt)
-                rss_f[j]=val2
-                rss_fm[j]=val1
-                val1,val2,val3,nam=tools.band_spectra(wave0,erss[Std_id[j],:],k=ki,zt=zt)
-                rss_ef[j]=val2
-                rss_efm[j]=val1
+                #val1,val2,val3,nam=tools.band_spectra(wave0,rss[Std_id[j],:],k=ki,zt=zt)
+                rss_f[j]=1#val2
+                rss_fm[j]=1#val1
+                #val1,val2,val3,nam=tools.band_spectra(wave0,erss[Std_id[j],:],k=ki,zt=zt)
+                rss_ef[j]=1#val2
+                rss_efm[j]=1#val1
             x_ifu_V=np.zeros([nfib0*nlt])
             y_ifu_V=np.zeros([nfib0*nlt])
             if use_slitmap:
