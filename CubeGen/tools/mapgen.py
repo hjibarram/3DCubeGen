@@ -68,7 +68,8 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         ra_fib=new_ra_fib[nt]
         dec_fib=new_dec_fib[nt]
         Std_id=Std_id[nt]
-
+        if np.abs(np.nanmean(ra_fib)) < 1:
+            print(file)
         if use_slitmap == False:
             agcam_coadd = agcam_dir+'/'+mjd[i % len(mjd)]+'/coadds/'+'lvm.sci.coadd_s'+expnum+'.fits'
             if True:#os.path.isfile(agcam_coadd):
@@ -99,7 +100,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 wt1.wcs.ctype = ["RA---TAN", "DEC--TAN"]
                 wt1.wcs.radesys = 'ICRS'
                 #wt1.wcs.equinox = 'J2000'#2024.8
-            
+        '''    
             if use_slitmap == False:
                 rac0=rac
                 dec0=dec
@@ -113,12 +114,12 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
             rss_fm=np.zeros([nfib0*nlt])
             rss_efm=np.zeros([nfib0*nlt])
             for j in range(0, nfib0):
-                #val1,val2,val3,nam=tools.band_spectra(wave0,rss[Std_id[j],:],k=ki,zt=zt)
-                rss_f[j]=1#val2
-                rss_fm[j]=1#val1
-                #val1,val2,val3,nam=tools.band_spectra(wave0,erss[Std_id[j],:],k=ki,zt=zt)
-                rss_ef[j]=1#val2
-                rss_efm[j]=1#val1
+                val1,val2,val3,nam=tools.band_spectra(wave0,rss[Std_id[j],:],k=ki,zt=zt)
+                rss_f[j]=val2
+                rss_fm[j]=val1
+                val1,val2,val3,nam=tools.band_spectra(wave0,erss[Std_id[j],:],k=ki,zt=zt)
+                rss_ef[j]=val2
+                rss_efm[j]=val1
             x_ifu_V=np.zeros([nfib0*nlt])
             y_ifu_V=np.zeros([nfib0*nlt])
             if use_slitmap:
@@ -138,12 +139,12 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
             wave=crval+cdelt*(np.arange(ny)+1-crpix)
             wave=wave/(1+helio/299792.458)
             for j in range(0, nfib0):
-                #val1,val2,val3,nam=tools.band_spectra(wave,rss[Std_id[j],:],k=ki,zt=zt)
-                rss_f[nfib0*i+j]=1#val2
-                rss_fm[nfib0*i+j]=1#val1
-                #val1,val2,val3,nam=tools.band_spectra(wave,erss[Std_id[j],:],k=ki,zt=zt)
-                rss_ef[nfib0*i+j]=1#val2
-                rss_efm[nfib0*i+j]=1#val1
+                val1,val2,val3,nam=tools.band_spectra(wave,rss[Std_id[j],:],k=ki,zt=zt)
+                rss_f[nfib0*i+j]=val2
+                rss_fm[nfib0*i+j]=val1
+                val1,val2,val3,nam=tools.band_spectra(wave,erss[Std_id[j],:],k=ki,zt=zt)
+                rss_ef[nfib0*i+j]=val2
+                rss_efm[nfib0*i+j]=val1
             if use_slitmap == False:    
                 ra_fib, dec_fib=tools.make_radec(xp,yp,rac,dec,PA)
             x_ifu_V[nfib0*i:nfib0*(i+1)]=ra_fib#xp+rac*3600
@@ -153,8 +154,9 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
                 x_ifu_pix[nfib0*i:nfib0*(i+1)]=x_pixel
                 y_ifu_pix[nfib0*i:nfib0*(i+1)]=y_pixel
-                if np.nanmax(x_pixel) > 150:
-                    print(file)
+                #if np.nanmax(x_pixel) > 150:
+                #    print(file)
+        '''        
         if pbars:
             pbar.update(1)     
     if pbars:
