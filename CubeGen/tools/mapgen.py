@@ -138,12 +138,12 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
             wave=crval+cdelt*(np.arange(ny)+1-crpix)
             wave=wave/(1+helio/299792.458)
             for j in range(0, nfib0):
-                val1,val2,val3,nam=tools.band_spectra(wave,rss[Std_id[j],:],k=ki,zt=zt)
-                rss_f[nfib0*i+j]=val2
-                rss_fm[nfib0*i+j]=val1
-                val1,val2,val3,nam=tools.band_spectra(wave,erss[Std_id[j],:],k=ki,zt=zt)
-                rss_ef[nfib0*i+j]=val2
-                rss_efm[nfib0*i+j]=val1
+                #val1,val2,val3,nam=tools.band_spectra(wave,rss[Std_id[j],:],k=ki,zt=zt)
+                rss_f[nfib0*i+j]=1#val2
+                rss_fm[nfib0*i+j]=1#val1
+                #val1,val2,val3,nam=tools.band_spectra(wave,erss[Std_id[j],:],k=ki,zt=zt)
+                rss_ef[nfib0*i+j]=1#val2
+                rss_efm[nfib0*i+j]=1#val1
             if use_slitmap == False:    
                 ra_fib, dec_fib=tools.make_radec(xp,yp,rac,dec,PA)
             x_ifu_V[nfib0*i:nfib0*(i+1)]=ra_fib#xp+rac*3600
