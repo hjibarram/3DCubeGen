@@ -70,7 +70,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         Std_id=Std_id[nt]
         print(np.nanmean(rss[Std_id,:]))
         print(np.nanmin(np.abs(ra_fib)/3600.0),np.nanmin(np.abs(dec_fib)/3600.0),file,'optionB')
-        '''
+        
         if use_slitmap == False:
             agcam_coadd = agcam_dir+'/'+mjd[i % len(mjd)]+'/coadds/'+'lvm.sci.coadd_s'+expnum+'.fits'
             if True:#os.path.isfile(agcam_coadd):
@@ -156,7 +156,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 x_ifu_pix[nfib0*i:nfib0*(i+1)]=x_pixel
                 y_ifu_pix[nfib0*i:nfib0*(i+1)]=y_pixel
                 #print(np.nanmin(np.abs(ra_fib)/3600.0),np.nanmin(np.abs(dec_fib)/3600.0),file,'optionB')        
-        '''
+        
         if pbars:
             pbar.update(1)     
     if pbars:
