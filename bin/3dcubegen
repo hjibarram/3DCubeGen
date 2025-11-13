@@ -178,12 +178,14 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
                 sigm_s=17.6/2*32*1/8
                 pix_s=17.6/2*0.75*32*1/8
                 type='h'
+            print('Generate the Cube in type '+type)    
             map_ifu(explist,nameF=nameF1+type,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
                 spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
                 alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
                 tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook)
             if cube2rss:
-                rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook)
+                print('Generate the RSS in type '+type)
+                rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook,pbars=pbars)
         else:
             if dit <= 500:
                 spec_range_l=[(3000,4000),(4000,5000),(5000,6000),(6000,7000),(7000,8000),(8000,9000),(9000,10000)]
@@ -196,6 +198,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
                 nameF=nameF1+type+'_'+"{:0>2}".format(str(int(i)))
                 id_l.extend(["{:0>2}".format(str(int(i)))])
                 spec_range=spec_range_l[i]
+                print('Generate the Cube in type '+type+' and in spec range ',spec_range,' of '+str(len(spec_range_l))+' ranges')
                 map_ifu(explist,nameF=nameF,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
                     spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
                     alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
@@ -206,17 +209,21 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
                 nameT='lvmCube-NAME.fits.gz'.replace('NAME',nameF1+type)
                 if nsp > 1:
                     for ii in range(0, nsp):
-                        for jj in range(0, nsp): 
-                            coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,nsplit=nsp,spt=[ii,jj],notebook=notebook)
+                        for jj in range(0, nsp):
+                            print('Generate the Coadding and Tiling of the Cube in type '+type+' and for '+str(ii)+'-'+str(jj)+' of '+str(nsp)+'-'+str(nsp)) 
+                            coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,nsplit=nsp,spt=[ii,jj],notebook=notebook,pbars=pbars)
                     if cube2rss:
                         for ii in range(0, nsp):
                             for jj in range(0, nsp):
                                 namet=nameF1+type+'_p'+str(ii)+str(jj)
-                                rssp_extract(namet,path=out_path,path_out=out_pathrss,notebook=notebook)
+                                print('Generate the RSS and Tiling in type '+type+' and for '+str(ii)+'-'+str(jj)+' of '+str(nsp)+'-'+str(nsp)) 
+                                rssp_extract(namet,path=out_path,path_out=out_pathrss,notebook=notebook,pbars=pbars)
                 else:
-                    coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,notebook=notebook)
+                    print('Generate the coadding of the Cube in type '+type)
+                    coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,notebook=notebook,pbars=pbars)
                     if cube2rss:
-                        rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook)
+                        print('Generate the RSS in type '+type)
+                        rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook,pbars=pbars)
 
 
  

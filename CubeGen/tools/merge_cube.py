@@ -12,17 +12,18 @@ from astropy.io import fits
 from scipy.interpolate import interp1d
 import CubeGen.tools.tools as tools
 
-def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0],notebook=True):
+def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0],notebook=True,pbars=True):
     n_slides=len(id_l)
     cube_list=[]
     hdr_list=[]
     size_list=[]
     if error:
-        cubeE_list=[]    
-    if notebook:
-        pbar=tqdm(total=n_slides)
-    else:
-        pbar=tqdmT(total=n_slides)
+        cubeE_list=[]
+    if pbars:        
+        if notebook:
+            pbar=tqdm(total=n_slides)
+        else:
+            pbar=tqdmT(total=n_slides)
     for i in range(0, n_slides):
         cube_file=path+'/'+nameR.replace('id',id_l[i])
         [cube, hdr]=fits.getdata(cube_file, 0, header=True)
@@ -64,8 +65,10 @@ def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0]
         cube_list.extend([cube])
         hdr_list.extend([hdr])
         size_list.extend([[nz,nx,ny]])
-        pbar.update(1)
-    pbar.close()
+        if pbars:
+            pbar.update(1)
+    if pbars:        
+        pbar.close()
     
     
     wcs_list=[]
@@ -119,10 +122,11 @@ def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0]
     IFU_coaddB=np.zeros([n_pix,nx2o-nx1o,ny2o-ny1o],dtype=int)
     
     cdelt_a=np.nanmax(np.array(cdelt_list))
-    if notebook:
-        pbar=tqdm(total=(nx2o-nx1o))
-    else:
-        pbar=tqdmT(total=(nx2o-nx1o))#(nx0))#  
+    if pbars:
+        if notebook:
+            pbar=tqdm(total=(nx2o-nx1o))
+        else:
+            pbar=tqdmT(total=(nx2o-nx1o))#(nx0))#  
     for i in range(nx1o, nx2o):#0, nx0):#
         for j in range(ny1o, ny2o):#0, ny0):#
             temp_spec=np.copy(IFU_coadd[:,i-nx1o,j-ny1o])
@@ -206,8 +210,10 @@ def coadd_cube(nameR,nameF,path='',id_l=['0','1'],error=False,nsplit=0,spt=[0,0]
             IFU_coadd[:,i-nx1o,j-ny1o]=temp_spec
             if error:
                 IFU_coaddE[:,i-nx1o,j-ny1o]=temp_specE 
-        pbar.update(1)
-    pbar.close()
+        if pbars:        
+            pbar.update(1)
+    if pbars:        
+        pbar.close()
 
                 
     hdr0=hdr_list[0]            

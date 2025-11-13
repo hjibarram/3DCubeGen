@@ -8,7 +8,7 @@ from astropy.wcs.utils import pixel_to_skycoord
 import warnings
 warnings.filterwarnings("ignore")
 
-def rssp_extract(name,path='./',path_out='./',basename_in='lvmCube-NAME.fits.gz',basename_out='lvmRSS-NAMElab.fits',flu16=True,nsplit=0,spt=[0,0],lvm=True,fluxu=1e-16,notebook=True):
+def rssp_extract(name,path='./',path_out='./',basename_in='lvmCube-NAME.fits.gz',basename_out='lvmRSS-NAMElab.fits',pbars=True,flu16=True,nsplit=0,spt=[0,0],lvm=True,fluxu=1e-16,notebook=True):
     file=basename_in.replace('NAME',name)
     cube_file=path+'/'+file
     [flux, hdr]=fits.getdata(cube_file, 0, header=True)
@@ -91,18 +91,21 @@ def rssp_extract(name,path='./',path_out='./',basename_in='lvmCube-NAME.fits.gz'
         del cubeT
     if flu16:
         fluxE=fluxE*fluxu
-    if notebook:
-        pbar=tqdm(total=(nx-nx1)*(ny-ny1))
-    else:
-        pbar=tqdmT(total=(nx-nx1)*(ny-ny1))
+    if pbars:    
+        if notebook:
+            pbar=tqdm(total=(nx-nx1)*(ny-ny1))
+        else:
+            pbar=tqdmT(total=(nx-nx1)*(ny-ny1))
     ct=0
     for i in range(nx1, nx):
         for j in range(ny1, ny):
             spec=flux[:,i-nx1,j-ny1]
             if np.nansum(spec) != 0:
                 ct=ct+1
-            pbar.update(1)
-    pbar.close()
+            if pbars:    
+                pbar.update(1)
+    if pbars:            
+        pbar.close()
     ns=ct
     rss=np.zeros([ns,nz])
     rssI=np.zeros([ns,nz])
@@ -136,10 +139,11 @@ def rssp_extract(name,path='./',path_out='./',basename_in='lvmCube-NAME.fits.gz'
     dec=np.zeros(ns)
     rssW[0,:]=wave
     ct=0
-    if notebook:
-        pbar=tqdm(total=ns)
-    else:
-        pbar=tqdmT(total=ns)
+    if pbars:
+        if notebook:
+            pbar=tqdm(total=ns)
+        else:
+            pbar=tqdmT(total=ns)
     for i in range(nx1, nx):
         for j in range(ny1, ny):
             spec=flux[:,i-nx1,j-ny1]
@@ -164,8 +168,10 @@ def rssp_extract(name,path='./',path_out='./',basename_in='lvmCube-NAME.fits.gz'
                 ra[ct]=sky1.ra.value
                 dec[ct]=sky1.dec.value
                 ct=ct+1
-                pbar.update(1)
-    pbar.close()
+                if pbars:
+                    pbar.update(1)
+    if pbars:
+        pbar.close()
     blockid=np.array(blockid)
     targettype=np.array(targettype)
     ifulabel=np.array(ifulabel)
