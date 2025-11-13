@@ -154,8 +154,8 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
         path_sas=os.environ['SAS_BASE_DIR']+'/'
     except:
         path_sas=path_sas+'/'
-    out_pathrss=out_pathrss+redux_ver+'/'
-    out_path=out_path+redux_ver+'/'
+    out_pathrss=out_pathrss+redux_ver+'/'+type+'/'
+    out_path=out_path+redux_ver+'/'+type+'/'
 
     sigm_s,pix_s=tools.kernel_pipe(type=type)
     alph_s=2.0
