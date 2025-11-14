@@ -286,7 +286,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     new_header = wt.to_header()
     h1=fits.PrimaryHDU(ifu,header=new_header)
     #h1=fits.PrimaryHDU(ifu)
-    h2=fits.ImageHDU(ifuM)
+    h2=fits.ImageHDU(ifuM,header=new_header)
     h3=fits.ImageHDU(ifu_e)
     h4=fits.ImageHDU(ifuM_e)
     head_list=[h1,h2,h3,h4]
@@ -331,21 +331,21 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     ht["NAXIS"]=2 
     ht["NAXIS1"]=nx
     ht["NAXIS2"]=ny
-    ht["CRVAL1"]=xat#xot/3600.0
-    ht["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    ht["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    ht["CRPIX1"]=nlx/2+0.5+dx
-    ht["CTYPE1"]='RA---TAN'
-    ht["CRVAL2"]=yat#yot/3600.0
-    ht["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.0
-    ht["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.0
-    ht["CRPIX2"]=nly/2+0.5+dy
-    ht["CTYPE2"]='DEC--TAN'
-    ht["CUNIT1"]='deg     '                                           
-    ht["CUNIT2"]='deg     '
-    ht["RADESYS"]='ICRS     '
-    ht["OBJSYS"]='ICRS    '
-    ht["EQUINOX"]=2000.00
+    #ht["CRVAL1"]=xat#xot/3600.0
+    #ht["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    #ht["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    #ht["CRPIX1"]=nlx/2+0.5+dx
+    #ht["CTYPE1"]='RA---TAN'
+    #ht["CRVAL2"]=yat#yot/3600.0
+    #ht["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.0
+    #ht["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.0
+    #ht["CRPIX2"]=nly/2+0.5+dy
+    #ht["CTYPE2"]='DEC--TAN'
+    #ht["CUNIT1"]='deg     '                                           
+    #ht["CUNIT2"]='deg     '
+    #ht["RADESYS"]='ICRS     '
+    #ht["OBJSYS"]='ICRS    '
+    #ht["EQUINOX"]=2000.00
     ht["IFUCON"]=(str(int(ns))+' ','NFibers')#5.167640389466101
     ht["BUNIT"]='ABmag/arcsec'
     ht.update() 
