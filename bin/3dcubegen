@@ -398,7 +398,7 @@ def pipemap(config_file,out_path,redux_ver,redux_dir,type,namel,use_slitmap,pbar
         path_sas=path_sas+'/'
     out_path=out_path+redux_ver+'/'
     try: 
-        nproc=data['pipecube'][0]['nproc']
+        nproc=data['pipemap'][0]['nproc']
     except:
         nproc=3
 
