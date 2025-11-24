@@ -206,7 +206,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
                 map_ifu(explist,nameF=nameF,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
                     spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
                     alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
-                    tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook)
+                    tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook,nproc=nproc)
 
             if mergecube:
                 nameR='lvmCube-NAME_id.fits.gz'.replace('NAME',nameF1+type)
@@ -397,6 +397,10 @@ def pipemap(config_file,out_path,redux_ver,redux_dir,type,namel,use_slitmap,pbar
     except:
         path_sas=path_sas+'/'
     out_path=out_path+redux_ver+'/'
+    try: 
+        nproc=data['pipecube'][0]['nproc']
+    except:
+        nproc=3
 
     sigm_s,pix_s=tools.kernel_pipe(type=type)
     alph_s=2.0
@@ -425,7 +429,7 @@ def pipemap(config_file,out_path,redux_ver,redux_dir,type,namel,use_slitmap,pbar
             print('Generating the '+labt[i])
             tyl=tyll[i]
             ki=i
-            gen_map(explist,multiT=True,nameF=nameF1+type,cent=cent,coord_cen=coord_cen,out_path=out_path,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
+            gen_map(explist,multiT=True,nproc=nproc,nameF=nameF1+type,cent=cent,coord_cen=coord_cen,out_path=out_path,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
                 use_slitmap=use_slitmap,pbars=pbars,tilelist=tilelist,tileglist=tileglist,zt=zt,ki=ki,sigm_s=sigm_s,pix_s=pix_s,alph_s=alph_s,
                 agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,mjd=mjd,redux_ver=redux_ver,basename=basename,notebook=notebook)       
             if deconv:

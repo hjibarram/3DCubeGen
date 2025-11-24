@@ -17,7 +17,7 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coord_ast=[0,0],coord_cen=[0,0],pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmMap-NAME_TRA.fits',path_lvmcore=''):
+def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coord_ast=[0,0],coord_cen=[0,0],pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,nproc=3,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmMap-NAME_TRA.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
@@ -245,7 +245,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         else:    
             ntp=np.where(Rsp <= (fibA*3.5*2/2.0))[0]
         if multiT:
-            nproc=3#3#cpu_count()
+            #nproc=3#3#cpu_count()
             with ThreadPool(nproc) as pool:
                 args=[(spec_ifu[ntp],specE_ifu[ntp],specM_ifu[ntp],specEM_ifu[ntp],x_ifu_V[ntp],y_ifu_V[ntp],fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nly,npros,nproc) for npros in range(0, nproc)]                    
                 #args=[(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nly,i,npros,nproc,wt,xot,yot) for npros in range(0, nproc)]                    
