@@ -204,7 +204,7 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
             else:
                 spec_range_l=[(3000,4000),(4000,4250),(4250,4500),(4500,4750),(4750,5000),(5000,5250),(5250,5500),(5500,5750),(5750,6000),(6000,6250),(6250,6500),(6500,6750),(6750,7000),(7000,7250),(7250,7500),(7500,7750),(7750,8000),(8000,8250),(8250,8500),(8500,8750),(8750,9000),(9000,9250),(9250,9500),(9500,9750),(9750,10000)]
             id_l=[]
-            for i in range(0, len(spec_range_l)):
+            for i in range(7, len(spec_range_l)):
                 nameF=nameF1+type+'_'+"{:0>2}".format(str(int(i)))
                 id_l.extend(["{:0>2}".format(str(int(i)))])
                 spec_range=spec_range_l[i]
