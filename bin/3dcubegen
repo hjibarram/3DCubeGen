@@ -93,7 +93,7 @@ def sincube(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,n
     
     
 cli.add_command(sincube)
-
+#Ni siquiera se que es esto, pero ok
 @cli.command('pipecube', short_help='pipeline to obtain the MC and LV cubes')
 @click.option('-c', '--config_file', type=str, default='', help='name of the config file')
 @click.option('-o', '--out_path', type=str, default='out_cubes/', help='path of the output cube files')
