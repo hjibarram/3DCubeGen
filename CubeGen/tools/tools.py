@@ -14,6 +14,44 @@ from multiprocessing.pool import ThreadPool
 from scipy.spatial.distance import pdist
 from tqdm.notebook import tqdm
 
+def read_filelist(name,path='',hid='wave',sep=','):
+    """
+    Reads a cvs file and returns the data as a dictionary.
+    Parameters:
+    name (str): The name of the file to read.
+    path (str): The directory path where the file is located.
+    head (str): The header identifier to locate the header line in the file.
+    sep (str): The separator used in the file (default is comma).
+
+    Returns:
+    dic array: The data read from the file.
+    """
+    file=path+name
+    f=open(file,'r')
+    dic={}
+    ct=0
+    for line in f:
+        ct+=1
+        if hid in line:
+            data=line.replace('\n','').replace(' ','').split(sep)
+            data=list(filter(None, data)) # Remove empty strings
+            nh=len(data)
+            for it in range(0, nh):
+                dic.update({data[it]:[]})
+            head=data
+        else:
+            data=line.replace('\n','').split(',')
+            data=list(filter(None,data))
+            if len(data) == nh:
+                for it in range(0, nh):
+                    try:
+                        val=float(data[it])
+                    except:
+                        val=data[it].replace(' ','')
+                    dic[head[it]].extend([val])
+    f.close()
+    return dic
+
 def median_a(x,lw=5,lower=10000,wave=[]):
     if len(wave) > 0:
         index=np.where(wave < lower)[0]
