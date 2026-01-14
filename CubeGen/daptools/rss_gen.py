@@ -387,6 +387,10 @@ def rssp_multi1d(namelist,path='./',path_in='./',path_out='./',hid='RA',sep=',',
     minw=100000
     for i in range(0, ns):
         spec_file=path_in+'/'+dirlist[i]+'/'+filelist[i]
+        try:
+            import MapLines.tools.tools as tol
+        except:
+            exit('MapLines package not found please install it at https://github.com/hjibarram/Map_line/releases/tag/v2.0.0')
         flux_t,flux_tE,wave_t=tol.get_oneDspectra(spec_file,input_format=input_format,error_c=True)
         flux_t=flux_t*fluxu*factor
         flux_tE=flux_tE*fluxu*factor
