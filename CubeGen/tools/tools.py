@@ -14,6 +14,43 @@ from multiprocessing.pool import ThreadPool
 from scipy.spatial.distance import pdist
 from tqdm.notebook import tqdm
 
+import numpy as np
+
+def numpy_to_tform(arr):
+    arr = np.asarray(arr)
+
+    # tipo base
+    base = arr.dtype
+
+    fits_map = {
+        np.dtype('float32'): 'E',
+        np.dtype('float64'): 'D',
+        np.dtype('int16'):   'I',
+        np.dtype('int32'):   'J',
+        np.dtype('int64'):   'K',
+        np.dtype('uint8'):   'B',
+        np.dtype('bool'):    'L'
+    }
+
+    if base.kind in ['U', 'S']:
+        # strings
+        strlen = arr.dtype.itemsize
+        return f'{strlen}A'
+
+    if base not in fits_map:
+        raise ValueError(f'Dtype no soportado: {base}')
+
+    code = fits_map[base]
+
+    # escalar o vector
+    if arr.ndim == 1:
+        return code
+    elif arr.ndim == 2:
+        return f'{arr.shape[1]}{code}'
+    else:
+        raise ValueError("FITS no soporta ndim > 2 en tablas")
+
+
 def read_filelist(name,path='',hid='wave',sep=','):
     """
     Reads a cvs file and returns the data as a dictionary.

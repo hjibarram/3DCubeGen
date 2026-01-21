@@ -365,15 +365,31 @@ def rssp_extract(name,path='./',path_out='./',basename_in='lvmCube-NAME.fits.gz'
 
 def rssp_multi1d(namelist,path='./',path_in='./',path_out='./',hid='RA',sep=',',key_files='FILE',keydir='ID',keyred='Z',
                  basename_in='lvmCube-NAME.fits.gz',basename_out='lvmRSS-NAMEl.fits',disp=0.5,
-                 pbars=True,input_format='SDSS',fluxu=1e-16,factor=1,notebook=True,name=''):
+                 pbars=True,input_format='SDSS',fluxu=1e-16,factor=1,notebook=True,name='',sortt=True,
+                 keys_ext=[],keyslabnew_ext=[]):
     values=tools.read_filelist(path+namelist,hid=hid,sep=sep)
     filelist=np.array(values[key_files])
     dirlist=np.array(values[keydir])
     zlist=np.array(values[keyred])
-    nt=np.argsort(zlist)
-    zlist=zlist[nt]
-    dirlist=dirlist[nt]
-    filelist=filelist[nt]
+    if len(keys_ext) > 0:
+        if len(keyslabnew_ext) == 0:
+            new_keys_ext=np.copy(keys_ext)
+        else:
+            if len(keyslabnew_ext) != len(keys_ext):
+                exit('Error: keyslabnew_ext and keys_ext must have the same length')
+            else:
+                new_keys_ext=np.copy(keyslabnew_ext)
+        new_values=[]
+        for i in range(len(keys_ext)):
+            new_values.extend([np.array(values[keys_ext[i]])])
+    if sortt:
+        nt=np.argsort(zlist)
+        zlist=zlist[nt]
+        dirlist=dirlist[nt]
+        filelist=filelist[nt]
+        if len(keys_ext) > 0:
+            for i in range(len(keys_ext)):
+                new_values[i]=new_values[i][nt]
     ns=len(filelist)
 
     if pbars:    
