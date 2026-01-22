@@ -29,7 +29,7 @@ def numpy_to_tform(arr):
         np.dtype('int32'):   'J',
         np.dtype('int64'):   'K',
         np.dtype('uint8'):   'B',
-        np.dtype('bool'):    'L'
+        np.dtype('bool'):    'L',
         np.dtype('>i8'):     'K'
     }
 
