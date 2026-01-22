@@ -30,6 +30,7 @@ def numpy_to_tform(arr):
         np.dtype('int64'):   'K',
         np.dtype('uint8'):   'B',
         np.dtype('bool'):    'L'
+        np.dtype('>i8'):     'K'
     }
 
     if base.kind in ['U', 'S']:
