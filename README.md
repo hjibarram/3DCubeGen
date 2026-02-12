@@ -40,7 +40,7 @@ sincube --help
 ------------------------------------------------------------------------
 
 # Core Concepts
-
+<!--
 ## How `NAME` is used (IMPORTANT)
 
 In 3DCubeGen configs, the string `NAME` in:
@@ -69,7 +69,7 @@ products:
 > definition + output basename), not the object label.**
 
 ------------------------------------------------------------------------
-
+-->
 ## Pipeline mode vs Single-run mode
 
 ### Pipeline mode
