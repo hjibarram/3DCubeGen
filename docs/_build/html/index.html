@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3DCubeGen Documentation &mdash; 3DCubeGen 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation &amp; Getting Started" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            3DCubeGen
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation &amp; Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LVM Pipeline</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel_smoothing.html">Kernel Smoothing Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">YAML Configuration Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exposure_list.html">Exposure List File Format</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Spectrographs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="megara.html">MEGARA Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virusp.html">VirusP Pipeline</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="algorithm.html">Reconstruction Algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Output Data Products</a></li>
+<li class="toctree-l1"><a class="reference internal" href="daptools.html">DAP Integration Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">3DCubeGen</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">3DCubeGen Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dcubegen-documentation">
+<h1>3DCubeGen Documentation<a class="headerlink" href="#dcubegen-documentation" title="Link to this heading"></a></h1>
+<p>3DCubeGen is a Python toolkit for reconstructing 3D astronomical data cubes
+from IFU (Integral Field Unit) spectrograph observations. It converts
+Row-Stacked Spectra (RSS) data into regular 3D cubes and 2D maps using
+weighted kernel interpolation. Three spectrographs are supported: LVM (SDSS
+Local Volume Mapping), MEGARA (GTC), and VirusP (HET).</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation &amp; Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-from-source">Installing from Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#core-dependencies">Core Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#optional-dependencies">Optional Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#quick-verification">Quick Verification</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">LVM Pipeline</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#single-vs-pipeline-commands">Single vs. Pipeline Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#cube-vs-map-commands">Cube vs. Map Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#pipecube-specific-features">pipecube-Specific Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#pipemap-specific-features">pipemap-Specific Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#parameter-comparison">Parameter Comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#quick-start-examples">Quick-Start Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="kernel_smoothing.html">Kernel Smoothing Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="kernel_smoothing.html#sincube-sinmap-explicit-parameters">sincube / sinmap: explicit parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernel_smoothing.html#pipecube-pipemap-type-letter">pipecube / pipemap: type letter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernel_smoothing.html#type-to-parameter-mapping">Type-to-parameter mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernel_smoothing.html#differences-beyond-the-kernel">Differences beyond the kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernel_smoothing.html#small-exposure-guard-in-pipecube">Small-exposure guard in pipecube</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">YAML Configuration Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#sincube-configuration">sincube Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#pipecube-configuration">pipecube Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#kernel-type-codes">Kernel Type Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#sas-directory-resolution">SAS Directory Resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#output-path-construction">Output Path Construction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="exposure_list.html">Exposure List File Format</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="exposure_list.html#file-format">File Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exposure_list.html#example-file">Example File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exposure_list.html#tile-group-derivation">Tile Group Derivation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exposure_list.html#how-the-exposure-list-connects-to-config-parameters">How the Exposure List Connects to Config Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exposure_list.html#rss-file-path-resolution">RSS File Path Resolution</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Other Spectrographs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="megara.html">MEGARA Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="megara.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="megara.html#cli-entry-point">CLI Entry Point</a></li>
+<li class="toctree-l2"><a class="reference internal" href="megara.html#rundrp">rundrp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="megara.html#runfulldrp">runfulldrp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="megara.html#configuration-file">Configuration File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="megara.html#differences-from-lvm">Differences from LVM</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="virusp.html">VirusP Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="virusp.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virusp.html#cli-entry-point">CLI Entry Point</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virusp.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virusp.html#cli-options">CLI Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virusp.html#configuration-file">Configuration File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virusp.html#virusp-specific-features">VirusP-Specific Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virusp.html#differences-from-lvm">Differences from LVM</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="algorithm.html">Reconstruction Algorithm</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="algorithm.html#kernel-interpolation">Kernel Interpolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm.html#radius-cutoff">Radius Cutoff</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm.html#error-propagation">Error Propagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm.html#adr-aware-mode">ADR-Aware Mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm.html#spaxel-size">Spaxel Size</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm.html#flux-scaling">Flux Scaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm.html#multi-threading">Multi-Threading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm.html#implementation-reference">Implementation Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Output Data Products</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html#lvm-cubes">LVM Cubes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html#lvm-maps">LVM Maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html#jpeg-composite-images">JPEG Composite Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html#lvm-rss-from-cube">LVM RSS (from cube)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html#megara-outputs">MEGARA Outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html#virusp-outputs">VirusP Outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html#flux-units">Flux Units</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="daptools.html">DAP Integration Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="daptools.html#rss-extraction-from-cubes">RSS Extraction from Cubes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="daptools.html#dap-emission-line-tools">DAP Emission Line Tools</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation &amp; Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hector Ibarra-Medel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

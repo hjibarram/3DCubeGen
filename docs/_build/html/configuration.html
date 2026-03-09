@@ -1,0 +1,619 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YAML Configuration Reference &mdash; 3DCubeGen 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Exposure List File Format" href="exposure_list.html" />
+    <link rel="prev" title="Kernel Smoothing Parameters" href="kernel_smoothing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            3DCubeGen
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation &amp; Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LVM Pipeline</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel_smoothing.html">Kernel Smoothing Parameters</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">YAML Configuration Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sincube-configuration">sincube Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sincube-example">sincube Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#pipecube-configuration">pipecube Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pipecube-example">pipecube Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#kernel-type-codes">Kernel Type Codes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sas-directory-resolution">SAS Directory Resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#output-path-construction">Output Path Construction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="exposure_list.html">Exposure List File Format</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Spectrographs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="megara.html">MEGARA Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virusp.html">VirusP Pipeline</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="algorithm.html">Reconstruction Algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Output Data Products</a></li>
+<li class="toctree-l1"><a class="reference internal" href="daptools.html">DAP Integration Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">3DCubeGen</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">YAML Configuration Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/configuration.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="yaml-configuration-reference">
+<h1>YAML Configuration Reference<a class="headerlink" href="#yaml-configuration-reference" title="Link to this heading"></a></h1>
+<p>3DCubeGen uses YAML configuration files to control LVM cube generation.
+Two command modes are available: <code class="docutils literal notranslate"><span class="pre">sincube</span></code> for generating a single cube, and
+<code class="docutils literal notranslate"><span class="pre">pipecube</span></code> for batch-processing multiple targets through a pipeline.</p>
+<p>Template configuration files are provided in the <code class="docutils literal notranslate"><span class="pre">Configfiles/</span></code> directory:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Configfiles/config_sincube.yml</span></code> – single-cube mode</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Configfiles/config_pipecube.yml</span></code> – pipeline mode</p></li>
+</ul>
+<section id="sincube-configuration">
+<h2>sincube Configuration<a class="headerlink" href="#sincube-configuration" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">sincube</span></code> section defines parameters for generating a single data cube
+from one target.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 18.0%" />
+<col style="width: 10.0%" />
+<col style="width: 12.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">survey_type</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LVM</span></code></p></td>
+<td><p>Survey identifier. Must contain <code class="docutils literal notranslate"><span class="pre">LVM</span></code> for LVM data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">out_path</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">out_cubes/</span></code></p></td>
+<td><p>Output directory for the generated cube FITS files.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">redux_ver</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1.1.dev0</span></code></p></td>
+<td><p>DRP reduction version of the input <code class="docutils literal notranslate"><span class="pre">lvmCFrame</span></code> files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">redux_dir</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
+<td><p>Path to the redux directory. When empty, defaults to
+<code class="docutils literal notranslate"><span class="pre">&lt;path_sas&gt;/sdsswork/lvm/spectro/redux</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sigm_s</span></code></p></td>
+<td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">32.2</span></code></p></td>
+<td><p>Smoothing kernel size (arcsec) used to reconstruct the cube.
+This sets the spatial resolution.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pix_s</span></code></p></td>
+<td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code></p></td>
+<td><p>Output spaxel size (arcsec). When set to <code class="docutils literal notranslate"><span class="pre">0</span></code>, it is auto-calculated
+as <code class="docutils literal notranslate"><span class="pre">0.75</span> <span class="pre">*</span> <span class="pre">sigm_s</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">alph_s</span></code></p></td>
+<td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.0</span></code></p></td>
+<td><p>Kernel shape factor. A value of <code class="docutils literal notranslate"><span class="pre">2.0</span></code> produces a Gaussian kernel.
+Values larger than 2 produce a sharper (more top-hat-like) kernel.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">flu16</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, output cube flux units are 10<sup>-16</sup> erg/s/cm<sup>2</sup>/A.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, units are erg/s/cm<sup>2</sup>/A.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nameF</span></code></p></td>
+<td><p>string</p></td>
+<td><p>–</p></td>
+<td><p>Root name for the target. Used as both the output cube filename stem
+and the exposure list filename (read from <code class="docutils literal notranslate"><span class="pre">pathF</span> <span class="pre">+</span> <span class="pre">nameF</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_slitmap</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Use the astrometry stored in the slitmap header of the RSS files.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pbars</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Enable or disable progress bars during processing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">spec_range</span></code></p></td>
+<td><p>list</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0]</span></code></p></td>
+<td><p>Spectral range <code class="docutils literal notranslate"><span class="pre">[lambda_min,</span> <span class="pre">lambda_max]</span></code> in Angstroms for the
+output cube. Set to <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0]</span></code> to use the full spectral range from the
+input RSS files.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">path_sas</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
+<td><p>Path to the local SDSS SAS directory. Used only if the
+<code class="docutils literal notranslate"><span class="pre">SAS_BASE_DIR</span></code> environment variable is not defined (see
+<a class="reference internal" href="#sas-env-var"><span class="std std-ref">SAS Directory Resolution</span></a>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">basename</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lvmSFrame-NAME.fits</span></code></p></td>
+<td><p>Template filename of the input RSS files. <code class="docutils literal notranslate"><span class="pre">NAME</span></code> is replaced at
+runtime with the exposure number.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">errors</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Enable error propagation. When <code class="docutils literal notranslate"><span class="pre">True</span></code>, the output cube includes an
+error extension computed via inverse-variance weighting.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fac_sizeY</span></code></p></td>
+<td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1</span></code></p></td>
+<td><p>Multiplicative factor applied to the field-of-view extent in the Y
+(declination) direction.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fac_sizeX</span></code></p></td>
+<td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1</span></code></p></td>
+<td><p>Multiplicative factor applied to the field-of-view extent in the X
+(right ascension) direction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cent</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Enable centering of the output field-of-view on the coordinates given
+by <code class="docutils literal notranslate"><span class="pre">coord_cen</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">coord_cen</span></code></p></td>
+<td><p>list</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0]</span></code></p></td>
+<td><p>Central coordinates <code class="docutils literal notranslate"><span class="pre">[RA,</span> <span class="pre">Dec]</span></code> in degrees for the output cube.
+Used when <code class="docutils literal notranslate"><span class="pre">cent</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pathF</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
+<td><p>Directory path where the exposure list file is located. The code opens
+<code class="docutils literal notranslate"><span class="pre">pathF</span> <span class="pre">+</span> <span class="pre">nameF</span></code>, so this must end with <code class="docutils literal notranslate"><span class="pre">/</span></code> if non-empty.</p></td>
+</tr>
+</tbody>
+</table>
+<section id="sincube-example">
+<h3>sincube Example<a class="headerlink" href="#sincube-example" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="nt">sincube</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">survey_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LVM</span>
+<span class="w">    </span><span class="nt">out_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_cubes/</span>
+<span class="w">    </span><span class="nt">redux_ver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1.1.dev0</span>
+<span class="w">    </span><span class="nt">redux_dir</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
+<span class="w">    </span><span class="nt">sigm_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32.2</span>
+<span class="w">    </span><span class="nt">pix_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="w">    </span><span class="nt">alph_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">    </span><span class="nt">flu16</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">nameF</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NGC_1234</span>
+<span class="w">    </span><span class="nt">use_slitmap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">pbars</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">spec_range</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">path_sas</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
+<span class="w">    </span><span class="nt">basename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lvmSFrame-NAME.fits</span>
+<span class="w">    </span><span class="nt">errors</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">fac_sizeY</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1</span>
+<span class="w">    </span><span class="nt">fac_sizeX</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1</span>
+<span class="w">    </span><span class="nt">cent</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">coord_cen</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">180.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-30.0</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">pathF</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">exposure_lists/</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="pipecube-configuration">
+<h2>pipecube Configuration<a class="headerlink" href="#pipecube-configuration" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">pipecube</span></code> section defines parameters for batch-processing multiple
+targets. It shares most parameters with <code class="docutils literal notranslate"><span class="pre">sincube</span></code> but adds pipeline-specific
+options and uses a predefined kernel type instead of explicit <code class="docutils literal notranslate"><span class="pre">sigm_s</span></code>/<code class="docutils literal notranslate"><span class="pre">pix_s</span></code>
+values.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 18.0%" />
+<col style="width: 10.0%" />
+<col style="width: 12.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">survey_type</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LVM</span></code></p></td>
+<td><p>Survey identifier. Must contain <code class="docutils literal notranslate"><span class="pre">LVM</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">out_path</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">out_cubes/</span></code></p></td>
+<td><p>Base output directory. The pipeline automatically appends
+<code class="docutils literal notranslate"><span class="pre">&lt;redux_ver&gt;/&lt;type&gt;/</span></code> to this path and creates the directory if it
+does not exist.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">redux_ver</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1.1.dev0</span></code></p></td>
+<td><p>DRP reduction version.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">redux_dir</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
+<td><p>Path to the redux directory. When empty, defaults to
+<code class="docutils literal notranslate"><span class="pre">&lt;path_sas&gt;/sdsswork/lvm/spectro/redux</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">type</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">c</span></code></p></td>
+<td><p>Kernel type code that sets the spatial resolution. See
+<a class="reference internal" href="kernel_smoothing.html#kernel-types"><span class="std std-ref">Type-to-parameter mapping</span></a> below.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">flu16</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Flux unit scaling (same as sincube).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nameL</span></code></p></td>
+<td><p>list</p></td>
+<td><p>–</p></td>
+<td><p>List of target names, e.g. <code class="docutils literal notranslate"><span class="pre">[NGC_1234,</span> <span class="pre">NGC_5678]</span></code>. Each name is used
+to find the corresponding exposure list file at <code class="docutils literal notranslate"><span class="pre">pathF</span> <span class="pre">+</span> <span class="pre">name</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_slitmap</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Use slitmap astrometry.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pbars</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Enable progress bars.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">path_sas</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
+<td><p>Local SAS directory path (see <a class="reference internal" href="#sas-env-var"><span class="std std-ref">SAS Directory Resolution</span></a>).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">basename</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lvmSFrame-NAME.fits</span></code></p></td>
+<td><p>RSS file template name.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">errors</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Enable error propagation.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fac_sizeY</span></code></p></td>
+<td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1</span></code></p></td>
+<td><p>FoV Y extent factor.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fac_sizeX</span></code></p></td>
+<td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1</span></code></p></td>
+<td><p>FoV X extent factor.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cent</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Enable FoV centering.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">coord_cenL</span></code></p></td>
+<td><p>list</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[[0,0]]</span></code></p></td>
+<td><p>List of <code class="docutils literal notranslate"><span class="pre">[RA,</span> <span class="pre">Dec]</span></code> coordinate pairs (degrees), one per target in
+<code class="docutils literal notranslate"><span class="pre">nameL</span></code>. Used when <code class="docutils literal notranslate"><span class="pre">cent</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pathF</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
+<td><p>Directory containing the exposure list files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mergecube</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
+<td><p>Enable cube merging. When a target has more than 100 exposures, the
+cube is built in spectral chunks and then co-added.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nsp</span></code></p></td>
+<td><p>int</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p>Number of spatial tiles per axis for the merged cube (<code class="docutils literal notranslate"><span class="pre">nsp</span> <span class="pre">x</span> <span class="pre">nsp</span></code>
+grid). Set to <code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">1</span></code> to disable spatial tiling.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cube2rss</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>After cube generation, extract an RSS from the cube.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">out_pathrss</span></code></p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">out_rss/</span></code></p></td>
+<td><p>Base output directory for extracted RSS files. The pipeline appends
+<code class="docutils literal notranslate"><span class="pre">&lt;redux_ver&gt;/&lt;type&gt;/</span></code> automatically.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nproc</span></code></p></td>
+<td><p>int</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
+<td><p>Number of parallel threads for the kernel interpolation.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">force_merge</span></code></p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
+<td><p>When <code class="docutils literal notranslate"><span class="pre">True</span></code>, skip cube generation and only run the co-addition step.
+Useful for restarting after a partial run.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">index_reset</span></code></p></td>
+<td><p>int</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p>Starting index for spectral chunk processing. Set to a non-zero value
+to resume from a specific chunk after interruption.</p></td>
+</tr>
+</tbody>
+</table>
+<section id="pipecube-example">
+<h3>pipecube Example<a class="headerlink" href="#pipecube-example" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="nt">pipecube</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">survey_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LVM</span>
+<span class="w">    </span><span class="nt">out_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_cubes/</span>
+<span class="w">    </span><span class="nt">redux_ver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1.1.dev0</span>
+<span class="w">    </span><span class="nt">redux_dir</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="w">    </span><span class="nt">flu16</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">nameL</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">NGC_1234</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">NGC_5678</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">use_slitmap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">pbars</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">path_sas</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
+<span class="w">    </span><span class="nt">basename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lvmSFrame-NAME.fits</span>
+<span class="w">    </span><span class="nt">errors</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">fac_sizeY</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1</span>
+<span class="w">    </span><span class="nt">fac_sizeX</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1</span>
+<span class="w">    </span><span class="nt">cent</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">coord_cenL</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">180.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-30.0</span><span class="p p-Indicator">],</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">200.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-25.0</span><span class="p p-Indicator">]]</span>
+<span class="w">    </span><span class="nt">pathF</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">exposure_lists/</span>
+<span class="w">    </span><span class="nt">mergecube</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="w">    </span><span class="nt">nsp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">    </span><span class="nt">cube2rss</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">out_pathrss</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_rss/</span>
+<span class="w">    </span><span class="nt">nproc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">    </span><span class="nt">force_merge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="w">    </span><span class="nt">index_reset</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="kernel-type-codes">
+<span id="kernel-types"></span><h2>Kernel Type Codes<a class="headerlink" href="#kernel-type-codes" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">pipecube</span></code> command uses a single-letter <code class="docutils literal notranslate"><span class="pre">type</span></code> code to select a
+predefined kernel size. The kernel size (<code class="docutils literal notranslate"><span class="pre">sigm_s</span></code>) and spaxel size
+(<code class="docutils literal notranslate"><span class="pre">pix_s</span></code>) are computed as:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>sigm_s = 8.8 * 32 * multiplier    (arcsec)
+pix_s  = 8.8 * 0.75 * 32 * multiplier  (arcsec)
+</pre></div>
+</div>
+<p>where the multiplier depends on the type code:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 13.3%" />
+<col style="width: 20.0%" />
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Code</p></th>
+<th class="head"><p>Multiplier</p></th>
+<th class="head"><p>sigm_s (arcsec)</p></th>
+<th class="head"><p>pix_s (arcsec)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">a</span></code></p></td>
+<td><p>16</p></td>
+<td><p>4505.6</p></td>
+<td><p>3379.2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">b</span></code></p></td>
+<td><p>8</p></td>
+<td><p>2252.8</p></td>
+<td><p>1689.6</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">c</span></code></p></td>
+<td><p>4</p></td>
+<td><p>1126.4</p></td>
+<td><p>844.8</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">d</span></code></p></td>
+<td><p>2</p></td>
+<td><p>563.2</p></td>
+<td><p>422.4</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">e</span></code></p></td>
+<td><p>1</p></td>
+<td><p>281.6</p></td>
+<td><p>211.2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">f</span></code></p></td>
+<td><p>1/2</p></td>
+<td><p>140.8</p></td>
+<td><p>105.6</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">g</span></code></p></td>
+<td><p>1/4</p></td>
+<td><p>70.4</p></td>
+<td><p>52.8</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">h</span></code></p></td>
+<td><p>1/8</p></td>
+<td><p>35.2</p></td>
+<td><p>26.4</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">i</span></code></p></td>
+<td><p>1/16</p></td>
+<td><p>17.6</p></td>
+<td><p>13.2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">j</span></code></p></td>
+<td><p>1/32</p></td>
+<td><p>8.8</p></td>
+<td><p>6.6</p></td>
+</tr>
+</tbody>
+</table>
+<p>Larger multipliers produce coarser spatial resolution (bigger kernels and
+spaxels), suitable for large mosaics. Smaller multipliers give finer resolution
+for individual pointings.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For targets with fewer than 3 exposures, types <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">j</span></code> are
+automatically upgraded to type <code class="docutils literal notranslate"><span class="pre">h</span></code> to avoid undersampling.</p>
+</div>
+</section>
+<section id="sas-directory-resolution">
+<span id="sas-env-var"></span><h2>SAS Directory Resolution<a class="headerlink" href="#sas-directory-resolution" title="Link to this heading"></a></h2>
+<p>The code resolves the SAS base directory in this order:</p>
+<ol class="arabic simple">
+<li><p>If the <code class="docutils literal notranslate"><span class="pre">SAS_BASE_DIR</span></code> environment variable is set, its value is used
+(with a trailing <code class="docutils literal notranslate"><span class="pre">/</span></code> appended).</p></li>
+<li><p>Otherwise, the <code class="docutils literal notranslate"><span class="pre">path_sas</span></code> config parameter is used (with a trailing
+<code class="docutils literal notranslate"><span class="pre">/</span></code> appended).</p></li>
+</ol>
+<p>The redux directory is then constructed as:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;SAS_BASE_DIR&gt;/sdsswork/lvm/spectro/redux
+</pre></div>
+</div>
+<p>unless <code class="docutils literal notranslate"><span class="pre">redux_dir</span></code> is explicitly set to a non-empty value.</p>
+</section>
+<section id="output-path-construction">
+<h2>Output Path Construction<a class="headerlink" href="#output-path-construction" title="Link to this heading"></a></h2>
+<p><strong>sincube</strong>: Output files are written directly to <code class="docutils literal notranslate"><span class="pre">out_path</span></code>.</p>
+<p><strong>pipecube</strong>: The pipeline appends <code class="docutils literal notranslate"><span class="pre">&lt;redux_ver&gt;/&lt;type&gt;/</span></code> to both
+<code class="docutils literal notranslate"><span class="pre">out_path</span></code> and <code class="docutils literal notranslate"><span class="pre">out_pathrss</span></code>. For example, with:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_cubes/</span>
+<span class="nt">out_pathrss</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_rss/</span>
+<span class="nt">redux_ver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1.1.dev0</span>
+<span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span>
+</pre></div>
+</div>
+<p>the effective output paths become:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>out_cubes/1.1.1.dev0/c/
+out_rss/1.1.1.dev0/c/
+</pre></div>
+</div>
+<p>These directories are created automatically if they do not exist.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="kernel_smoothing.html" class="btn btn-neutral float-left" title="Kernel Smoothing Parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="exposure_list.html" class="btn btn-neutral float-right" title="Exposure List File Format" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hector Ibarra-Medel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

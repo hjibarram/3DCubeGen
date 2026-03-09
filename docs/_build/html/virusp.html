@@ -1,0 +1,357 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VirusP Pipeline &mdash; 3DCubeGen 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Reconstruction Algorithm" href="algorithm.html" />
+    <link rel="prev" title="MEGARA Pipeline" href="megara.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            3DCubeGen
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation &amp; Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LVM Pipeline</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel_smoothing.html">Kernel Smoothing Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">YAML Configuration Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exposure_list.html">Exposure List File Format</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Spectrographs</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="megara.html">MEGARA Pipeline</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">VirusP Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cli-entry-point">CLI Entry Point</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cli-options">CLI Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-file">Configuration File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#virusp-specific-features">VirusP-Specific Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#differences-from-lvm">Differences from LVM</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="algorithm.html">Reconstruction Algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Output Data Products</a></li>
+<li class="toctree-l1"><a class="reference internal" href="daptools.html">DAP Integration Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">3DCubeGen</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">VirusP Pipeline</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/virusp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="virusp-pipeline">
+<h1>VirusP Pipeline<a class="headerlink" href="#virusp-pipeline" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>VirusP (VIRUS-P) is a fiber-fed IFU spectrograph on the 2.7 m Harlan J. Smith
+Telescope at McDonald Observatory (HET heritage instrument). It features 246
+fibers with 4.16” diameter, covering a 1.7’ x 1.7’ field of view, operating in
+the optical range (3400–6800 A typical).</p>
+</section>
+<section id="cli-entry-point">
+<h2>CLI Entry Point<a class="headerlink" href="#cli-entry-point" title="Link to this heading"></a></h2>
+<p>The VirusP pipeline is accessed via the <code class="docutils literal notranslate"><span class="pre">vpcubetools</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vpcubetools<span class="w"> </span>vpcube<span class="w"> </span><span class="o">[</span>options<span class="o">]</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">vpcube</span></code> command generates a reconstructed data cube from one or more
+VirusP observation pointings.</p>
+</section>
+<section id="basic-usage">
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># With a config file:</span>
+vpcubetools<span class="w"> </span>vpcube<span class="w"> </span>-c<span class="w"> </span>config_vpcube.yml
+
+<span class="c1"># With CLI options:</span>
+vpcubetools<span class="w"> </span>vpcube<span class="w"> </span>--name_list<span class="w"> </span>Name1<span class="w"> </span>Name2<span class="w"> </span>--redux_dir<span class="w"> </span>/path/to/rss<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--out_path<span class="w"> </span>out_cubes/<span class="w"> </span>--namef<span class="w"> </span>OutputName
+</pre></div>
+</div>
+</section>
+<section id="cli-options">
+<h2>CLI Options<a class="headerlink" href="#cli-options" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 22.0%" />
+<col style="width: 12.0%" />
+<col style="width: 66.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-c,</span> <span class="pre">--config_file</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
+<td><p>YAML configuration file (overrides CLI options)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-i,</span> <span class="pre">--name_list</span></code></p></td>
+<td><p>–</p></td>
+<td><p>List of input observation pointing names</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-o,</span> <span class="pre">--out_path</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">out_cubes/</span></code></p></td>
+<td><p>Output directory for the cube</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-r,</span> <span class="pre">--redux_dir</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
+<td><p>Path to the directory containing reduced RSS files</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-s,</span> <span class="pre">--sigm_s</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">32.2</span></code></p></td>
+<td><p>Smoothing kernel size (arcsec)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-p,</span> <span class="pre">--pix_s</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code></p></td>
+<td><p>Spaxel size (0 = <code class="docutils literal notranslate"><span class="pre">0.75</span> <span class="pre">*</span> <span class="pre">sigm_s</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-a,</span> <span class="pre">--alph_s</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.0</span></code></p></td>
+<td><p>Kernel shape factor</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-f,</span> <span class="pre">--flu16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Use 10<sup>-16</sup> erg/s/cm<sup>2</sup>/A units</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-n,</span> <span class="pre">--namef</span></code></p></td>
+<td><p>–</p></td>
+<td><p>Output root name for the data cube</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-m,</span> <span class="pre">--fib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4.16</span></code></p></td>
+<td><p>Fiber diameter (arcsec)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-t,</span> <span class="pre">--base_namewcs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">NAME_wcs.txt</span></code></p></td>
+<td><p>WCS text file basename template</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-y,</span> <span class="pre">--basename</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">NAME_abscal_HST.fits</span></code></p></td>
+<td><p>Input RSS file basename template</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-h,</span> <span class="pre">--basenamec</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">vpCube-NAME.fits</span></code></p></td>
+<td><p>Output cube basename template</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-e,</span> <span class="pre">--errors</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Enable error propagation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-u,</span> <span class="pre">--fac_sizey</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1</span></code></p></td>
+<td><p>FoV extent factor in Y</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-x,</span> <span class="pre">--fac_sizex</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1</span></code></p></td>
+<td><p>FoV extent factor in X</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-k,</span> <span class="pre">--radvel</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Apply heliocentric velocity correction</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-z,</span> <span class="pre">--adrcor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Apply Atmospheric Differential Refraction correction</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-g,</span> <span class="pre">--spec_range</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(None,</span> <span class="pre">None)</span></code></p></td>
+<td><p>Spectral range <code class="docutils literal notranslate"><span class="pre">(lambda_min,</span> <span class="pre">lambda_max)</span></code> in Angstroms</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-b,</span> <span class="pre">--pbars</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>Show progress bars</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="configuration-file">
+<h2>Configuration File<a class="headerlink" href="#configuration-file" title="Link to this heading"></a></h2>
+<p>The VirusP pipeline accepts a YAML configuration file. A template is provided
+at <code class="docutils literal notranslate"><span class="pre">CubeGen/virustools/configfiles/config_vpcube.yml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="nt">vpcube</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">survey_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">virusP</span>
+<span class="w">    </span><span class="nt">name_list</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Name1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Name2</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">out_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_cubes/</span>
+<span class="w">    </span><span class="nt">redux_dir</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
+<span class="w">    </span><span class="nt">fib</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4.16</span>
+<span class="w">    </span><span class="nt">sigm_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4.16</span>
+<span class="w">    </span><span class="nt">pix_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="w">    </span><span class="nt">alph_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="w">    </span><span class="nt">flu16</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">nameF</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NameF</span>
+<span class="w">    </span><span class="nt">spec_range</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">pbars</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">base_nameWCS</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NAME_wcs.txt</span>
+<span class="w">    </span><span class="nt">basename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NAME_abscal_HST.fits</span>
+<span class="w">    </span><span class="nt">basenameC</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vpCube-NAME.fits</span>
+<span class="w">    </span><span class="nt">errors</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">fac_sizeY</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1</span>
+<span class="w">    </span><span class="nt">fac_sizeX</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1</span>
+<span class="w">    </span><span class="nt">radvel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">adrcor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+</pre></div>
+</div>
+</section>
+<section id="virusp-specific-features">
+<h2>VirusP-Specific Features<a class="headerlink" href="#virusp-specific-features" title="Link to this heading"></a></h2>
+<p><strong>Separate WCS files</strong></p>
+<p>Unlike LVM (which reads astrometry from the SLITMAP extension of each RSS
+file), VirusP uses external WCS text files. The <code class="docutils literal notranslate"><span class="pre">base_nameWCS</span></code> parameter
+specifies the basename template; for each pointing in <code class="docutils literal notranslate"><span class="pre">name_list</span></code>, the code
+reads <code class="docutils literal notranslate"><span class="pre">&lt;redux_dir&gt;/&lt;name&gt;_wcs.txt</span></code> to obtain the fiber positions on sky.</p>
+<p><strong>Heliocentric velocity correction</strong></p>
+<p>When <code class="docutils literal notranslate"><span class="pre">radvel:</span> <span class="pre">True</span></code>, the pipeline applies a heliocentric velocity correction
+to shift the wavelength solution from the topocentric to the heliocentric
+frame.</p>
+<p><strong>ADR correction</strong></p>
+<p>When <code class="docutils literal notranslate"><span class="pre">adrcor:</span> <span class="pre">True</span></code>, fiber positions are adjusted per wavelength channel to
+correct for Atmospheric Differential Refraction. This activates the ADR-aware
+interpolation mode described in <a class="reference internal" href="algorithm.html"><span class="doc">Reconstruction Algorithm</span></a>, where the kernel weights
+become wavelength-dependent.</p>
+<p><strong>Configurable fiber diameter</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">fib</span></code> parameter sets the fiber diameter (default 4.16”), which affects
+both the radius cutoff and the flux area scaling factor. This differs from LVM
+(fixed at 35.3”) and MEGARA (derived from the bundle geometry).</p>
+</section>
+<section id="differences-from-lvm">
+<h2>Differences from LVM<a class="headerlink" href="#differences-from-lvm" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 35.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Aspect</p></th>
+<th class="head"><p>VirusP</p></th>
+<th class="head"><p>LVM</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Fiber count</p></td>
+<td><p>246</p></td>
+<td><p>~1800 science fibers</p></td>
+</tr>
+<tr class="row-odd"><td><p>Fiber diameter</p></td>
+<td><p>4.16” (configurable)</p></td>
+<td><p>35.3” (fixed)</p></td>
+</tr>
+<tr class="row-even"><td><p>Default <code class="docutils literal notranslate"><span class="pre">sigm_s</span></code></p></td>
+<td><p>4.16” (fiber-matched)</p></td>
+<td><p>32.2”</p></td>
+</tr>
+<tr class="row-odd"><td><p>Astrometry source</p></td>
+<td><p>External WCS text files</p></td>
+<td><p>SLITMAP extension in RSS FITS</p></td>
+</tr>
+<tr class="row-even"><td><p>Directory structure</p></td>
+<td><p>Flat (<code class="docutils literal notranslate"><span class="pre">redux_dir/</span></code>)</p></td>
+<td><p>SAS tree (version/tilegroup/tile/mjd)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Heliocentric correction</p></td>
+<td><p>Built-in (<code class="docutils literal notranslate"><span class="pre">radvel</span></code>)</p></td>
+<td><p>Applied during RSS reduction</p></td>
+</tr>
+<tr class="row-even"><td><p>ADR correction</p></td>
+<td><p>Built-in (<code class="docutils literal notranslate"><span class="pre">adrcor</span></code>)</p></td>
+<td><p>Not available</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="megara.html" class="btn btn-neutral float-left" title="MEGARA Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="algorithm.html" class="btn btn-neutral float-right" title="Reconstruction Algorithm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hector Ibarra-Medel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Output Data Products &mdash; 3DCubeGen 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="DAP Integration Tools" href="daptools.html" />
+    <link rel="prev" title="Reconstruction Algorithm" href="algorithm.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            3DCubeGen
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation &amp; Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LVM Pipeline</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel_smoothing.html">Kernel Smoothing Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">YAML Configuration Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exposure_list.html">Exposure List File Format</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Spectrographs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="megara.html">MEGARA Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virusp.html">VirusP Pipeline</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="algorithm.html">Reconstruction Algorithm</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Output Data Products</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#lvm-cubes">LVM Cubes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lvm-maps">LVM Maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jpeg-composite-images">JPEG Composite Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lvm-rss-from-cube">LVM RSS (from cube)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#megara-outputs">MEGARA Outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#virusp-outputs">VirusP Outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#flux-units">Flux Units</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="daptools.html">DAP Integration Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">3DCubeGen</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Output Data Products</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/outputs.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="output-data-products">
+<h1>Output Data Products<a class="headerlink" href="#output-data-products" title="Link to this heading"></a></h1>
+<p>3DCubeGen produces several types of output files depending on the command and
+spectrograph used. All output files are FITS format and are gzip-compressed by
+default.</p>
+<section id="lvm-cubes">
+<h2>LVM Cubes<a class="headerlink" href="#lvm-cubes" title="Link to this heading"></a></h2>
+<p><strong>Filename:</strong> <code class="docutils literal notranslate"><span class="pre">lvmCube-&lt;name&gt;.fits.gz</span></code></p>
+<p>Generated by <code class="docutils literal notranslate"><span class="pre">sincube</span></code> and <code class="docutils literal notranslate"><span class="pre">pipecube</span></code>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 20.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>HDU</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Content</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>PrimaryHDU</p></td>
+<td><p>Flux cube [n_wave, n_y, n_x]. Contains WCS header with RA/Dec
+(TAN projection) and wavelength (linear, Angstroms) axes.</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>ImageHDU</p></td>
+<td><p>Error cube [n_wave, n_y, n_x] (if <code class="docutils literal notranslate"><span class="pre">errors:</span> <span class="pre">True</span></code>). Propagated
+errors from inverse-variance weighting.</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>ImageHDU</p></td>
+<td><p>Unity array (reserved)</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>ImageHDU</p></td>
+<td><p>Mask array (reserved)</p></td>
+</tr>
+</tbody>
+</table>
+<p>Key header keywords:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CRVAL1</span></code>, <code class="docutils literal notranslate"><span class="pre">CRVAL2</span></code> – RA, Dec reference coordinates (deg)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CD1_1</span></code>, <code class="docutils literal notranslate"><span class="pre">CD2_2</span></code> – pixel scale in RA, Dec (deg/pix)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CRVAL3</span></code>, <code class="docutils literal notranslate"><span class="pre">CD3_3</span></code>, <code class="docutils literal notranslate"><span class="pre">CRPIX3</span></code> – wavelength solution (Angstroms)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CTYPE3:</span> <span class="pre">WAVE</span></code> – air wavelength (linear)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IFUCON</span></code> – number of fibers used in reconstruction</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BUNIT</span></code> – flux units (<code class="docutils literal notranslate"><span class="pre">10^-16</span> <span class="pre">erg/s/cm^2</span></code> when <code class="docutils literal notranslate"><span class="pre">flu16:</span> <span class="pre">True</span></code>,
+otherwise <code class="docutils literal notranslate"><span class="pre">erg/s/cm^2</span></code>)</p></li>
+</ul>
+</section>
+<section id="lvm-maps">
+<h2>LVM Maps<a class="headerlink" href="#lvm-maps" title="Link to this heading"></a></h2>
+<p><strong>Filename:</strong> <code class="docutils literal notranslate"><span class="pre">lvmMap-&lt;name&gt;_&lt;band&gt;.fits.gz</span></code></p>
+<p>Generated by <code class="docutils literal notranslate"><span class="pre">sinmap</span></code> and <code class="docutils literal notranslate"><span class="pre">pipemap</span></code>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 20.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>HDU</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Content</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0 (FLUX)</p></td>
+<td><p>PrimaryHDU</p></td>
+<td><p>Flux map [n_y, n_x] in erg/s/cm<sup>2</sup>. Contains 2D WCS
+header with RA/Dec (TAN projection).</p></td>
+</tr>
+<tr class="row-odd"><td><p>1 (MAG)</p></td>
+<td><p>ImageHDU</p></td>
+<td><p>Magnitude map [n_y, n_x] in AB mag/arcsec<sup>2</sup>.</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>ImageHDU</p></td>
+<td><p>Flux error map</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>ImageHDU</p></td>
+<td><p>Magnitude error map</p></td>
+</tr>
+</tbody>
+</table>
+<p>The <code class="docutils literal notranslate"><span class="pre">&lt;band&gt;</span></code> suffix corresponds to the photometric filter used:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 85.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Band</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>OII</p></td>
+<td><p>[OII] 3728 A narrow-band</p></td>
+</tr>
+<tr class="row-odd"><td><p>OIII</p></td>
+<td><p>[OIII] 5008 A narrow-band</p></td>
+</tr>
+<tr class="row-even"><td><p>HI</p></td>
+<td><p>H-alpha 6565 A narrow-band</p></td>
+</tr>
+<tr class="row-odd"><td><p>SII</p></td>
+<td><p>[SII] 6733 A narrow-band</p></td>
+</tr>
+<tr class="row-even"><td><p>g</p></td>
+<td><p>SDSS g broad-band</p></td>
+</tr>
+<tr class="row-odd"><td><p>r</p></td>
+<td><p>SDSS r broad-band</p></td>
+</tr>
+<tr class="row-even"><td><p>i</p></td>
+<td><p>SDSS i broad-band</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="jpeg-composite-images">
+<h2>JPEG Composite Images<a class="headerlink" href="#jpeg-composite-images" title="Link to this heading"></a></h2>
+<p><strong>Filename:</strong> <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;_&lt;type&gt;.jpeg</span></code></p>
+<p>Generated by <code class="docutils literal notranslate"><span class="pre">pipemap</span></code> after all seven photometric bands are produced.
+These are three-color composite images constructed from the magnitude maps.</p>
+<p>Available composites:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 30.0%" />
+<col style="width: 55.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head"><p>Channels (R, G, B)</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>OHS</p></td>
+<td><p>[SII], H-alpha, [OIII]</p></td>
+<td><p>Narrow-band emission line composite</p></td>
+</tr>
+<tr class="row-odd"><td><p>OOH</p></td>
+<td><p>H-alpha, [OIII], [OII]</p></td>
+<td><p>Narrow-band emission line composite</p></td>
+</tr>
+<tr class="row-even"><td><p>gri</p></td>
+<td><p>i, r, g</p></td>
+<td><p>Broad-band continuum composite</p></td>
+</tr>
+<tr class="row-odd"><td><p>griOOH</p></td>
+<td><p>Weighted blend</p></td>
+<td><p>Combined broad-band + narrow-band with configurable weights</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="lvm-rss-from-cube">
+<h2>LVM RSS (from cube)<a class="headerlink" href="#lvm-rss-from-cube" title="Link to this heading"></a></h2>
+<p><strong>Filename:</strong> <code class="docutils literal notranslate"><span class="pre">lvmRSS-&lt;name&gt;.fits.gz</span></code></p>
+<p>Generated by <code class="docutils literal notranslate"><span class="pre">pipecube</span></code> when <code class="docutils literal notranslate"><span class="pre">cube2rss:</span> <span class="pre">True</span></code>, or manually via
+<code class="docutils literal notranslate"><span class="pre">rssp_extract()</span></code> after a <code class="docutils literal notranslate"><span class="pre">sincube</span></code> run (see <a class="reference internal" href="daptools.html"><span class="doc">DAP Integration Tools</span></a>). Each
+non-zero spaxel in the input cube becomes one “fiber” row in the RSS.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 8.0%" />
+<col style="width: 18.0%" />
+<col style="width: 16.0%" />
+<col style="width: 58.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>HDU</p></th>
+<th class="head"><p>EXTNAME</p></th>
+<th class="head"><p>Status</p></th>
+<th class="head"><p>Content</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>ORIGINAL</p></td>
+<td><p>Real</p></td>
+<td><p>Primary header copied from the cube. <code class="docutils literal notranslate"><span class="pre">POSCIRA</span></code>/<code class="docutils literal notranslate"><span class="pre">POSCIDE</span></code> are
+set from the cube’s <code class="docutils literal notranslate"><span class="pre">CRVAL1</span></code>/<code class="docutils literal notranslate"><span class="pre">CRVAL2</span></code>. <code class="docutils literal notranslate"><span class="pre">EXPOSURE</span></code> is
+hardcoded to <code class="docutils literal notranslate"><span class="pre">000000</span></code> (not recoverable from the cube).</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>FLUX</p></td>
+<td><p>Real</p></td>
+<td><p>Flux array [n_spaxels, n_wave] extracted spaxel-by-spaxel from
+cube HDU 0. Units match the cube (see <a class="reference internal" href="#flux-units">Flux Units</a> below).</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>IVAR</p></td>
+<td><p>Real<a class="footnote-reference brackets" href="#err" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></td>
+<td><p>Inverse variance [n_spaxels, n_wave] computed as <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">error²</span></code>
+from cube HDU 1.</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>MASK</p></td>
+<td><p>Placeholder</p></td>
+<td><p>Zero array. No mask information is stored in the cube.</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>WAVE</p></td>
+<td><p>Real</p></td>
+<td><p>Wavelength array [1, n_wave] in Angstroms, reconstructed from the
+cube header keywords <code class="docutils literal notranslate"><span class="pre">CRVAL3</span></code>, <code class="docutils literal notranslate"><span class="pre">CDELT3</span></code>/<code class="docutils literal notranslate"><span class="pre">CD3_3</span></code>, <code class="docutils literal notranslate"><span class="pre">CRPIX3</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>LSF</p></td>
+<td><p>Placeholder</p></td>
+<td><p>Ones array. The line spread function is not preserved in the cube.</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>SKY_EAST</p></td>
+<td><p>Placeholder</p></td>
+<td><p>Ones array. Sky spectra are not stored in the cube.</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>SKY_EAST_IVAR</p></td>
+<td><p>Placeholder</p></td>
+<td><p>Ones array.</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>SKY_WEST</p></td>
+<td><p>Placeholder</p></td>
+<td><p>Ones array.</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>SKY_WEST_IVAR</p></td>
+<td><p>Placeholder</p></td>
+<td><p>Ones array.</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>SLITMAP</p></td>
+<td><p>Real</p></td>
+<td><p>Binary table. <code class="docutils literal notranslate"><span class="pre">ra</span></code>/<code class="docutils literal notranslate"><span class="pre">dec</span></code> are computed from the cube WCS.
+<code class="docutils literal notranslate"><span class="pre">xpmm</span></code>/<code class="docutils literal notranslate"><span class="pre">ypmm</span></code> store the pixel column/row in the cube for
+back-referencing. Bookkeeping columns (<code class="docutils literal notranslate"><span class="pre">targettype</span></code>,
+<code class="docutils literal notranslate"><span class="pre">telescope</span></code>, <code class="docutils literal notranslate"><span class="pre">ifulabel</span></code>, etc.) contain generic placeholder
+strings.</p></td>
+</tr>
+</tbody>
+</table>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="err" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Requires the cube to have been generated with <code class="docutils literal notranslate"><span class="pre">errors:</span> <span class="pre">True</span></code>.
+If error propagation was disabled, HDU 1 of the cube is an array of
+ones and the IVAR extension will contain ones throughout.</p>
+</aside>
+</aside>
+</section>
+<section id="megara-outputs">
+<h2>MEGARA Outputs<a class="headerlink" href="#megara-outputs" title="Link to this heading"></a></h2>
+<p><strong>Cube:</strong> <code class="docutils literal notranslate"><span class="pre">megCube-&lt;name&gt;.fits</span></code> / <code class="docutils literal notranslate"><span class="pre">megCube-&lt;name&gt;_&lt;VPH&gt;.fits.gz</span></code></p>
+<p>The MEGARA cube follows a similar structure to the LVM cube (flux in HDU 0,
+WCS header) but includes VPH grating information and spectrophotometric
+calibration metadata in the header.</p>
+<p><strong>Spectrum:</strong> <code class="docutils literal notranslate"><span class="pre">megSpec-&lt;name&gt;_&lt;VPH&gt;.fits.gz</span></code></p>
+<p>A 1D extracted spectrum generated by <code class="docutils literal notranslate"><span class="pre">runfulldrp</span></code> from the reconstructed
+cube.</p>
+</section>
+<section id="virusp-outputs">
+<h2>VirusP Outputs<a class="headerlink" href="#virusp-outputs" title="Link to this heading"></a></h2>
+<p><strong>Cube:</strong> <code class="docutils literal notranslate"><span class="pre">vpCube-&lt;name&gt;.fits</span></code></p>
+<p>The VirusP cube follows the same structure as the LVM cube (flux in HDU 0
+with 3D WCS, error in HDU 1 if enabled). The output is not gzip-compressed
+by default unless configured otherwise.</p>
+</section>
+<section id="flux-units">
+<h2>Flux Units<a class="headerlink" href="#flux-units" title="Link to this heading"></a></h2>
+<p>The flux unit convention depends on the <code class="docutils literal notranslate"><span class="pre">flu16</span></code> parameter:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">flu16:</span> <span class="pre">True</span></code> (default) – flux values are in units of
+<strong>10</strong><sup>-16</sup> <strong>erg/s/cm</strong><sup>2</sup><strong>/A</strong>. The header keyword
+<code class="docutils literal notranslate"><span class="pre">BUNIT</span></code> is set to <code class="docutils literal notranslate"><span class="pre">10^-16</span> <span class="pre">erg/s/cm^2</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flu16:</span> <span class="pre">False</span></code> – flux values are in native units of
+<strong>erg/s/cm</strong><sup>2</sup><strong>/A</strong>.</p></li>
+</ul>
+<p>The 10<sup>-16</sup> scaling is applied by dividing the flux array by
+10<sup>-16</sup>, so numerical values in the FITS file are larger and more
+convenient to work with.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="algorithm.html" class="btn btn-neutral float-left" title="Reconstruction Algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="daptools.html" class="btn btn-neutral float-right" title="DAP Integration Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hector Ibarra-Medel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
