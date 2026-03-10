@@ -1,0 +1,364 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kernel Smoothing Parameters &mdash; 3DCubeGen 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="YAML Configuration Reference" href="configuration.html" />
+    <link rel="prev" title="Commands Overview" href="commands.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            3DCubeGen
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation &amp; Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LVM Pipeline</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Kernel Smoothing Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sincube-sinmap-explicit-parameters">sincube / sinmap: explicit parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pipecube-pipemap-type-letter">pipecube / pipemap: type letter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#type-to-parameter-mapping">Type-to-parameter mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#differences-beyond-the-kernel">Differences beyond the kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#small-exposure-guard-in-pipecube">Small-exposure guard in pipecube</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">YAML Configuration Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exposure_list.html">Exposure List File Format</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Spectrographs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="megara.html">MEGARA Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virusp.html">VirusP Pipeline</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="algorithm.html">Reconstruction Algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Output Data Products</a></li>
+<li class="toctree-l1"><a class="reference internal" href="daptools.html">DAP Integration Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">3DCubeGen</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Kernel Smoothing Parameters</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/kernel_smoothing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="kernel-smoothing-parameters">
+<h1>Kernel Smoothing Parameters<a class="headerlink" href="#kernel-smoothing-parameters" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">sincube</span></code>/<code class="docutils literal notranslate"><span class="pre">sinmap</span></code> and <code class="docutils literal notranslate"><span class="pre">pipecube</span></code>/<code class="docutils literal notranslate"><span class="pre">pipemap</span></code> commands use the same
+underlying kernel interpolation algorithm but specify its smoothing parameters
+in different ways.  This page explains both conventions and shows how to
+translate between them.</p>
+<section id="sincube-sinmap-explicit-parameters">
+<h2>sincube / sinmap: explicit parameters<a class="headerlink" href="#sincube-sinmap-explicit-parameters" title="Link to this heading"></a></h2>
+<p>The single-target commands accept three kernel parameters directly in the
+config file:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12.0%" />
+<col style="width: 55.0%" />
+<col style="width: 33.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Default</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sigm_s</span></code></p></td>
+<td><p>Smoothing kernel size <span class="math notranslate nohighlight">\(\sigma\)</span> in arcsec.  Controls the spatial
+resolution of the output cube: a larger value smooths over more fibers
+and produces coarser effective resolution.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">32.2</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pix_s</span></code></p></td>
+<td><p>Output spaxel size in arcsec.  Set to <code class="docutils literal notranslate"><span class="pre">0</span></code> to auto-compute as
+<code class="docutils literal notranslate"><span class="pre">0.75</span> <span class="pre">*</span> <span class="pre">sigm_s</span></code>.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">alph_s</span></code></p></td>
+<td><p>Kernel shape factor <span class="math notranslate nohighlight">\(\alpha\)</span>.  <code class="docutils literal notranslate"><span class="pre">2.0</span></code> gives a Gaussian profile;
+values above 2.0 produce a sharper, more top-hat-like kernel.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.0</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Example <code class="docutils literal notranslate"><span class="pre">sincube</span></code> config section:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sincube</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">sigm_s</span><span class="p">:</span> <span class="mf">35.2</span>
+    <span class="n">pix_s</span><span class="p">:</span> <span class="mf">0.0</span>      <span class="c1"># auto → 0.75 × 35.2 = 26.4 arcsec</span>
+    <span class="n">alph_s</span><span class="p">:</span> <span class="mf">2.0</span>
+</pre></div>
+</div>
+</section>
+<section id="pipecube-pipemap-type-letter">
+<h2>pipecube / pipemap: type letter<a class="headerlink" href="#pipecube-pipemap-type-letter" title="Link to this heading"></a></h2>
+<p>The pipeline commands replace the three parameters above with a single
+<code class="docutils literal notranslate"><span class="pre">type</span></code> letter (<code class="docutils literal notranslate"><span class="pre">a</span></code> through <code class="docutils literal notranslate"><span class="pre">j</span></code>).  The letter is passed to
+<code class="docutils literal notranslate"><span class="pre">tools.kernel_pipe()</span></code> which computes <code class="docutils literal notranslate"><span class="pre">sigm_s</span></code> and <code class="docutils literal notranslate"><span class="pre">pix_s</span></code> from a fixed
+formula based on the LVM fiber size:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\sigma   &amp;= \frac{17.6}{2} \times 32 \times v = 8.8 \times 32 \times v \\[4pt]
+p        &amp;= 0.75\,\sigma\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(v\)</span> is a scale factor that doubles with each step from <code class="docutils literal notranslate"><span class="pre">j</span></code> to
+<code class="docutils literal notranslate"><span class="pre">a</span></code>.  The shape factor <span class="math notranslate nohighlight">\(\alpha\)</span> is <strong>always 2.0</strong> (Gaussian) in
+pipeline mode and cannot be changed through the config.</p>
+<p>Example <code class="docutils literal notranslate"><span class="pre">pipecube</span></code> config section:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipecube</span><span class="p">:</span>
+  <span class="o">-</span> <span class="nb">type</span><span class="p">:</span> <span class="n">h</span>
+</pre></div>
+</div>
+</section>
+<section id="type-to-parameter-mapping">
+<span id="kernel-types"></span><h2>Type-to-parameter mapping<a class="headerlink" href="#type-to-parameter-mapping" title="Link to this heading"></a></h2>
+<p>The table below gives the <code class="docutils literal notranslate"><span class="pre">sigm_s</span></code> and <code class="docutils literal notranslate"><span class="pre">pix_s</span></code> values produced by each
+<code class="docutils literal notranslate"><span class="pre">type</span></code> letter, together with the equivalent <code class="docutils literal notranslate"><span class="pre">sincube</span></code> config block.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 7.0%" />
+<col style="width: 8.0%" />
+<col style="width: 18.0%" />
+<col style="width: 18.0%" />
+<col style="width: 10.0%" />
+<col style="width: 39.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><code class="docutils literal notranslate"><span class="pre">type</span></code></p></th>
+<th class="head"><p>scale <span class="math notranslate nohighlight">\(v\)</span></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">sigm_s</span></code> (arcsec)</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">pix_s</span></code> (arcsec)</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">alph_s</span></code></p></th>
+<th class="head"><p>Equivalent <code class="docutils literal notranslate"><span class="pre">sincube</span></code> / <code class="docutils literal notranslate"><span class="pre">sinmap</span></code> values</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">a</span></code></p></td>
+<td><p>16</p></td>
+<td><p>4505.6</p></td>
+<td><p>3379.2</p></td>
+<td><p>2.0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigm_s:</span> <span class="pre">4505.6</span></code>, <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">3379.2</span></code>, <code class="docutils literal notranslate"><span class="pre">alph_s:</span> <span class="pre">2.0</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">b</span></code></p></td>
+<td><p>8</p></td>
+<td><p>2252.8</p></td>
+<td><p>1689.6</p></td>
+<td><p>2.0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigm_s:</span> <span class="pre">2252.8</span></code>, <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">1689.6</span></code>, <code class="docutils literal notranslate"><span class="pre">alph_s:</span> <span class="pre">2.0</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">c</span></code></p></td>
+<td><p>4</p></td>
+<td><p>1126.4</p></td>
+<td><p>844.8</p></td>
+<td><p>2.0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigm_s:</span> <span class="pre">1126.4</span></code>, <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">844.8</span></code>, <code class="docutils literal notranslate"><span class="pre">alph_s:</span> <span class="pre">2.0</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">d</span></code></p></td>
+<td><p>2</p></td>
+<td><p>563.2</p></td>
+<td><p>422.4</p></td>
+<td><p>2.0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigm_s:</span> <span class="pre">563.2</span></code>, <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">422.4</span></code>, <code class="docutils literal notranslate"><span class="pre">alph_s:</span> <span class="pre">2.0</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">e</span></code></p></td>
+<td><p>1</p></td>
+<td><p>281.6</p></td>
+<td><p>211.2</p></td>
+<td><p>2.0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigm_s:</span> <span class="pre">281.6</span></code>, <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">211.2</span></code>, <code class="docutils literal notranslate"><span class="pre">alph_s:</span> <span class="pre">2.0</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">f</span></code></p></td>
+<td><p>1/2</p></td>
+<td><p>140.8</p></td>
+<td><p>105.6</p></td>
+<td><p>2.0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigm_s:</span> <span class="pre">140.8</span></code>, <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">105.6</span></code>, <code class="docutils literal notranslate"><span class="pre">alph_s:</span> <span class="pre">2.0</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">g</span></code></p></td>
+<td><p>1/4</p></td>
+<td><p>70.4</p></td>
+<td><p>52.8</p></td>
+<td><p>2.0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigm_s:</span> <span class="pre">70.4</span></code>, <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">52.8</span></code>, <code class="docutils literal notranslate"><span class="pre">alph_s:</span> <span class="pre">2.0</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">h</span></code></p></td>
+<td><p>1/8</p></td>
+<td><p>35.2</p></td>
+<td><p>26.4</p></td>
+<td><p>2.0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigm_s:</span> <span class="pre">35.2</span></code>, <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">26.4</span></code>, <code class="docutils literal notranslate"><span class="pre">alph_s:</span> <span class="pre">2.0</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">i</span></code></p></td>
+<td><p>1/16</p></td>
+<td><p>17.6</p></td>
+<td><p>13.2</p></td>
+<td><p>2.0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigm_s:</span> <span class="pre">17.6</span></code>, <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">13.2</span></code>, <code class="docutils literal notranslate"><span class="pre">alph_s:</span> <span class="pre">2.0</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">j</span></code></p></td>
+<td><p>1/32</p></td>
+<td><p>8.8</p></td>
+<td><p>6.6</p></td>
+<td><p>2.0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigm_s:</span> <span class="pre">8.8</span></code>, <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">6.6</span></code>, <code class="docutils literal notranslate"><span class="pre">alph_s:</span> <span class="pre">2.0</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The scale factor <span class="math notranslate nohighlight">\(v\)</span> doubles for each step up the alphabet, so the
+resolution coarsens by a factor of two per step.  The <code class="docutils literal notranslate"><span class="pre">sigm_s</span></code> base value of
+281.6 arcsec (type <code class="docutils literal notranslate"><span class="pre">e</span></code>, <span class="math notranslate nohighlight">\(v = 1\)</span>) equals <code class="docutils literal notranslate"><span class="pre">8.8</span> <span class="pre">×</span> <span class="pre">32</span></code>, where 8.8 arcsec
+is the LVM fiber radius.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">0</span></code> is used in <code class="docutils literal notranslate"><span class="pre">sincube</span></code>/<code class="docutils literal notranslate"><span class="pre">sinmap</span></code>, the auto-computed
+spaxel size is <code class="docutils literal notranslate"><span class="pre">0.75</span> <span class="pre">×</span> <span class="pre">sigm_s</span></code> – the same ratio used by <code class="docutils literal notranslate"><span class="pre">kernel_pipe()</span></code>.
+Setting <code class="docutils literal notranslate"><span class="pre">pix_s:</span> <span class="pre">0</span></code> in <code class="docutils literal notranslate"><span class="pre">sincube</span></code> is therefore equivalent to the pipeline
+behaviour.</p>
+</div>
+</section>
+<section id="differences-beyond-the-kernel">
+<h2>Differences beyond the kernel<a class="headerlink" href="#differences-beyond-the-kernel" title="Link to this heading"></a></h2>
+<p>Even with identical <code class="docutils literal notranslate"><span class="pre">sigm_s</span></code>, <code class="docutils literal notranslate"><span class="pre">pix_s</span></code>, and <code class="docutils literal notranslate"><span class="pre">alph_s</span></code> values, the two
+modes differ in a few other respects:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 35.0%" />
+<col style="width: 35.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">sincube</span></code> / <code class="docutils literal notranslate"><span class="pre">sinmap</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">pipecube</span></code> / <code class="docutils literal notranslate"><span class="pre">pipemap</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">alph_s</span></code> configurable</p></td>
+<td><p>Yes</p></td>
+<td><p>No (hardcoded to 2.0)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Targets per run</p></td>
+<td><p>One (<code class="docutils literal notranslate"><span class="pre">nameF</span></code>)</p></td>
+<td><p>Many (<code class="docutils literal notranslate"><span class="pre">nameL</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p>RSS extraction</p></td>
+<td><p>Not available</p></td>
+<td><p>Optional (<code class="docutils literal notranslate"><span class="pre">cube2rss:</span> <span class="pre">True</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Spectral chunking</p></td>
+<td><p>Not available</p></td>
+<td><p>Automatic for &gt; 100 exposures</p></td>
+</tr>
+<tr class="row-even"><td><p>Cube co-addition</p></td>
+<td><p>Not available</p></td>
+<td><p>Optional (<code class="docutils literal notranslate"><span class="pre">mergecube:</span> <span class="pre">True</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Output path</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">out_path</span></code> as given</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">out_path/&lt;redux_ver&gt;/&lt;type&gt;/</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="small-exposure-guard-in-pipecube">
+<h2>Small-exposure guard in pipecube<a class="headerlink" href="#small-exposure-guard-in-pipecube" title="Link to this heading"></a></h2>
+<p>When fewer than three exposures are available for a target, <code class="docutils literal notranslate"><span class="pre">pipecube</span></code>
+automatically promotes types <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">j</span></code> up to type <code class="docutils literal notranslate"><span class="pre">h</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt; 3 exposures  +  type i or j  →  forced to type h
+(sigm_s = 35.2 arcsec,  pix_s = 26.4 arcsec)
+</pre></div>
+</div>
+<p>This prevents the finest-resolution kernels from being used when there is
+insufficient fiber coverage to support them.  There is no equivalent guard in
+<code class="docutils literal notranslate"><span class="pre">sincube</span></code>; if you set <code class="docutils literal notranslate"><span class="pre">sigm_s</span></code> to 17.6 or 8.8 arcsec with very few
+exposures the kernel will be applied as specified.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="commands.html" class="btn btn-neutral float-left" title="Commands Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="configuration.html" class="btn btn-neutral float-right" title="YAML Configuration Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hector Ibarra-Medel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

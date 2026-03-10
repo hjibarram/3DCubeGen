@@ -17,7 +17,7 @@ import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
 
-def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coord_ast=[0,0],coord_cen=[0,0],pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmMap-NAME_TRA.fits',path_lvmcore=''):
+def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coord_ast=[0,0],coord_cen=[0,0],pbars=True,fac_sizeX=1.1,fac_sizeY=1.1,multiT=False,nproc=3,pix_s=18.5,zt=0,ki=5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],redux_ver='0.1.1.dev0/1111/',scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmMap-NAME_TRA.fits',path_lvmcore=''):
     try:
         nlt=len(expnumL)
     except:
@@ -68,7 +68,9 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         ra_fib=new_ra_fib[nt]
         dec_fib=new_dec_fib[nt]
         Std_id=Std_id[nt]
-
+        #print(np.nanmean(rss[Std_id,:])/1e-16)
+        #print(np.nanmin(np.abs(ra_fib)/3600.0),np.nanmin(np.abs(dec_fib)/3600.0),file,'optionB')
+        
         if use_slitmap == False:
             agcam_coadd = agcam_dir+'/'+mjd[i % len(mjd)]+'/coadds/'+'lvm.sci.coadd_s'+expnum+'.fits'
             if True:#os.path.isfile(agcam_coadd):
@@ -99,7 +101,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 wt1.wcs.ctype = ["RA---TAN", "DEC--TAN"]
                 wt1.wcs.radesys = 'ICRS'
                 #wt1.wcs.equinox = 'J2000'#2024.8
-            
+    
             if use_slitmap == False:
                 rac0=rac
                 dec0=dec
@@ -153,6 +155,8 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
                 x_pixel, y_pixel = skycoord_to_pixel(sky_coord, wt1)
                 x_ifu_pix[nfib0*i:nfib0*(i+1)]=x_pixel
                 y_ifu_pix[nfib0*i:nfib0*(i+1)]=y_pixel
+                #print(np.nanmin(np.abs(ra_fib)/3600.0),np.nanmin(np.abs(dec_fib)/3600.0),file,'optionB')        
+        
         if pbars:
             pbar.update(1)     
     if pbars:
@@ -241,7 +245,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
         else:    
             ntp=np.where(Rsp <= (fibA*3.5*2/2.0))[0]
         if multiT:
-            nproc=3#3#cpu_count()
+            #nproc=3#3#cpu_count()
             with ThreadPool(nproc) as pool:
                 args=[(spec_ifu[ntp],specE_ifu[ntp],specM_ifu[ntp],specEM_ifu[ntp],x_ifu_V[ntp],y_ifu_V[ntp],fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nly,npros,nproc) for npros in range(0, nproc)]                    
                 #args=[(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pix_s,sigm_s,alph_s,yo,xi,xf,nw,nly,i,npros,nproc,wt,xot,yot) for npros in range(0, nproc)]                    
@@ -282,7 +286,7 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     new_header = wt.to_header()
     h1=fits.PrimaryHDU(ifu,header=new_header)
     #h1=fits.PrimaryHDU(ifu)
-    h2=fits.ImageHDU(ifuM)
+    h2=fits.ImageHDU(ifuM,header=new_header)
     h3=fits.ImageHDU(ifu_e)
     h4=fits.ImageHDU(ifuM_e)
     head_list=[h1,h2,h3,h4]
@@ -327,21 +331,21 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     ht["NAXIS"]=2 
     ht["NAXIS1"]=nx
     ht["NAXIS2"]=ny
-    ht["CRVAL1"]=xat#xot/3600.0
-    ht["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    ht["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
-    ht["CRPIX1"]=nlx/2+0.5+dx
-    ht["CTYPE1"]='RA---TAN'
-    ht["CRVAL2"]=yat#yot/3600.0
-    ht["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.0
-    ht["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.0
-    ht["CRPIX2"]=nly/2+0.5+dy
-    ht["CTYPE2"]='DEC--TAN'
-    ht["CUNIT1"]='deg     '                                           
-    ht["CUNIT2"]='deg     '
-    ht["RADESYS"]='ICRS     '
-    ht["OBJSYS"]='ICRS    '
-    ht["EQUINOX"]=2000.00
+    #ht["CRVAL1"]=xat#xot/3600.0
+    #ht["CD1_1"]=-np.cos(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    #ht["CD1_2"]=-np.sin(thet*np.pi/180.0)*pix_s/3600.0#*np.cos(yot/3600.0*np.pi/180.)
+    #ht["CRPIX1"]=nlx/2+0.5+dx
+    #ht["CTYPE1"]='RA---TAN'
+    #ht["CRVAL2"]=yat#yot/3600.0
+    #ht["CD2_1"]=-np.sin(thet*np.pi/180.)*pix_s/3600.0
+    #ht["CD2_2"]=np.cos(thet*np.pi/180.)*pix_s/3600.0
+    #ht["CRPIX2"]=nly/2+0.5+dy
+    #ht["CTYPE2"]='DEC--TAN'
+    #ht["CUNIT1"]='deg     '                                           
+    #ht["CUNIT2"]='deg     '
+    #ht["RADESYS"]='ICRS     '
+    #ht["OBJSYS"]='ICRS    '
+    #ht["EQUINOX"]=2000.00
     ht["IFUCON"]=(str(int(ns))+' ','NFibers')#5.167640389466101
     ht["BUNIT"]='ABmag/arcsec'
     ht.update() 

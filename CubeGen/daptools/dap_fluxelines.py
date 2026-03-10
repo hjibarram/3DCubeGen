@@ -54,7 +54,7 @@ def extract_PMvalues(list_vals,hdu_list,key_list='PM_ELINES'):
                 keys_evel.extend([table_hdr[keys[it]]])
     return [keys_flux,keys_eflux,keys_disp,keys_edisp,keys_vel,keys_evel,extention]
 
-def get_values(file_rss,file_dap,nx,ny,map_dap=[],map_dap2=[],notebook=True):
+def get_values(file_rss,file_dap,nx,ny,map_dap=[],map_dap2=[],map_dap3=[],notebook=True):
     
     hdu_list = fits.open(file_rss)
     table_hdu = hdu_list['SLITMAP']
@@ -109,12 +109,25 @@ def get_values(file_rss,file_dap,nx,ny,map_dap=[],map_dap2=[],notebook=True):
     keys_vals=[keys_flux1[0],keys_vel1[0],keys_disp1[0],keys_eflux1[0],keys_evel1[0],keys_edisp1[0]]
     table_hduPM = hdu_list['PM_ELINES']
     table_dataPM = table_hduPM.data
+    table_hduPM_KEL = hdu_list['PM_KEL']
+    table_dataPM_KEL = table_hduPM_KEL.data
 
     id_PM=table_dataPM.field('id_fib')
     wave_mod=table_dataPM.field('wl')
     nt=np.where(id_PM == 0)[0]
     n_mods=len(nt)
     wave_mod=wave_mod[nt]
+    wsort=np.argsort(wave_mod)
+    wave_mod=wave_mod[wsort]
+
+    id_PM_KEL=table_dataPM_KEL.field('id_fib')
+    wave_mod_KEL=table_dataPM_KEL.field('wl')
+    nt=np.where(id_PM_KEL == 0)[0]
+    n_modsKEL=len(nt)
+    wave_mod_KEL=wave_mod_KEL[nt]
+    wsort_KEL=np.argsort(wave_mod_KEL)
+    wave_mod_KEL=wave_mod_KEL[wsort_KEL]
+
     id_dap=table_dataB.field('id')    
     xp=[]
     yp=[]
@@ -148,6 +161,13 @@ def get_values(file_rss,file_dap,nx,ny,map_dap=[],map_dap2=[],notebook=True):
     eflux_valPM=np.zeros([n_mods,n_spax])
     edisp_valPM=np.zeros([n_mods,n_spax])
     evel_valPM=np.zeros([n_mods,n_spax])
+
+    flux_valPM_KEL=np.zeros([n_modsKEL,n_spax])
+    disp_valPM_KEL=np.zeros([n_modsKEL,n_spax])
+    vel_valPM_KEL=np.zeros([n_modsKEL,n_spax])
+    eflux_valPM_KEL=np.zeros([n_modsKEL,n_spax])
+    edisp_valPM_KEL=np.zeros([n_modsKEL,n_spax])
+    evel_valPM_KEL=np.zeros([n_modsKEL,n_spax])
 
     
     for j in range(0, n_keys):
@@ -187,26 +207,43 @@ def get_values(file_rss,file_dap,nx,ny,map_dap=[],map_dap2=[],notebook=True):
         edisp_val[j,:]=val2e
         evel_val[j,:]=val3e
         eEW_val[j,:]=val4e
+
     for j in range(0, n_spax):
         nt=np.where(id_PM == j)[0]
-        val1=table_dataPM.field(keys_flux1[0])[nt]
-        val2=table_dataPM.field(keys_disp1[0])[nt]
-        val3=table_dataPM.field(keys_vel1[0])[nt]
-        val1e=table_dataPM.field(keys_eflux1[0])[nt]
-        val2e=table_dataPM.field(keys_edisp1[0])[nt]
-        val3e=table_dataPM.field(keys_evel1[0])[nt]
+        val1=table_dataPM.field(keys_flux1[0])[nt][wsort]
+        val2=table_dataPM.field(keys_disp1[0])[nt][wsort]
+        val3=table_dataPM.field(keys_vel1[0])[nt][wsort]
+        val1e=table_dataPM.field(keys_eflux1[0])[nt][wsort]
+        val2e=table_dataPM.field(keys_edisp1[0])[nt][wsort]
+        val3e=table_dataPM.field(keys_evel1[0])[nt][wsort]
         flux_valPM[:,j]=val1
         disp_valPM[:,j]=val2
         vel_valPM[:,j]=val3
         eflux_valPM[:,j]=val1e
         edisp_valPM[:,j]=val2e
         evel_valPM[:,j]=val3e
+
+        nt=np.where(id_PM_KEL == j)[0]
+        val1=table_dataPM_KEL.field(keys_flux1[0])[nt][wsort_KEL]
+        val2=table_dataPM_KEL.field(keys_disp1[0])[nt][wsort_KEL]
+        val3=table_dataPM_KEL.field(keys_vel1[0])[nt][wsort_KEL]
+        val1e=table_dataPM_KEL.field(keys_eflux1[0])[nt][wsort_KEL]
+        val2e=table_dataPM_KEL.field(keys_edisp1[0])[nt][wsort_KEL]
+        val3e=table_dataPM_KEL.field(keys_evel1[0])[nt][wsort_KEL]
+        flux_valPM_KEL[:,j]=val1
+        disp_valPM_KEL[:,j]=val2
+        vel_valPM_KEL[:,j]=val3
+        eflux_valPM_KEL[:,j]=val1e
+        edisp_valPM_KEL[:,j]=val2e
+        evel_valPM_KEL[:,j]=val3e
     hdu_list.close()
 
     if len(map_dap) == 0:
         map_dap=np.zeros([n_keys*8,nx,ny])
     if len(map_dap2) == 0:
-        map_dap2=np.zeros([n_mods*6,nx,ny])    
+        map_dap2=np.zeros([n_mods*6,nx,ny])
+    if len(map_dap3) == 0:
+        map_dap3=np.zeros([n_modsKEL*6,nx,ny])        
     
     if notebook:    
         pbar=tqdm(total=n_spax)
@@ -232,12 +269,19 @@ def get_values(file_rss,file_dap,nx,ny,map_dap=[],map_dap2=[],notebook=True):
                         map_dap2[h+n_mods*3,i,j]=eflux_valPM[h,k]
                         map_dap2[h+n_mods*4,i,j]=evel_valPM[h,k]
                         map_dap2[h+n_mods*5,i,j]=edisp_valPM[h,k]
+                    for h in range(0, n_modsKEL):
+                        map_dap3[h+n_modsKEL*0,i,j]=flux_valPM_KEL[h,k]
+                        map_dap3[h+n_modsKEL*1,i,j]=vel_valPM_KEL[h,k]
+                        map_dap3[h+n_modsKEL*2,i,j]=disp_valPM_KEL[h,k]
+                        map_dap3[h+n_modsKEL*3,i,j]=eflux_valPM_KEL[h,k]
+                        map_dap3[h+n_modsKEL*4,i,j]=evel_valPM_KEL[h,k]
+                        map_dap3[h+n_modsKEL*5,i,j]=edisp_valPM_KEL[h,k]    
                     pbar.update(1)
     pbar.close()
 
     list_vals=[keys_flux,keys_eflux,keys_disp,keys_edisp,keys_vel,keys_evel,keys_EW,keys_eEW]
     
-    return map_dap,map_dap2,n_keys,list_vals,wave_mod,keys_vals
+    return map_dap,map_dap2,map_dap3,n_keys,list_vals,wave_mod,wave_mod_KEL,keys_vals
 
 def dap_extract_fluxelines(name,out_path='./',path_cube='./',path_dap='./',path_rss='./',basename_cube='lvmCube-NAME.fits.gz',basename_dap='NAME.dap.fits.gz',basename_rss='lvmRSS-NAME.fits.gz',nsplit=0,spt=[False,[1,1],2],notebook=True):    
 
@@ -260,7 +304,7 @@ def dap_extract_fluxelines(name,out_path='./',path_cube='./',path_dap='./',path_
                 file_rss=path_rss+'/'+basename_rss.replace('NAME',name+val)
                 file_dap=path_dap.replace(name,name+val)+'/'+basename_dap.replace('NAME',name+val)
                 if i == 0 and j == 0:
-                    map_dap,map_dap2,n_keys,list_vals_out,wave_mod,keys_vals=get_values(file_rss,file_dap,nx,ny,notebook=notebook)
+                    map_dap,map_dap2,map_dap3,n_keys,list_vals_out,wave_mod,wave_mod_KEL,keys_vals=get_values(file_rss,file_dap,nx,ny,notebook=notebook)
                 else:
                     #if i == 2 and j ==3:
                     if spt[0] == True:
@@ -270,13 +314,13 @@ def dap_extract_fluxelines(name,out_path='./',path_cube='./',path_dap='./',path_
                                     val='_p'+str(i)+str(j)+'_p'+str(k)+str(l)
                                     file_rss=path_rss+'/'+basename_rss.replace('NAME',name+val)
                                     file_dap=path_dap.replace(name,name+val)+'/'+basename_dap.replace('NAME',name+val)
-                                    map_dap,map_dap2,n_keys,list_vals_out=get_values(file_rss,file_dap,nx,ny,map_dap=map_dap,map_dap2=map_dap2,notebook=notebook)
+                                    map_dap,map_dap2,map_dap3,n_keys,list_vals_out=get_values(file_rss,file_dap,nx,ny,map_dap=map_dap,map_dap2=map_dap2,map_dap3=map_dap3,notebook=notebook)
                     else:
-                        map_dap,map_dap2,n_keys,list_vals_out,wave_mod,keys_vals=get_values(file_rss,file_dap,nx,ny,map_dap=map_dap,map_dap2=map_dap2,notebook=notebook)
+                        map_dap,map_dap2,map_dap3,n_keys,list_vals_out,wave_mod,wave_mod_KEL,keys_vals=get_values(file_rss,file_dap,nx,ny,map_dap=map_dap,map_dap2=map_dap2,map_dap3=map_dap3,notebook=notebook)
     else:
         file_rss=path_rss+'/'+basename_rss.replace('NAME',name)
         file_dap=path_dap+'/'+basename_dap.replace('NAME',name)
-        map_dap,map_dap2,n_keys,list_vals_out,wave_mod,keys_vals=get_values(file_rss,file_dap,nx,ny,notebook=notebook)
+        map_dap,map_dap2,map_dap3,n_keys,list_vals_out,wave_mod,wave_mod_KEL,keys_vals=get_values(file_rss,file_dap,nx,ny,notebook=notebook)
 
     keys_flux,keys_eflux,keys_disp,keys_edisp,keys_vel,keys_evel,keys_EW,keys_eEW=list_vals_out
     
@@ -284,22 +328,8 @@ def dap_extract_fluxelines(name,out_path='./',path_cube='./',path_dap='./',path_
 
     h1=fits.PrimaryHDU(map_dap,header=head)
     h2=fits.ImageHDU(map_dap2,header=head)
+    h3=fits.ImageHDU(map_dap3,header=head)
     h_k=h1.header
-    #h_k["CRVAL1"]=hdr['CRVAL1']
-    #h_k["CD1_1"]=hdr["CD1_1"]
-    #h_k["CD1_2"]=hdr["CD1_2"]
-    #h_k["CRPIX1"]=hdr["CRPIX1"]
-    #h_k["CTYPE1"]=hdr["CTYPE1"]
-    #h_k["CRVAL2"]=hdr['CRVAL2']
-    #h_k["CD2_1"]=hdr["CD2_1"]
-    #h_k["CD2_2"]=hdr["CD2_2"]
-    #h_k["CRPIX2"]=hdr["CRPIX2"]
-    #h_k["CTYPE2"]=hdr["CTYPE2"]
-    #h_k["CUNIT1"]=hdr["CUNIT1"]                                           
-    #h_k["CUNIT2"]=hdr["CUNIT2"]
-    #h_k["RADESYS"]=hdr["RADESYS"]
-    #h_k["OBJSYS"]=hdr["OBJSYS"]
-    #h_k["EQUINOX"]=hdr["EQUINOX"]    
     for i in range(0, n_keys):
         lab="{:0>4}".format(str(int(i+1+n_keys*0)))
         h_k["VAL_"+lab]=keys_flux[i]
@@ -329,28 +359,22 @@ def dap_extract_fluxelines(name,out_path='./',path_cube='./',path_dap='./',path_
     n_mods=len(wave_mod)
     n_keys2=len(keys_vals)
     h_k=h2.header
-    #h_k["CRVAL1"]=hdr['CRVAL1']
-    #h_k["CD1_1"]=hdr["CD1_1"]
-    #h_k["CD1_2"]=hdr["CD1_2"]
-    #h_k["CRPIX1"]=hdr["CRPIX1"]
-    #h_k["CTYPE1"]=hdr["CTYPE1"]
-    #h_k["CRVAL2"]=hdr['CRVAL2']
-    #h_k["CD2_1"]=hdr["CD2_1"]
-    #h_k["CD2_2"]=hdr["CD2_2"]
-    #h_k["CRPIX2"]=hdr["CRPIX2"]
-    #h_k["CTYPE2"]=hdr["CTYPE2"]
-    #h_k["CUNIT1"]=hdr["CUNIT1"]                                           
-    #h_k["CUNIT2"]=hdr["CUNIT2"]
-    #h_k["RADESYS"]=hdr["RADESYS"]
-    #h_k["OBJSYS"]=hdr["OBJSYS"]
-    #h_k["EQUINOX"]=hdr["EQUINOX"]  
     h_k['EXTNAME']='PM'
     for j in range(0, n_keys2):
         for i in range(0, n_mods):
             lab="{:0>4}".format(str(int(i+1+n_mods*j)))
             h_k["VAL_"+lab]=str(np.round(wave_mod[i],2))+'_'+keys_vals[j]
     h_k.update()
-    hlist=fits.HDUList([h1,h2])
+    n_mods=len(wave_mod_KEL)
+    n_keys3=len(keys_vals)
+    h_k=h3.header
+    h_k['EXTNAME']='PM_KEL'
+    for j in range(0, n_keys3):
+        for i in range(0, n_mods):
+            lab="{:0>4}".format(str(int(i+1+n_mods*j)))
+            h_k["VAL_"+lab]=str(np.round(wave_mod_KEL[i],2))+'_'+keys_vals[j]
+    h_k.update()
+    hlist=fits.HDUList([h1,h2,h3])
     hlist.update_extend()
     basenameC='lvmDAPMap-NAME-flux_elines.fits'
     file=out_path+'/'+basenameC.replace('NAME',name)

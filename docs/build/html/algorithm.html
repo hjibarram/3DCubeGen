@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reconstruction Algorithm &mdash; 3DCubeGen 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Output Data Products" href="outputs.html" />
+    <link rel="prev" title="VirusP Pipeline" href="virusp.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            3DCubeGen
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation &amp; Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LVM Pipeline</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel_smoothing.html">Kernel Smoothing Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">YAML Configuration Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exposure_list.html">Exposure List File Format</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Spectrographs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="megara.html">MEGARA Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virusp.html">VirusP Pipeline</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reconstruction Algorithm</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#kernel-interpolation">Kernel Interpolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#radius-cutoff">Radius Cutoff</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#error-propagation">Error Propagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adr-aware-mode">ADR-Aware Mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spaxel-size">Spaxel Size</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#flux-scaling">Flux Scaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multi-threading">Multi-Threading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation-reference">Implementation Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Output Data Products</a></li>
+<li class="toctree-l1"><a class="reference internal" href="daptools.html">DAP Integration Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">3DCubeGen</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Reconstruction Algorithm</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/algorithm.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="reconstruction-algorithm">
+<h1>Reconstruction Algorithm<a class="headerlink" href="#reconstruction-algorithm" title="Link to this heading"></a></h1>
+<p>3DCubeGen reconstructs regular 3D data cubes (RA, Dec, wavelength) from
+irregularly sampled IFU fiber data using weighted kernel interpolation. The
+same core algorithm is shared across all three supported spectrographs (LVM,
+MEGARA, VirusP).</p>
+<section id="kernel-interpolation">
+<h2>Kernel Interpolation<a class="headerlink" href="#kernel-interpolation" title="Link to this heading"></a></h2>
+<p>For each output spaxel, the algorithm computes a weighted sum of all fiber
+spectra within a cutoff radius. The weight assigned to each fiber depends on
+its distance from the spaxel center:</p>
+<div class="math notranslate nohighlight">
+\[w_k = \exp\!\left(-\frac{1}{2}\left(\frac{R_k}{\sigma}\right)^{\!\alpha}\right)\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(R_k\)</span> is the Euclidean distance from fiber <em>k</em> to the spaxel center
+(arcsec)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\sigma\)</span> is the smoothing kernel size (<code class="docutils literal notranslate"><span class="pre">sigm_s</span></code> config parameter,
+arcsec)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha\)</span> is the shape factor (<code class="docutils literal notranslate"><span class="pre">alph_s</span></code> config parameter)</p></li>
+</ul>
+<p>The shape factor controls the kernel profile:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\alpha = 2\)</span> produces a <strong>Gaussian</strong> kernel (the default)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha &gt; 2\)</span> produces a sharper, more top-hat-like kernel</p></li>
+</ul>
+<p>The interpolated flux at each spaxel is the weighted mean:</p>
+<div class="math notranslate nohighlight">
+\[F_{\text{spaxel}} = \frac{\sum_k F_k \, w_k}{\sum_k w_k}\]</div>
+<p>Only fibers with finite, positive flux values contribute to the sum. Spaxels
+with zero total weight are left at zero flux.</p>
+</section>
+<section id="radius-cutoff">
+<h2>Radius Cutoff<a class="headerlink" href="#radius-cutoff" title="Link to this heading"></a></h2>
+<p>To avoid unnecessary computation, only fibers within a cutoff radius of each
+spaxel are considered. The cutoff radius is:</p>
+<div class="math notranslate nohighlight">
+\[r_{\text{cut}} = \max\!\left(\frac{\sigma}{2},\; \frac{d_{\text{fib}} \times 3.5 \times 2}{2}\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(d_{\text{fib}}\)</span> is the fiber diameter. For LVM, the fiber
+diameter parameter (<code class="docutils literal notranslate"><span class="pre">fibA</span></code>) is 35.3 arcsec; for VirusP it is configurable
+(default 4.16 arcsec); for MEGARA it is derived from the hexagonal bundle
+geometry.</p>
+<p>Additionally, a Y-axis pre-filter selects only fibers whose Y coordinate is
+within <span class="math notranslate nohighlight">\(r_{\text{cut}}\)</span> of the current row, reducing the inner loop
+to nearby fibers.</p>
+</section>
+<section id="error-propagation">
+<h2>Error Propagation<a class="headerlink" href="#error-propagation" title="Link to this heading"></a></h2>
+<p>When error propagation is enabled (<code class="docutils literal notranslate"><span class="pre">errors:</span> <span class="pre">True</span></code>), errors are propagated
+using inverse-variance weighting:</p>
+<div class="math notranslate nohighlight">
+\[\sigma_{\text{spaxel}} = \frac{\sqrt{\sum_k (\sigma_k \, w_k)^2}}{\sum_k w_k}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sigma_k\)</span> is the error spectrum of fiber <em>k</em>. This preserves the
+correct noise scaling through the weighted interpolation.</p>
+</section>
+<section id="adr-aware-mode">
+<h2>ADR-Aware Mode<a class="headerlink" href="#adr-aware-mode" title="Link to this heading"></a></h2>
+<p>When fiber positions vary as a function of wavelength (e.g., due to
+Atmospheric Differential Refraction correction), the position arrays become
+2D: <code class="docutils literal notranslate"><span class="pre">x_ifu_V[n_fibers,</span> <span class="pre">n_wavelengths]</span></code>. The algorithm detects this
+automatically (<code class="docutils literal notranslate"><span class="pre">len(x_ifu_V.shape)</span> <span class="pre">&gt;</span> <span class="pre">1</span></code>) and switches to per-wavelength
+distance calculations:</p>
+<ul class="simple">
+<li><p>In <strong>1D mode</strong> (fixed positions): a single scalar distance is computed per
+fiber-spaxel pair, and the weight applies uniformly across the spectrum.</p></li>
+<li><p>In <strong>2D mode</strong> (wavelength-dependent positions): the distance
+<span class="math notranslate nohighlight">\(R_k(\lambda)\)</span> is computed for each wavelength channel independently,
+producing wavelength-dependent weights.</p></li>
+</ul>
+<p>This mode is used by the VirusP pipeline when <code class="docutils literal notranslate"><span class="pre">adrcor:</span> <span class="pre">True</span></code>.</p>
+</section>
+<section id="spaxel-size">
+<h2>Spaxel Size<a class="headerlink" href="#spaxel-size" title="Link to this heading"></a></h2>
+<p>The output spaxel size is controlled by the <code class="docutils literal notranslate"><span class="pre">pix_s</span></code> parameter. When set to
+<code class="docutils literal notranslate"><span class="pre">0</span></code> (auto-calculate), each spectrograph uses its own default:</p>
+<ul class="simple">
+<li><p><strong>LVM</strong>: <code class="docutils literal notranslate"><span class="pre">pix_s</span> <span class="pre">=</span> <span class="pre">0.75</span> <span class="pre">*</span> <span class="pre">sigm_s</span></code></p></li>
+<li><p><strong>MEGARA</strong>: <code class="docutils literal notranslate"><span class="pre">pix_s</span> <span class="pre">=</span> <span class="pre">sigm_s</span></code></p></li>
+<li><p><strong>VirusP</strong>: <code class="docutils literal notranslate"><span class="pre">pix_s</span> <span class="pre">=</span> <span class="pre">0.75</span> <span class="pre">*</span> <span class="pre">sigm_s</span></code></p></li>
+</ul>
+</section>
+<section id="flux-scaling">
+<h2>Flux Scaling<a class="headerlink" href="#flux-scaling" title="Link to this heading"></a></h2>
+<p>After interpolation, the flux in each spaxel is scaled by an area factor to
+convert from fiber-integrated flux to surface brightness:</p>
+<div class="math notranslate nohighlight">
+\[\text{factor} = \frac{(\text{pix\_s})^2}{\pi \, (d_{\text{fib}} / 2)^2}\]</div>
+<p>This accounts for the different solid angles subtended by a square spaxel
+versus a circular fiber aperture.</p>
+</section>
+<section id="multi-threading">
+<h2>Multi-Threading<a class="headerlink" href="#multi-threading" title="Link to this heading"></a></h2>
+<p>The reconstruction is parallelized along the spatial Y-axis using Python’s
+<code class="docutils literal notranslate"><span class="pre">ThreadPool</span></code>. The number of threads is controlled by the <code class="docutils literal notranslate"><span class="pre">nproc</span></code> config
+parameter. Each thread processes a contiguous block of rows independently.</p>
+<p>The outer loop iterates over X columns, and for each column the Y-axis work is
+split across <code class="docutils literal notranslate"><span class="pre">nproc</span></code> threads, with each thread calling the <code class="docutils literal notranslate"><span class="pre">ifu_const()</span></code>
+kernel function on its assigned row range.</p>
+</section>
+<section id="implementation-reference">
+<h2>Implementation Reference<a class="headerlink" href="#implementation-reference" title="Link to this heading"></a></h2>
+<p>The core interpolation functions are in <code class="docutils literal notranslate"><span class="pre">CubeGen/tools/kernel.py</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ifu_const()</span></code> – cube reconstruction kernel (flux + optional error)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">map_const()</span></code> – map reconstruction kernel (flux + magnitude + errors)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">matrix_const()</span></code> – matrix-mode variant used for covariance estimation</p></li>
+</ul>
+<p>The kernel functions are called by the spectrograph-specific drivers:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CubeGen/tools/cubegen.py::map_ifu()</span></code> – LVM cube generation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CubeGen/tools/mapgen.py::gen_map()</span></code> – LVM map generation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CubeGen/megaratools/megcubegen.py::megmap_ifu()</span></code> – MEGARA cube generation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CubeGen/virustools/viruscubegen.py::virusmap_ifu()</span></code> – VirusP cube generation</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="virusp.html" class="btn btn-neutral float-left" title="VirusP Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="outputs.html" class="btn btn-neutral float-right" title="Output Data Products" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hector Ibarra-Medel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

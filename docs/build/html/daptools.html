@@ -1,0 +1,363 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DAP Integration Tools &mdash; 3DCubeGen 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Output Data Products" href="outputs.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            3DCubeGen
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation &amp; Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LVM Pipeline</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel_smoothing.html">Kernel Smoothing Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">YAML Configuration Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exposure_list.html">Exposure List File Format</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Spectrographs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="megara.html">MEGARA Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virusp.html">VirusP Pipeline</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="algorithm.html">Reconstruction Algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Output Data Products</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">DAP Integration Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rss-extraction-from-cubes">RSS Extraction from Cubes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#producing-rss-output-from-sincube">Producing RSS output from sincube</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#which-rss-extensions-contain-real-data">Which RSS extensions contain real data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dap-emission-line-tools">DAP Emission Line Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#extract-values"><code class="docutils literal notranslate"><span class="pre">extract_values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extract-pmvalues"><code class="docutils literal notranslate"><span class="pre">extract_PMvalues()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-values"><code class="docutils literal notranslate"><span class="pre">get_values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dap-extract-fluxelines"><code class="docutils literal notranslate"><span class="pre">dap_extract_fluxelines()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">3DCubeGen</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">DAP Integration Tools</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/daptools.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dap-integration-tools">
+<h1>DAP Integration Tools<a class="headerlink" href="#dap-integration-tools" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">CubeGen.daptools</span></code> module provides utilities for interfacing
+reconstructed cubes with downstream analysis tools, particularly the
+Data Analysis Pipeline (DAP) used by the LVM survey.</p>
+<section id="rss-extraction-from-cubes">
+<h2>RSS Extraction from Cubes<a class="headerlink" href="#rss-extraction-from-cubes" title="Link to this heading"></a></h2>
+<p><strong>Module:</strong> <code class="docutils literal notranslate"><span class="pre">CubeGen.daptools.rss_gen</span></code></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rssp_extract()</span></code> function converts a reconstructed 3D cube back into a
+pseudo-RSS (Row-Stacked Spectra) format. This is used when the downstream
+analysis pipeline expects RSS-format input rather than 3D cubes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">CubeGen.daptools.rss_gen</span><span class="w"> </span><span class="kn">import</span> <span class="n">rssp_extract</span>
+
+<span class="n">rssp_extract</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;NGC_1234&#39;</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="s1">&#39;./cubes/&#39;</span><span class="p">,</span>
+    <span class="n">path_out</span><span class="o">=</span><span class="s1">&#39;./rss/&#39;</span><span class="p">,</span>
+    <span class="n">basename_in</span><span class="o">=</span><span class="s1">&#39;lvmCube-NAME.fits.gz&#39;</span><span class="p">,</span>
+    <span class="n">basename_out</span><span class="o">=</span><span class="s1">&#39;lvmRSS-NAMElab.fits&#39;</span><span class="p">,</span>
+    <span class="n">flu16</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">nsplit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>How it works:</strong></p>
+<ol class="arabic simple">
+<li><p>Reads the input cube (flux + error extensions)</p></li>
+<li><p>Iterates over all spatial pixels (spaxels)</p></li>
+<li><p>Each non-zero spaxel becomes one “fiber” in the output RSS</p></li>
+<li><p>Constructs a SLITMAP table with RA/Dec coordinates derived from the
+cube’s WCS, plus pixel positions for back-referencing</p></li>
+<li><p>Writes the result as a multi-extension FITS file (see <a class="reference internal" href="outputs.html"><span class="doc">Output Data Products</span></a>)</p></li>
+</ol>
+<section id="producing-rss-output-from-sincube">
+<h3>Producing RSS output from sincube<a class="headerlink" href="#producing-rss-output-from-sincube" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">sincube</span></code> command does not have a <code class="docutils literal notranslate"><span class="pre">cube2rss</span></code> option – that feature is
+only available in <code class="docutils literal notranslate"><span class="pre">pipecube</span></code>.  However, <code class="docutils literal notranslate"><span class="pre">rssp_extract()</span></code> requires only the
+cube file as input, so it can be called manually after <code class="docutils literal notranslate"><span class="pre">sincube</span></code> completes:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">CubeGen.daptools.rss_gen</span><span class="w"> </span><span class="kn">import</span> <span class="n">rssp_extract</span>
+
+<span class="n">rssp_extract</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;NGC_1234&#39;</span><span class="p">,</span>          <span class="c1"># matches the name used in the sincube config</span>
+    <span class="n">path</span><span class="o">=</span><span class="s1">&#39;out_cubes/&#39;</span><span class="p">,</span>        <span class="c1"># out_path from the sincube config</span>
+    <span class="n">path_out</span><span class="o">=</span><span class="s1">&#39;out_rss/&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The function reads HDU 0 (flux) and HDU 1 (error) from
+<code class="docutils literal notranslate"><span class="pre">lvmCube-NGC_1234.fits.gz</span></code> and writes <code class="docutils literal notranslate"><span class="pre">lvmRSS-NGC_1234.fits.gz</span></code> to
+<code class="docutils literal notranslate"><span class="pre">out_rss/</span></code>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><code class="docutils literal notranslate"><span class="pre">sincube</span></code> must be run with <code class="docutils literal notranslate"><span class="pre">errors:</span> <span class="pre">True</span></code> in the config file.  When
+errors are disabled, HDU 1 of the cube is an array of ones, and the IVAR
+extension of the RSS will be filled with meaningless values
+(<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">1.0²</span> <span class="pre">=</span> <span class="pre">1</span></code> everywhere).</p>
+</div>
+</section>
+<section id="which-rss-extensions-contain-real-data">
+<h3>Which RSS extensions contain real data<a class="headerlink" href="#which-rss-extensions-contain-real-data" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">rssp_extract()</span></code> works entirely from the cube file.  Because the cube does
+not preserve the original per-fiber sky spectra or LSF, several output
+extensions cannot be reconstructed and are filled with placeholder values:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 20.0%" />
+<col style="width: 15.0%" />
+<col style="width: 55.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>HDU</p></th>
+<th class="head"><p>EXTNAME</p></th>
+<th class="head"><p>Status</p></th>
+<th class="head"><p>Content</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>ORIGINAL</p></td>
+<td><p><strong>Real</strong></p></td>
+<td><p>Primary header copied from the cube, with <code class="docutils literal notranslate"><span class="pre">POSCIRA</span></code>/<code class="docutils literal notranslate"><span class="pre">POSCIDE</span></code>
+set from the cube’s <code class="docutils literal notranslate"><span class="pre">CRVAL1</span></code>/<code class="docutils literal notranslate"><span class="pre">CRVAL2</span></code>.  <code class="docutils literal notranslate"><span class="pre">EXPOSURE</span></code> is
+hardcoded to <code class="docutils literal notranslate"><span class="pre">000000</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>FLUX</p></td>
+<td><p><strong>Real</strong></p></td>
+<td><p>Flux spectra extracted spaxel-by-spaxel from the cube HDU 0.</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>IVAR</p></td>
+<td><p><strong>Real</strong> (requires <code class="docutils literal notranslate"><span class="pre">errors:</span> <span class="pre">True</span></code>)</p></td>
+<td><p>Inverse variance computed as <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">error²</span></code> from cube HDU 1.
+If the cube was generated without error propagation, this
+extension contains ones and should not be used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>MASK</p></td>
+<td><p><strong>Placeholder</strong></p></td>
+<td><p>Zero array – no mask information survives cube reconstruction.</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>WAVE</p></td>
+<td><p><strong>Real</strong></p></td>
+<td><p>Wavelength array reconstructed from the cube header keywords
+<code class="docutils literal notranslate"><span class="pre">CRVAL3</span></code>, <code class="docutils literal notranslate"><span class="pre">CDELT3</span></code>/<code class="docutils literal notranslate"><span class="pre">CD3_3</span></code>, and <code class="docutils literal notranslate"><span class="pre">CRPIX3</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>LSF</p></td>
+<td><p><strong>Placeholder</strong></p></td>
+<td><p>Ones array – the line spread function is not stored in the cube.</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>SKY_EAST</p></td>
+<td><p><strong>Placeholder</strong></p></td>
+<td><p>Ones array – sky spectra are not preserved in the cube.</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>SKY_EAST_IVAR</p></td>
+<td><p><strong>Placeholder</strong></p></td>
+<td><p>Ones array.</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>SKY_WEST</p></td>
+<td><p><strong>Placeholder</strong></p></td>
+<td><p>Ones array.</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>SKY_WEST_IVAR</p></td>
+<td><p><strong>Placeholder</strong></p></td>
+<td><p>Ones array.</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>SLITMAP</p></td>
+<td><p><strong>Real</strong></p></td>
+<td><p>Binary table.  <code class="docutils literal notranslate"><span class="pre">ra</span></code> and <code class="docutils literal notranslate"><span class="pre">dec</span></code> are computed from the cube WCS
+via <code class="docutils literal notranslate"><span class="pre">pixel_to_skycoord()</span></code>.  <code class="docutils literal notranslate"><span class="pre">xpmm</span></code>/<code class="docutils literal notranslate"><span class="pre">ypmm</span></code> store the pixel
+column/row in the cube for back-referencing.  Bookkeeping columns
+(<code class="docutils literal notranslate"><span class="pre">targettype</span></code>, <code class="docutils literal notranslate"><span class="pre">telescope</span></code>, <code class="docutils literal notranslate"><span class="pre">ifulabel</span></code>, etc.) are filled
+with generic placeholder strings (<code class="docutils literal notranslate"><span class="pre">'science'</span></code>, <code class="docutils literal notranslate"><span class="pre">'Sci'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'Sci1'</span></code>).</p></td>
+</tr>
+</tbody>
+</table>
+<p>This is the same behaviour whether the cube was produced by <code class="docutils literal notranslate"><span class="pre">sincube</span></code> or
+<code class="docutils literal notranslate"><span class="pre">pipecube</span></code> – <code class="docutils literal notranslate"><span class="pre">rssp_extract()</span></code> is called identically in both cases and
+uses no information beyond the cube file itself.</p>
+<p><strong>Spatial tiling support:</strong></p>
+<p>For large cubes that exceed memory limits, the <code class="docutils literal notranslate"><span class="pre">nsplit</span></code> parameter enables
+spatial tiling. When <code class="docutils literal notranslate"><span class="pre">nsplit</span> <span class="pre">&gt;</span> <span class="pre">1</span></code>, the cube is divided into an
+<code class="docutils literal notranslate"><span class="pre">nsplit</span> <span class="pre">x</span> <span class="pre">nsplit</span></code> grid, and only the tile specified by <code class="docutils literal notranslate"><span class="pre">spt=[i,</span> <span class="pre">j]</span></code> is
+processed. The output filename is tagged with the tile index (e.g.,
+<code class="docutils literal notranslate"><span class="pre">lvmRSS-NGC_1234_p01.fits</span></code>).</p>
+<p><strong>1D RSS from external spectra:</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rssp_multi1d()</span></code> function creates a pseudo-RSS from a collection of
+independent 1D spectra (not from a cube). It reads a file list, resamples all
+spectra to a common wavelength grid, and writes the result in the same
+multi-extension format as <code class="docutils literal notranslate"><span class="pre">rssp_extract()</span></code>. This is useful for collecting
+spectra from different sources into a single DAP-compatible file.</p>
+</section>
+</section>
+<section id="dap-emission-line-tools">
+<h2>DAP Emission Line Tools<a class="headerlink" href="#dap-emission-line-tools" title="Link to this heading"></a></h2>
+<p><strong>Module:</strong> <code class="docutils literal notranslate"><span class="pre">CubeGen.daptools.dap_fluxelines</span></code></p>
+<p>These tools extract emission line measurements from DAP analysis products and
+map them back onto the 2D spatial grid of the original cube.</p>
+<section id="extract-values">
+<h3><code class="docutils literal notranslate"><span class="pre">extract_values()</span></code><a class="headerlink" href="#extract-values" title="Link to this heading"></a></h3>
+<p>Reads emission line fit results from the <code class="docutils literal notranslate"><span class="pre">NP_ELINES_B</span></code>, <code class="docutils literal notranslate"><span class="pre">NP_ELINES_R</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">NP_ELINES_I</span></code> extensions of a DAP output file. Extracts for each line:</p>
+<ul class="simple">
+<li><p>Flux and error (<code class="docutils literal notranslate"><span class="pre">flux</span></code>, <code class="docutils literal notranslate"><span class="pre">e_flux</span></code>)</p></li>
+<li><p>Velocity and error (<code class="docutils literal notranslate"><span class="pre">vel</span></code>, <code class="docutils literal notranslate"><span class="pre">e_vel</span></code>)</p></li>
+<li><p>Velocity dispersion and error (<code class="docutils literal notranslate"><span class="pre">disp</span></code>, <code class="docutils literal notranslate"><span class="pre">e_disp</span></code>)</p></li>
+<li><p>Equivalent width and error (<code class="docutils literal notranslate"><span class="pre">EW</span></code>, <code class="docutils literal notranslate"><span class="pre">e_EW</span></code>)</p></li>
+</ul>
+</section>
+<section id="extract-pmvalues">
+<h3><code class="docutils literal notranslate"><span class="pre">extract_PMvalues()</span></code><a class="headerlink" href="#extract-pmvalues" title="Link to this heading"></a></h3>
+<p>Reads emission line fit results from the <code class="docutils literal notranslate"><span class="pre">PM_ELINES</span></code> and <code class="docutils literal notranslate"><span class="pre">PM_KEL</span></code>
+extensions (parametric and kinematic emission line fits). Extracts flux,
+velocity, and dispersion for each modeled wavelength.</p>
+</section>
+<section id="get-values">
+<h3><code class="docutils literal notranslate"><span class="pre">get_values()</span></code><a class="headerlink" href="#get-values" title="Link to this heading"></a></h3>
+<p>Combines <code class="docutils literal notranslate"><span class="pre">extract_values()</span></code> and <code class="docutils literal notranslate"><span class="pre">extract_PMvalues()</span></code> to build complete
+2D emission line maps. For each spaxel in the original cube grid, it matches
+the DAP fiber ID to the RSS SLITMAP coordinates and places the measurements
+at the correct spatial position.</p>
+<p>Returns three map arrays:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">map_dap</span></code> – non-parametric line measurements (NP), shape
+<code class="docutils literal notranslate"><span class="pre">[n_lines</span> <span class="pre">*</span> <span class="pre">8,</span> <span class="pre">nx,</span> <span class="pre">ny]</span></code> (8 quantities per line)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">map_dap2</span></code> – parametric line measurements (PM), shape
+<code class="docutils literal notranslate"><span class="pre">[n_models</span> <span class="pre">*</span> <span class="pre">6,</span> <span class="pre">nx,</span> <span class="pre">ny]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">map_dap3</span></code> – kinematic emission line measurements (PM_KEL), shape
+<code class="docutils literal notranslate"><span class="pre">[n_models</span> <span class="pre">*</span> <span class="pre">6,</span> <span class="pre">nx,</span> <span class="pre">ny]</span></code></p></li>
+</ul>
+</section>
+<section id="dap-extract-fluxelines">
+<h3><code class="docutils literal notranslate"><span class="pre">dap_extract_fluxelines()</span></code><a class="headerlink" href="#dap-extract-fluxelines" title="Link to this heading"></a></h3>
+<p>High-level wrapper that orchestrates the full extraction workflow:</p>
+<ol class="arabic simple">
+<li><p>Reads the cube header to determine spatial dimensions and WCS</p></li>
+<li><p>Optionally handles spatial tiling (<code class="docutils literal notranslate"><span class="pre">nsplit</span> <span class="pre">&gt;</span> <span class="pre">1</span></code>)</p></li>
+<li><p>Calls <code class="docutils literal notranslate"><span class="pre">get_values()</span></code> for each tile or the full cube</p></li>
+<li><p>Writes the output as <code class="docutils literal notranslate"><span class="pre">lvmDAPMap-&lt;name&gt;-flux_elines.fits.gz</span></code> with three
+extensions: NP, PM, and PM_KEL</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">CubeGen.daptools.dap_fluxelines</span><span class="w"> </span><span class="kn">import</span> <span class="n">dap_extract_fluxelines</span>
+
+<span class="n">dap_extract_fluxelines</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;NGC_1234&#39;</span><span class="p">,</span>
+    <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;./dap_maps/&#39;</span><span class="p">,</span>
+    <span class="n">path_cube</span><span class="o">=</span><span class="s1">&#39;./cubes/&#39;</span><span class="p">,</span>
+    <span class="n">path_dap</span><span class="o">=</span><span class="s1">&#39;./dap/&#39;</span><span class="p">,</span>
+    <span class="n">path_rss</span><span class="o">=</span><span class="s1">&#39;./rss/&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The output header contains <code class="docutils literal notranslate"><span class="pre">VAL_xxxx</span></code> keywords that map each slice of the
+data cube to the corresponding emission line and measurement type (e.g.,
+<code class="docutils literal notranslate"><span class="pre">flux_Ha_6565</span></code>, <code class="docutils literal notranslate"><span class="pre">vel_OIII_5008</span></code>).</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="outputs.html" class="btn btn-neutral float-left" title="Output Data Products" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hector Ibarra-Medel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

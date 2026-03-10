@@ -1,0 +1,569 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Commands Overview &mdash; 3DCubeGen 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Kernel Smoothing Parameters" href="kernel_smoothing.html" />
+    <link rel="prev" title="Installation &amp; Getting Started" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            3DCubeGen
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation &amp; Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LVM Pipeline</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Commands Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#single-vs-pipeline-commands">Single vs. Pipeline Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cube-vs-map-commands">Cube vs. Map Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pipecube-specific-features">pipecube-Specific Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pipemap-specific-features">pipemap-Specific Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parameter-comparison">Parameter Comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start-examples">Quick-Start Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="kernel_smoothing.html">Kernel Smoothing Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">YAML Configuration Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exposure_list.html">Exposure List File Format</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Spectrographs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="megara.html">MEGARA Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virusp.html">VirusP Pipeline</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="algorithm.html">Reconstruction Algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Output Data Products</a></li>
+<li class="toctree-l1"><a class="reference internal" href="daptools.html">DAP Integration Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">3DCubeGen</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Commands Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/commands.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="commands-overview">
+<h1>Commands Overview<a class="headerlink" href="#commands-overview" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">3dcubegen</span></code> CLI provides four commands for LVM data. They fall into two
+categories – <strong>cube generation</strong> (full 3D spectral cubes) and <strong>map
+generation</strong> (2D narrow/broad-band images) – each available in a single-target
+or batch-pipeline mode.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>3dcubegen<span class="w"> </span>&lt;command&gt;<span class="w"> </span>-c<span class="w"> </span>&lt;config_file&gt;
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 14.0%" />
+<col style="width: 14.0%" />
+<col style="width: 72.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Output</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sincube</span></code></p></td>
+<td><p>3D cube</p></td>
+<td><p>Generate one data cube from a single target’s exposure list.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pipecube</span></code></p></td>
+<td><p>3D cube(s)</p></td>
+<td><p>Batch-process multiple targets into cubes, with optional spectral
+chunking, co-addition, and RSS extraction.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sinmap</span></code></p></td>
+<td><p>2D map(s)</p></td>
+<td><p>Generate narrow-band or broad-band 2D images for a single target.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pipemap</span></code></p></td>
+<td><p>2D map(s) + color JPEGs</p></td>
+<td><p>Batch-process multiple targets into all seven filter maps and
+composite color images (OHS, OOH, gri, griOOH).</p></td>
+</tr>
+</tbody>
+</table>
+<section id="single-vs-pipeline-commands">
+<h2>Single vs. Pipeline Commands<a class="headerlink" href="#single-vs-pipeline-commands" title="Link to this heading"></a></h2>
+<p>The “sin” (single) and “pipe” (pipeline) variants differ in three key ways:</p>
+<p><strong>1. Number of targets</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sincube</span></code> / <code class="docutils literal notranslate"><span class="pre">sinmap</span></code> process <strong>one target</strong> at a time. The target name
+is set by <code class="docutils literal notranslate"><span class="pre">nameF</span></code>, and its coordinates by <code class="docutils literal notranslate"><span class="pre">coord_cen</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pipecube</span></code> / <code class="docutils literal notranslate"><span class="pre">pipemap</span></code> process a <strong>list of targets</strong> in a loop. Target
+names are given as a YAML list in <code class="docutils literal notranslate"><span class="pre">nameL</span></code>, with matching coordinates in
+<code class="docutils literal notranslate"><span class="pre">coord_cenL</span></code>.</p></li>
+</ul>
+<p><strong>2. Kernel specification</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sincube</span></code> / <code class="docutils literal notranslate"><span class="pre">sinmap</span></code> accept explicit kernel parameters: <code class="docutils literal notranslate"><span class="pre">sigm_s</span></code>
+(kernel size in arcsec), <code class="docutils literal notranslate"><span class="pre">pix_s</span></code> (spaxel size), and <code class="docutils literal notranslate"><span class="pre">alph_s</span></code> (shape
+factor). This gives full control over spatial resolution.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pipecube</span></code> / <code class="docutils literal notranslate"><span class="pre">pipemap</span></code> use a single-letter <code class="docutils literal notranslate"><span class="pre">type</span></code> code (<code class="docutils literal notranslate"><span class="pre">a</span></code> through
+<code class="docutils literal notranslate"><span class="pre">j</span></code>) that maps to predefined <code class="docutils literal notranslate"><span class="pre">sigm_s</span></code> and <code class="docutils literal notranslate"><span class="pre">pix_s</span></code> values via
+<code class="docutils literal notranslate"><span class="pre">kernel_pipe()</span></code>. The shape factor <code class="docutils literal notranslate"><span class="pre">alph_s</span></code> is fixed at 2.0 (Gaussian).
+See <a class="reference internal" href="kernel_smoothing.html#kernel-types"><span class="std std-ref">Type-to-parameter mapping</span></a> for the full table.</p></li>
+</ul>
+<p><strong>3. Output path structure</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sincube</span></code> / <code class="docutils literal notranslate"><span class="pre">sinmap</span></code> write output directly into <code class="docutils literal notranslate"><span class="pre">out_path</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pipecube</span></code> / <code class="docutils literal notranslate"><span class="pre">pipemap</span></code> append <code class="docutils literal notranslate"><span class="pre">&lt;redux_ver&gt;/&lt;type&gt;/</span></code> to the output
+path automatically (e.g. <code class="docutils literal notranslate"><span class="pre">out_cubes/1.1.1.dev0/c/</span></code>).</p></li>
+</ul>
+</section>
+<section id="cube-vs-map-commands">
+<h2>Cube vs. Map Commands<a class="headerlink" href="#cube-vs-map-commands" title="Link to this heading"></a></h2>
+<p><strong>Cube commands</strong> (<code class="docutils literal notranslate"><span class="pre">sincube</span></code>, <code class="docutils literal notranslate"><span class="pre">pipecube</span></code>) produce full 3D FITS data cubes
+(RA x Dec x wavelength). They read RSS frames, interpolate fiber spectra onto
+a regular spatial grid using the weighted kernel algorithm, and write the
+result as <code class="docutils literal notranslate"><span class="pre">lvmCube-&lt;name&gt;.fits.gz</span></code>.</p>
+<p><strong>Map commands</strong> (<code class="docutils literal notranslate"><span class="pre">sinmap</span></code>, <code class="docutils literal notranslate"><span class="pre">pipemap</span></code>) produce 2D FITS images by
+convolving the RSS spectra with photometric filter curves before spatial
+interpolation. The output files are named <code class="docutils literal notranslate"><span class="pre">lvmMap-&lt;name&gt;_&lt;band&gt;.fits.gz</span></code>.</p>
+<p>The available photometric bands are:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 8.0%" />
+<col style="width: 15.0%" />
+<col style="width: 20.0%" />
+<col style="width: 57.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Code</p></th>
+<th class="head"><p>Band</p></th>
+<th class="head"><p>Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>OII</p></td>
+<td><p>[OII] 3728 A</p></td>
+<td><p>Narrow-band (doublet, 8 A width)</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>OIII</p></td>
+<td><p>[OIII] 5008 A</p></td>
+<td><p>Narrow-band (5 A width)</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>HI</p></td>
+<td><p>H-alpha 6565 A</p></td>
+<td><p>Narrow-band (5 A width)</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>SII</p></td>
+<td><p>[SII] 6733 A</p></td>
+<td><p>Narrow-band (5 A width)</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>g</p></td>
+<td><p>SDSS g</p></td>
+<td><p>Broad-band</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>r</p></td>
+<td><p>SDSS r</p></td>
+<td><p>Broad-band</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>i</p></td>
+<td><p>SDSS i</p></td>
+<td><p>Broad-band</p></td>
+</tr>
+</tbody>
+</table>
+<p>Map-specific parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">redshift</span></code> – target redshift, used to shift filter curves to rest frame.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">photoband</span></code> – which band(s) to generate. In <code class="docutils literal notranslate"><span class="pre">sinmap</span></code> this is a
+comma-separated list (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;0,2,5&quot;</span></code>). In <code class="docutils literal notranslate"><span class="pre">pipemap</span></code> all 7 bands are
+always generated.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">deconv</span></code> – enable Richardson-Lucy deconvolution of the output map.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">psfdecv</span></code> – PSF sigma for deconvolution (arcsec). If <code class="docutils literal notranslate"><span class="pre">0</span></code>, the PSF is
+estimated as <code class="docutils literal notranslate"><span class="pre">sqrt(fiber_size^2</span> <span class="pre">+</span> <span class="pre">kernel_size^2)</span></code>.</p></li>
+</ul>
+</section>
+<section id="pipecube-specific-features">
+<h2>pipecube-Specific Features<a class="headerlink" href="#pipecube-specific-features" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pipecube</span></code> has several features beyond what <code class="docutils literal notranslate"><span class="pre">sincube</span></code> offers:</p>
+<p><strong>Spectral chunking for large mosaics</strong></p>
+<p>When a target has more than 100 exposures, the full spectral range cannot fit
+in memory at once. <code class="docutils literal notranslate"><span class="pre">pipecube</span></code> automatically splits the cube into spectral
+chunks:</p>
+<ul class="simple">
+<li><p>101–500 exposures: 7 chunks (1000 A each)</p></li>
+<li><p>501–1000 exposures: 13 chunks (500 A each)</p></li>
+<li><p>&gt;1000 exposures: 25 chunks (250 A each)</p></li>
+</ul>
+<p>The chunks are then co-added into a single cube when <code class="docutils literal notranslate"><span class="pre">mergecube:</span> <span class="pre">True</span></code>.</p>
+<p><strong>Spatial tiling</strong></p>
+<p>Set <code class="docutils literal notranslate"><span class="pre">nsp</span></code> to a value &gt; 1 to split the merged cube into an <code class="docutils literal notranslate"><span class="pre">nsp</span> <span class="pre">x</span> <span class="pre">nsp</span></code>
+spatial grid. This is useful for very large mosaics that exceed memory limits.</p>
+<p><strong>RSS extraction</strong></p>
+<p>When <code class="docutils literal notranslate"><span class="pre">cube2rss:</span> <span class="pre">True</span></code>, <code class="docutils literal notranslate"><span class="pre">pipecube</span></code> extracts an RSS from each generated
+cube and writes it to <code class="docutils literal notranslate"><span class="pre">out_pathrss</span></code>.</p>
+<p><strong>Resume support</strong></p>
+<p>If a run is interrupted during spectral chunk processing, set
+<code class="docutils literal notranslate"><span class="pre">index_reset</span></code> to the chunk index where it stopped to resume without
+reprocessing earlier chunks. Set <code class="docutils literal notranslate"><span class="pre">force_merge:</span> <span class="pre">True</span></code> to skip cube generation
+entirely and only run the co-addition step.</p>
+</section>
+<section id="pipemap-specific-features">
+<h2>pipemap-Specific Features<a class="headerlink" href="#pipemap-specific-features" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pipemap</span></code> generates all seven photometric bands for each target and then
+automatically creates composite color JPEG images:</p>
+<ul class="simple">
+<li><p><strong>OHS</strong> – [OIII] (blue) + H-alpha (green) + [SII] (red)</p></li>
+<li><p><strong>OOH</strong> – [OII] (blue) + [OIII] (green) + H-alpha (red)</p></li>
+<li><p><strong>gri</strong> – g (blue) + r (green) + i (red)</p></li>
+<li><p><strong>griOOH</strong> – broad-band + narrow-band composite with configurable weights</p></li>
+</ul>
+<p>If <code class="docutils literal notranslate"><span class="pre">deconv</span></code> is enabled, deconvolved versions of each image and composite
+are also produced.</p>
+</section>
+<section id="parameter-comparison">
+<h2>Parameter Comparison<a class="headerlink" href="#parameter-comparison" title="Link to this heading"></a></h2>
+<p>The table below summarizes which parameters are available in each command.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29.4%" />
+<col style="width: 17.6%" />
+<col style="width: 17.6%" />
+<col style="width: 17.6%" />
+<col style="width: 17.6%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>sincube</p></th>
+<th class="head"><p>pipecube</p></th>
+<th class="head"><p>sinmap</p></th>
+<th class="head"><p>pipemap</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">survey_type</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">out_path</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y <a class="footnote-reference brackets" href="#auto" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></td>
+<td><p>Y</p></td>
+<td><p>Y <a class="footnote-reference brackets" href="#auto" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">redux_ver</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">redux_dir</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sigm_s</span></code></p></td>
+<td><p>Y</p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pix_s</span></code></p></td>
+<td><p>Y</p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">alph_s</span></code></p></td>
+<td><p>Y</p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">type</span></code></p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">flu16</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nameF</span></code></p></td>
+<td><p>Y</p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nameL</span></code></p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">coord_cen</span></code></p></td>
+<td><p>Y</p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">coord_cenL</span></code></p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_slitmap</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pbars</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">spec_range</span></code></p></td>
+<td><p>Y</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">path_sas</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">basename</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">errors</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fac_sizeY</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fac_sizeX</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cent</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pathF</span></code></p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mergecube</span></code></p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nsp</span></code></p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cube2rss</span></code></p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">out_pathrss</span></code></p></td>
+<td></td>
+<td><p>Y <a class="footnote-reference brackets" href="#auto" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nproc</span></code></p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">force_merge</span></code></p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">index_reset</span></code></p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">redshift</span></code></p></td>
+<td></td>
+<td></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">photoband</span></code></p></td>
+<td></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deconv</span></code></p></td>
+<td></td>
+<td></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">psfdecv</span></code></p></td>
+<td></td>
+<td></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+</tbody>
+</table>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="auto" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id3">3</a>)</span>
+<p>Path has <code class="docutils literal notranslate"><span class="pre">&lt;redux_ver&gt;/&lt;type&gt;/</span></code> appended automatically.</p>
+</aside>
+</aside>
+</section>
+<section id="quick-start-examples">
+<h2>Quick-Start Examples<a class="headerlink" href="#quick-start-examples" title="Link to this heading"></a></h2>
+<p><strong>Generate a single cube with custom kernel:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>3dcubegen<span class="w"> </span>sincube<span class="w"> </span>-c<span class="w"> </span>config_sincube.yml
+</pre></div>
+</div>
+<p><strong>Batch-generate cubes for multiple targets at type-c resolution:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>3dcubegen<span class="w"> </span>pipecube<span class="w"> </span>-c<span class="w"> </span>config_pipecube.yml
+</pre></div>
+</div>
+<p><strong>Generate an H-alpha narrow-band map for one target:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>3dcubegen<span class="w"> </span>sinmap<span class="w"> </span>-c<span class="w"> </span>config_sinmap.yml
+</pre></div>
+</div>
+<p><strong>Batch-generate all maps and color composites:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>3dcubegen<span class="w"> </span>pipemap<span class="w"> </span>-c<span class="w"> </span>config_pipemap.yml
+</pre></div>
+</div>
+<p>All commands can also be run entirely from CLI flags without a config file.
+See <code class="docutils literal notranslate"><span class="pre">3dcubegen</span> <span class="pre">&lt;command&gt;</span> <span class="pre">--help</span></code> for the full list of options.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation &amp; Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="kernel_smoothing.html" class="btn btn-neutral float-right" title="Kernel Smoothing Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hector Ibarra-Medel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

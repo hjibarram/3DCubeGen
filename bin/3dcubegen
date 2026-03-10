@@ -93,7 +93,7 @@ def sincube(config_file,out_path,redux_ver,redux_dir,sigm_s,pix_s,alph_s,flu16,n
     
     
 cli.add_command(sincube)
-
+#Ni siquiera se que es esto, pero ok
 @cli.command('pipecube', short_help='pipeline to obtain the MC and LV cubes')
 @click.option('-c', '--config_file', type=str, default='', help='name of the config file')
 @click.option('-o', '--out_path', type=str, default='out_cubes/', help='path of the output cube files')
@@ -154,8 +154,23 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
         path_sas=os.environ['SAS_BASE_DIR']+'/'
     except:
         path_sas=path_sas+'/'
-    out_pathrss=out_pathrss+redux_ver+'/'
-    out_path=out_path+redux_ver+'/'
+    try: 
+        nproc=data['pipecube'][0]['nproc']
+    except:
+        nproc=3
+    f_merge=False
+    try: 
+        f_merge=data['pipecube'][0]['force_merge']
+    except:
+        f_merge=False
+    inres=0    
+    try: 
+        inres=data['pipecube'][0]['index_reset']
+    except:
+        inres=0    
+            
+    out_pathrss=out_pathrss+redux_ver+'/'+type+'/'
+    out_path=out_path+redux_ver+'/'+type+'/'
 
     sigm_s,pix_s=tools.kernel_pipe(type=type)
     alph_s=2.0
@@ -175,49 +190,59 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
         if dit <= 100:
             spec_range=(None,None)
             if dit < 3:
-                sigm_s=17.6/2*32*1/8
-                pix_s=17.6/2*0.75*32*1/8
-                type='h'
+                if type == 'i' or type == 'j':
+                    sigm_s=17.6/2*32*1/8
+                    pix_s=17.6/2*0.75*32*1/8
+                    type='h'
+            print('Generate the Cube in type '+type)    
             map_ifu(explist,nameF=nameF1+type,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
                 spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
                 alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
-                tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook)
+                tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook,nproc=nproc)
             if cube2rss:
-                rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook)
+                print('Generate the RSS in type '+type)
+                rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook,pbars=pbars)
         else:
             if dit <= 500:
                 spec_range_l=[(3000,4000),(4000,5000),(5000,6000),(6000,7000),(7000,8000),(8000,9000),(9000,10000)]
-
             elif dit <= 1000:
                 spec_range_l=[(3000,4000),(4000,4500),(4500,5000),(5000,5500),(5500,6000),(6000,6500),(6500,7000),(7000,7500),(7500,8000),(8000,8500),(8500,9000),(9000,9500),(9500,10000)]
             else:
                 spec_range_l=[(3000,4000),(4000,4250),(4250,4500),(4500,4750),(4750,5000),(5000,5250),(5250,5500),(5500,5750),(5750,6000),(6000,6250),(6250,6500),(6500,6750),(6750,7000),(7000,7250),(7250,7500),(7500,7750),(7750,8000),(8000,8250),(8250,8500),(8500,8750),(8750,9000),(9000,9250),(9250,9500),(9500,9750),(9750,10000)]
             id_l=[]
-            for i in range(0, len(spec_range_l)):
+            if inres >= len(spec_range_l):
+                print('Error: the index_reset is larger than the number of spectral ranges, set default value')
+                inres=0
+            for i in range(inres, len(spec_range_l)):
                 nameF=nameF1+type+'_'+"{:0>2}".format(str(int(i)))
                 id_l.extend(["{:0>2}".format(str(int(i)))])
                 spec_range=spec_range_l[i]
-                map_ifu(explist,nameF=nameF,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
-                    spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
-                    alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
-                    tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook)
-
+                if f_merge == False:
+                    print('Generate the Cube in type '+type+' and in spec range ',spec_range,' of '+str(len(spec_range_l))+' ranges')
+                    map_ifu(explist,nameF=nameF,flu16=flu16,cent=cent,coord_cen=coord_cen,errors=errors,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
+                        spec_range=spec_range,multiT=True,use_slitmap=use_slitmap,pbars=pbars,out_path=out_path,sigm_s=sigm_s,pix_s=pix_s,
+                        alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
+                        tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook,nproc=nproc)
             if mergecube:
                 nameR='lvmCube-NAME_id.fits.gz'.replace('NAME',nameF1+type)
                 nameT='lvmCube-NAME.fits.gz'.replace('NAME',nameF1+type)
                 if nsp > 1:
                     for ii in range(0, nsp):
-                        for jj in range(0, nsp): 
-                            coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,nsplit=nsp,spt=[ii,jj],notebook=notebook)
+                        for jj in range(0, nsp):
+                            print('Generate the Coadding and Tiling of the Cube in type '+type+' and for '+str(ii)+'-'+str(jj)+' of '+str(nsp)+'-'+str(nsp)) 
+                            coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,nsplit=nsp,spt=[ii,jj],notebook=notebook,pbars=pbars)
                     if cube2rss:
                         for ii in range(0, nsp):
                             for jj in range(0, nsp):
                                 namet=nameF1+type+'_p'+str(ii)+str(jj)
-                                rssp_extract(namet,path=out_path,path_out=out_pathrss,notebook=notebook)
+                                print('Generate the RSS and Tiling in type '+type+' and for '+str(ii)+'-'+str(jj)+' of '+str(nsp)+'-'+str(nsp)) 
+                                rssp_extract(namet,path=out_path,path_out=out_pathrss,notebook=notebook,pbars=pbars)
                 else:
-                    coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,notebook=notebook)
+                    print('Generate the coadding of the Cube in type '+type)
+                    coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,notebook=notebook,pbars=pbars)
                     if cube2rss:
-                        rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook)
+                        print('Generate the RSS in type '+type)
+                        rssp_extract(nameF1+type,path=out_path,path_out=out_pathrss,notebook=notebook,pbars=pbars)
 
 
  
@@ -387,6 +412,10 @@ def pipemap(config_file,out_path,redux_ver,redux_dir,type,namel,use_slitmap,pbar
     except:
         path_sas=path_sas+'/'
     out_path=out_path+redux_ver+'/'
+    try: 
+        nproc=data['pipemap'][0]['nproc']
+    except:
+        nproc=3
 
     sigm_s,pix_s=tools.kernel_pipe(type=type)
     alph_s=2.0
@@ -407,15 +436,16 @@ def pipemap(config_file,out_path,redux_ver,redux_dir,type,namel,use_slitmap,pbar
         dit=len(explist)
         spec_range=(None,None)
         if dit < 3:
-            sigm_s=17.6/2*32*1/8
-            pix_s=17.6/2*0.75*32*1/8
-            type='h'
+            if type == 'i' or type == 'j':
+                sigm_s=17.6/2*32*1/8
+                pix_s=17.6/2*0.75*32*1/8
+                type='h'
         zt=redshift
         for i in range(0, len(labt)):
             print('Generating the '+labt[i])
             tyl=tyll[i]
             ki=i
-            gen_map(explist,multiT=True,nameF=nameF1+type,cent=cent,coord_cen=coord_cen,out_path=out_path,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
+            gen_map(explist,multiT=True,nproc=nproc,nameF=nameF1+type,cent=cent,coord_cen=coord_cen,out_path=out_path,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,
                 use_slitmap=use_slitmap,pbars=pbars,tilelist=tilelist,tileglist=tileglist,zt=zt,ki=ki,sigm_s=sigm_s,pix_s=pix_s,alph_s=alph_s,
                 agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,mjd=mjd,redux_ver=redux_ver,basename=basename,notebook=notebook)       
             if deconv:

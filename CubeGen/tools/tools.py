@@ -14,6 +14,83 @@ from multiprocessing.pool import ThreadPool
 from scipy.spatial.distance import pdist
 from tqdm.notebook import tqdm
 
+import numpy as np
+
+def numpy_to_tform(arr):
+    arr = np.asarray(arr)
+
+    # tipo base
+    base = arr.dtype
+
+    fits_map = {
+        np.dtype('float32'): 'E',
+        np.dtype('float64'): 'D',
+        np.dtype('int16'):   'I',
+        np.dtype('int32'):   'J',
+        np.dtype('int64'):   'K',
+        np.dtype('uint8'):   'B',
+        np.dtype('bool'):    'L',
+        np.dtype('>i8'):     'K',
+        np.dtype('>f8'):     'D'
+    }
+
+    if base.kind in ['U', 'S']:
+        # strings
+        strlen = arr.dtype.itemsize
+        return f'{strlen}A'
+
+    if base not in fits_map:
+        raise ValueError(f'Dtype no soportado: {base}')
+
+    code = fits_map[base]
+
+    # escalar o vector
+    if arr.ndim == 1:
+        return code
+    elif arr.ndim == 2:
+        return f'{arr.shape[1]}{code}'
+    else:
+        raise ValueError("FITS no soporta ndim > 2 en tablas")
+
+
+def read_filelist(name,path='',hid='wave',sep=','):
+    """
+    Reads a cvs file and returns the data as a dictionary.
+    Parameters:
+    name (str): The name of the file to read.
+    path (str): The directory path where the file is located.
+    head (str): The header identifier to locate the header line in the file.
+    sep (str): The separator used in the file (default is comma).
+
+    Returns:
+    dic array: The data read from the file.
+    """
+    file=path+name
+    f=open(file,'r')
+    dic={}
+    ct=0
+    for line in f:
+        ct+=1
+        if hid in line:
+            data=line.replace('\n','').replace(' ','').split(sep)
+            data=list(filter(None, data)) # Remove empty strings
+            nh=len(data)
+            for it in range(0, nh):
+                dic.update({data[it]:[]})
+            head=data
+        else:
+            data=line.replace('\n','').split(',')
+            data=list(filter(None,data))
+            if len(data) == nh:
+                for it in range(0, nh):
+                    try:
+                        val=float(data[it])
+                    except:
+                        val=data[it].replace(' ','')
+                    dic[head[it]].extend([val])
+    f.close()
+    return dic
+
 def median_a(x,lw=5,lower=10000,wave=[]):
     if len(wave) > 0:
         index=np.where(wave < lower)[0]
