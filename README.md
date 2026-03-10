@@ -17,6 +17,7 @@ This repository provides four main command-line executables:
 This documentation targets the **dev branch**.
 
 The full documentation can be looked at https://hjibarram.github.io/3DCubeGen/
+
 ------------------------------------------------------------------------
 
 # Installation
