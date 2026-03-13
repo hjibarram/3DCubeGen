@@ -748,8 +748,6 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         pdl_00g=imag_F[0,1,:,:]
         pdl_00r=imag_F[0,2,:,:]
         pdl_00i=imag_F[0,3,:,:]
-        print(np.nanmax(pdl_00g),np.nanmax(pdl_00r),np.nanmax(pdl_00i))
-        print(np.nanmin(pdl_00g),np.nanmin(pdl_00r),np.nanmin(pdl_00i))
         if len(pdl_00r[np.where(pdl_00r > 0)]) > 0:
             max=17.5#np.nanmin(pdl_00r[np.where(pdl_00r > 0)])-0.5#24.0#17.5
         else:
