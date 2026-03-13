@@ -652,6 +652,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
                         photo_a[i,j]=-2.5*np.log10(1e-10*0)#14
                     else:
                         photo_a[i,j]=-2.5*np.log10(f_fin/0.5**2)
+                    print(f_fin)    
                     photo_b[i,j]=f_fin*zerop[k]*jans
                     photo_c[i,j]=f_fi2
         if fitsf == 1:
