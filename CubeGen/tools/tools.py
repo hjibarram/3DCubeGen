@@ -631,8 +631,8 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
             data=line.replace('/n','').split(' ')
             data=list(filter(None,data))
             if len(data) > 1:
-                wave.extend([float(data[0])])
-                trans.extend([float(data[1])])
+                wave.extend([float(data[1])])
+                trans.extend([float(data[2])])
         f.close()
         d_wave=np.zeros(len(wave))
         for kk in range(1,len(wave)):
@@ -651,8 +651,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
                     if f_fin <= 0:
                         photo_a[i,j]=-2.5*np.log10(1e-10*0)#14
                     else:
-                        photo_a[i,j]=-2.5*np.log10(f_fin/0.5**2)
-                    print(np.nanmax(wave_s),np.nanmin(wave_s))    
+                        photo_a[i,j]=-2.5*np.log10(f_fin/0.5**2)   
                     photo_b[i,j]=f_fin*zerop[k]*jans
                     photo_c[i,j]=f_fi2
         if fitsf == 1:
