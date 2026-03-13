@@ -13,7 +13,7 @@ import yaml
 from multiprocessing.pool import ThreadPool
 from scipy.spatial.distance import pdist
 from tqdm.notebook import tqdm
-
+from PIL import Image as im2
 import numpy as np
 
 def numpy_to_tform(arr):
@@ -597,6 +597,172 @@ def band_spectra(wave_s,pdl_flux,k=5,zt=0):
     else:
         photo_a,photo_b,photo_c=[0,0,0]
     return photo_a,photo_b,photo_c,band[k]
+
+
+def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,zrf=0.1,clam=0.9):
+    vel_light=299792458.0
+    ang=1e-10
+    jans=1e-23
+    pdl_flux=spec
+    pdl_flux=pdl_flux*1e-16
+    [nw,nx,ny]=pdl_flux.shape
+    int_spec1=np.zeros(nw)
+    int_spec2=np.zeros(nw)
+    wave_s=np.zeros(nw)
+    for j in range(0, nw):
+        wave_s[j]=(crval+cdelt*(j+1-crpix))*(1+zrf)
+        int_spec1[j]=np.sum(pdl_flux[j,:,:])#*clam/cdelt#/5500.#/cdelt
+        int_spec2[j]=np.sum(pdl_flux[j,:,:])*wave_s[j]**2.0/vel_light*ang/jans/3631.0#/cdelt*clam/cdelt
+    file=['SDSS_u.txt','SDSS_u.txt','SDSS_u.txt','SDSS_u.txt','SDSS_z.txt','NUV_GALEX.txt','FUV_GALEX.txt','U_Johnson.txt','B_Johnson.txt','V_Johnson.txt','I_Cousins.txt','R_Cousins.txt','J_2MASS.txt','H_2MASS.txt','K_2MASS.txt','ha_filter_sh.txt']
+    band=['u','g','r','i','z','NUV','FUV','U','B','V','I','R','J','H','K','ha']
+    zerop=[3631.0,3631.0,3730.0,3730.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0]
+    imag_F=np.zeros([3,len(band),nx,ny])
+    for k in range(0, len(band)):
+        photo_a=np.zeros([nx,ny])
+        photo_b=np.zeros([nx,ny])
+        photo_c=np.zeros([nx,ny])
+        photo_ae=np.zeros([nx,ny])
+        photo_be=np.zeros([nx,ny])
+        photo_ce=np.zeros([nx,ny])
+        f=open(dir+file[k],'r')
+        wave=[]
+        trans=[]
+        for line in f:
+            data=line.replace('/n','').split(' ')
+            data=list(filter(None,data))
+            if len(data) > 1:
+                wave.extend([float(data[0])])
+                trans.extend([float(data[1])])
+        f.close()
+        d_wave=np.zeros(len(wave))
+        for kk in range(1,len(wave)):
+            d_wave[kk]=wave[kk]-wave[kk-1]
+        d_wave[0]=d_wave[1]
+        trans=np.array(trans)
+        wave=np.array(wave)
+        for i in range(0, nx):
+            for j in range(0, ny):
+                spec=pdl_flux[:,i,j]
+                if np.sum(spec) > 0:
+                    spec1=interp1d(wave_s, spec,kind='linear',bounds_error=False,fill_value=0.)(wave)
+                    flux_t=spec1*trans*d_wave#/5500.# **2.0#Por la mezcla de normalizaciones, si no se usa mezcla entoces usar d_wave
+                    f_fin=simpson_r(flux_t*wave**2.0/d_wave/vel_light*ang,wave,0,len(wave)-2,typ=1)/simpson_r(trans,wave,0,len(wave)-2,typ=1)/jans/zerop[k]
+                    f_fi2=simpson_r(flux_t/d_wave,wave,0,len(wave)-2,typ=1)/simpson_r(trans,wave,0,len(wave)-2,typ=1)
+                    if f_fin <= 0:
+                        photo_a[i,j]=-2.5*np.log10(1e-10*0)#14
+                    else:
+                        photo_a[i,j]=-2.5*np.log10(f_fin+1e-10*0)
+                    photo_b[i,j]=f_fin*zerop[k]*jans
+                    photo_c[i,j]=f_fi2
+        if fitsf == 1:
+            if k == 0:
+                hdr["NAXIS"]=2
+                hdr["UNITS"]=('Magnitudes', '-2.5log(F/F0) with F0 as ZPOINT')
+            hdr["PBAND"]=file[k].replace('.txt','')
+            hdr["ZPOINT"]=(zerop[k], 'Zero Point in Jy')
+            hdr2=hdr
+            hdr3=hdr
+            if k == 0:
+                hdr2["UNITS"]='ergs/s/cm^2/Hz'
+                hdr3["UNITS"]='ergs/s/cm^2/A'
+        imag_F1=photo_a
+        imag_F2=photo_b
+        imag_F3=photo_c
+        imag_F[0,k,:,:]=imag_F1
+        imag_F[1,k,:,:]=imag_F2
+        imag_F[2,k,:,:]=imag_F3
+        if fitsf == 1:
+            name_f=name.replace('.fits.gz','.')
+            h1=fits.HDUList([fits.PrimaryHDU(imag_F1,header=hdr)])
+            h2=fits.HDUList([fits.PrimaryHDU(imag_F2,header=hdr2)])
+            h3=fits.HDUList([fits.PrimaryHDU(imag_F3,header=hdr3)])
+            h1.update_extend()
+            h2.update_extend()
+            h3.update_extend()
+            out_fit1=dir1+name_f+band[k]+'_'+str(np.int(age*1000))+'.fits'
+            out_fit2=dir1+name_f+band[k]+'_'+str(np.int(age*1000))+'_F.fits'
+            out_fit3=dir1+name_f+band[k]+'_'+str(np.int(age*1000))+'_L.fits'
+            h1.writeto(out_fit1,overwrite=True)
+            h2.writeto(out_fit2,overwrite=True)
+            h3.writeto(out_fit3,overwrite=True)
+            sycall('gzip -f '+out_fit1)
+            sycall('gzip -f '+out_fit2)
+            sycall('gzip -f '+out_fit3)
+    if outs == 1:
+        name_f=name.replace('.fits.gz','.')
+        nt_s=np.where((wave_s > 3500) & (wave_s < 10000))[0]
+        max_val1=np.amax(int_spec1[nt_s])*1.25
+        max_val2=-2.5*np.log10(np.amax(int_spec2[nt_s])*1.85)
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots(figsize=(8,5.5))
+        ax.set_ylim(0,max_val1)#0.75e-14)#
+        ax.set_xlim(1500,20000)
+        ax.set_xlabel("$Wavelength [A]$",fontsize=14)
+        ax.set_ylabel("Flux $[erg/s/cm^2/A]$",fontsize=14)
+        plt.title("Age="+str(round(10**(age-6),2))+" Myr")
+        plt.plot(wave_s,int_spec1)
+        fig.tight_layout()
+        plt.savefig(dir1+name_f+'_'+str(np.int(age*1000))+'spec.jpg')
+        plt.close()    
+
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots(figsize=(8,5.5))
+        ax.set_ylim(0,max_val1)#0.75e-14)#
+        ax.set_xlim(3800,9000)
+        ax.set_xlabel("$Wavelength [A]$",fontsize=14)
+        ax.set_ylabel("Flux $[erg/s/cm^2/A]$",fontsize=14)
+        plt.title("Age="+str(round(10**(age-6),2))+" Myr")
+        plt.plot(wave_s,int_spec1)
+        fig.tight_layout()
+        plt.savefig(dir1+name_f+'_'+str(np.int(age*1000))+'spec2.jpg')
+        plt.close()    
+        
+        fig, ax = plt.subplots(figsize=(8,5.5))
+        ax.set_xlim(1500,20000)
+        ax.set_xlabel("$Wavelength [A]$",fontsize=14)
+        ax.set_ylabel("Mag $[AB]$",fontsize=14)
+        plt.title("Age="+str(round(10**(age-6),2))+" Myr")
+        plt.plot(wave_s,-2.5*np.log10(int_spec2))
+        fig.tight_layout()
+        plt.savefig(dir1+name_f+'_'+str(np.int(age*1000))+'spec_Hz.jpg')
+        plt.close()
+
+
+        fig, ax = plt.subplots(figsize=(8,5.5))
+        ax.set_xlim(3800,9000)
+        ax.set_xlabel("$Wavelength [A]$",fontsize=14)
+        ax.set_ylabel("Mag $[AB]$",fontsize=14)
+        plt.title("Age="+str(round(10**(age-6),2))+" Myr")
+        plt.plot(wave_s,-2.5*np.log10(int_spec2))
+        fig.tight_layout()
+        plt.savefig(dir1+name_f+'_'+str(np.int(age*1000))+'spec_Hz2.jpg')
+        plt.close()
+
+        pdl_00g=imag_F[0,1,:,:]
+        pdl_00r=imag_F[0,2,:,:]
+        pdl_00i=imag_F[0,3,:,:]
+        if len(pdl_00r[np.where(pdl_00r > 0)]) > 0:
+            max=np.amin(pdl_00r[np.where(pdl_00r > 0)])-0.5#24.0#17.5
+        else:
+            max=20.0
+        min=25.0
+        nx,ny=pdl_00g.shape
+        pdl_00g=(np.flipud(pdl_00g)-min)/(max-min)*256
+        pdl_00r=(np.flipud(pdl_00r)-min)/(max-min)*256
+        pdl_00i=(np.flipud(pdl_00i)-min)/(max-min)*256
+        pdl_00g[np.where(pdl_00g < 0)]=0
+        pdl_00r[np.where(pdl_00r < 0)]=0
+        pdl_00i[np.where(pdl_00i < 0)]=0
+        pdl_00g[np.where(pdl_00g > 255)]=255
+        pdl_00r[np.where(pdl_00r > 255)]=255
+        pdl_00i[np.where(pdl_00i > 255)]=255
+        pdl_00=np.zeros([nx,ny,3],dtype="uint8")
+        pdl_00[:,:,0]=pdl_00i
+        pdl_00[:,:,1]=pdl_00r
+        pdl_00[:,:,2]=pdl_00g
+        im = im2.fromarray(pdl_00)
+        im.save(dir1+name_f+'_'+str(np.int(age*1000))+"gri.jpeg",quality=100)
+    return imag_F    
 
 def twoD_interpolB(x,y,x1,x2,x3,y1,y2,y3,z1,z2,z3):
     a=(y2-y1)*(z3-z1)-(y3-y1)*(z2-z1)
