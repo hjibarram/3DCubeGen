@@ -698,7 +698,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         try:
             ax.set_ylim(0,max_val1)
         except:
-            continue
+            pass
         ax.set_xlim(1500,20000)
         ax.set_xlabel("$Wavelength [A]$",fontsize=14)
         ax.set_ylabel("Flux $[erg/s/cm^2/A]$",fontsize=14)
@@ -713,7 +713,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         try:
             ax.set_ylim(0,max_val1)
         except:
-            continue
+            pass
         ax.set_xlim(3800,9000)
         ax.set_xlabel("$Wavelength [A]$",fontsize=14)
         ax.set_ylabel("Flux $[erg/s/cm^2/A]$",fontsize=14)
