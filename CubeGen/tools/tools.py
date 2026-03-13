@@ -693,6 +693,8 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         nt_s=np.where((wave_s > 3500) & (wave_s < 10000))[0]
         max_val1=np.nanmax(int_spec1[nt_s])*1.25
         max_val2=-2.5*np.log10(np.nanmax(int_spec2[nt_s])*1.85)
+        import matplotlib
+        matplotlib.use('Agg')
         import matplotlib.pyplot as plt
         fig, ax = plt.subplots(figsize=(8,5.5))
         try:
@@ -708,7 +710,6 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         plt.savefig(dir1+name_f+'_'+str(int(age*1000))+'spec.jpg')
         plt.close()    
 
-        import matplotlib.pyplot as plt
         fig, ax = plt.subplots(figsize=(8,5.5))
         try:
             ax.set_ylim(0,max_val1)
