@@ -691,8 +691,8 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
     if outs == 1:
         name_f=name.replace('.fits.gz','.')
         nt_s=np.where((wave_s > 3500) & (wave_s < 10000))[0]
-        max_val1=np.amax(int_spec1[nt_s])*1.25
-        max_val2=-2.5*np.log10(np.amax(int_spec2[nt_s])*1.85)
+        max_val1=np.nanmax(int_spec1[nt_s])*1.25
+        max_val2=-2.5*np.log10(np.nanmax(int_spec2[nt_s])*1.85)
         import matplotlib.pyplot as plt
         fig, ax = plt.subplots(figsize=(8,5.5))
         ax.set_ylim(0,max_val1)#0.75e-14)#
@@ -742,7 +742,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         pdl_00r=imag_F[0,2,:,:]
         pdl_00i=imag_F[0,3,:,:]
         if len(pdl_00r[np.where(pdl_00r > 0)]) > 0:
-            max=np.amin(pdl_00r[np.where(pdl_00r > 0)])-0.5#24.0#17.5
+            max=np.nanmax(pdl_00r[np.where(pdl_00r > 0)])-0.5#24.0#17.5
         else:
             max=20.0
         min=25.0
