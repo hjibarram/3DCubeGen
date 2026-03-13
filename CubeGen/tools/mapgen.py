@@ -167,16 +167,16 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
     if cent:
         ra_cen,dec_cen=coord_cen
         if ra_cen == 0:
-            yot=(np.amax(y_ifu_V)+np.amin(y_ifu_V))/2.0
-            xot=(np.amax(x_ifu_V)+np.amin(x_ifu_V))/2.0
+            yot=(np.nanmax(y_ifu_V)+np.nanmin(y_ifu_V))/2.0
+            xot=(np.nanmax(x_ifu_V)+np.nanmin(x_ifu_V))/2.0
         else:
             sky_coord = SkyCoord(ra=ra_cen, dec=dec_cen, frame="icrs", unit="deg")
             xot, yot = skycoord_to_pixel(sky_coord, wt1)
             xot=xot*pix_s
             yot=yot*pix_s
     else:    
-        yot=(np.amax(y_ifu_V)+np.amin(y_ifu_V))/2.0
-        xot=(np.amax(x_ifu_V)+np.amin(x_ifu_V))/2.0
+        yot=(np.nanmax(y_ifu_V)+np.nanmin(y_ifu_V))/2.0
+        xot=(np.nanmax(x_ifu_V)+np.nanmin(x_ifu_V))/2.0
     skycor = pixel_to_skycoord(xot/pix_s,yot/pix_s,wt1)
     xat=skycor.ra.value
     yat=skycor.dec.value
@@ -189,11 +189,11 @@ def gen_map(expnumL,nameF='MapLVM',notebook=True,use_slitmap=True,cent=False,coo
 
     
     if cent:
-        nlx=int(round((np.amax(x_ifu_V)-np.amin(x_ifu_V)+1)/pix_s))
-        nly=int(round((np.amax(y_ifu_V)-np.amin(y_ifu_V)+1)/pix_s))
+        nlx=int(round((np.nanmax(x_ifu_V)-np.nanmin(x_ifu_V)+1)/pix_s))
+        nly=int(round((np.nanmax(y_ifu_V)-np.nanmin(y_ifu_V)+1)/pix_s))
     else:
-        nlx=int(round((np.amax([np.amax(x_ifu_V),-np.amin(x_ifu_V)])+1)*2/pix_s))
-        nly=int(round((np.amax([np.amax(y_ifu_V),-np.amin(y_ifu_V)])+1)*2/pix_s))
+        nlx=int(round((np.nanmax([np.nanmax(x_ifu_V),-np.nanmin(x_ifu_V)])+1)*2/pix_s))
+        nly=int(round((np.nanmax([np.nanmax(y_ifu_V),-np.nanmin(y_ifu_V)])+1)*2/pix_s))
     nlx=int(nlx*fac_sizeX)
     nly=int(nly*fac_sizeY)
     if nlx== 0:

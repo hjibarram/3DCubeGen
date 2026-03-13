@@ -85,8 +85,8 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
                     rss_ef[n_fib0*ii+i]=np.sqrt(np.nansum(interp1d(wave,erss[fib,:],kind='linear',bounds_error=False)(wave0)**2))
                 x_ifu_V[n_fib0*ii+i]=x_ifu[i]
                 y_ifu_V[n_fib0*ii+i]=y_ifu[i]
-    yot=(np.amax(y_ifu_V)+np.amin(y_ifu_V))/2.0
-    xot=(np.amax(x_ifu_V)+np.amin(x_ifu_V))/2.0
+    yot=(np.nanmax(y_ifu_V)+np.nanmin(y_ifu_V))/2.0
+    xot=(np.nanmax(x_ifu_V)+np.nanmin(x_ifu_V))/2.0
     x_ifu_V=x_ifu_V-xot
     y_ifu_V=y_ifu_V-yot
     nw=len(wave0)
@@ -94,8 +94,8 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
     #pix_s=0.35
     fibA=0.000336666666666667/2*3600.0#
     thet=0.0
-    nlx=int(round((np.amax([np.amax(x_ifu_V),-np.amin(x_ifu_V)])+1)*2/pix_s))
-    nly=int(round((np.amax([np.amax(y_ifu_V),-np.amin(y_ifu_V)])+1)*2/pix_s))
+    nlx=int(round((np.nanmax([np.nanmax(x_ifu_V),-np.nanmin(x_ifu_V)])+1)*2/pix_s))
+    nly=int(round((np.nanmax([np.nanmax(y_ifu_V),-np.nanmin(y_ifu_V)])+1)*2/pix_s))
     nlx=int(nlx*fac_sizeX)
     nly=int(nly*fac_sizeY)
     if nlx== 0:

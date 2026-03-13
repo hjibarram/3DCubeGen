@@ -110,8 +110,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
         data_0.extend([rss])
         hdr_0.extend([hdr])
         hdr_1.extend([hdr1])
-    yot=(np.amax(y_ifu_V[:,0])+np.amin(y_ifu_V[:,0]))/2.0
-    xot=(np.amax(x_ifu_V[:,0])+np.amin(x_ifu_V[:,0]))/2.0
+    yot=(np.nanmax(y_ifu_V[:,0])+np.nanmin(y_ifu_V[:,0]))/2.0
+    xot=(np.nanmax(x_ifu_V[:,0])+np.nanmin(x_ifu_V[:,0]))/2.0
     x_ifu_V=x_ifu_V-xot
     y_ifu_V=y_ifu_V-yot
     nw=len(wave0)
@@ -119,8 +119,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
     #pix_s=0.35
     fibA=0.000336666666666667/2*3600.0#
     thet=0.0
-    nlx=int(round((np.amax([np.amax(x_ifu_V[:,0]),-np.amin(x_ifu_V[:,0])])+1)*2/pix_s))
-    nly=int(round((np.amax([np.amax(y_ifu_V[:,0]),-np.amin(y_ifu_V[:,0])])+1)*2/pix_s))
+    nlx=int(round((np.nanmax([np.nanmax(x_ifu_V[:,0]),-np.nanmin(x_ifu_V[:,0])])+1)*2/pix_s))
+    nly=int(round((np.nanmax([np.nanmax(y_ifu_V[:,0]),-np.nanmin(y_ifu_V[:,0])])+1)*2/pix_s))
     nlx=int(nlx*fac_sizeX)
     nly=int(nly*fac_sizeY)
     if nlx== 0:

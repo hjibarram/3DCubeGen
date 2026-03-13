@@ -111,8 +111,8 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,fcovmat=False,nproc
         pbar.close()
     y_ifu_V=y_ifu_pix*pix_s
     x_ifu_V=x_ifu_pix*pix_s
-    yot=(np.amax(y_ifu_V)+np.amin(y_ifu_V))/2.0
-    xot=(np.amax(x_ifu_V)+np.amin(x_ifu_V))/2.0
+    yot=(np.nanmax(y_ifu_V)+np.nanmin(y_ifu_V))/2.0
+    xot=(np.nanmax(x_ifu_V)+np.nanmin(x_ifu_V))/2.0
     skycor = pixel_to_skycoord(xot/pix_s,yot/pix_s,wt1)
     xat=skycor.ra.value
     yat=skycor.dec.value
@@ -124,8 +124,8 @@ def gen_matrix(expnumL,multiT=False,errors=True,covana=False,fcovmat=False,nproc
     thet=0.0
 
 
-    nlx=int(round((np.amax([np.amax(x_ifu_V),-np.amin(x_ifu_V)])+1)*2/pix_s))
-    nly=int(round((np.amax([np.amax(y_ifu_V),-np.amin(y_ifu_V)])+1)*2/pix_s))
+    nlx=int(round((np.nanmax([np.nanmax(x_ifu_V),-np.nanmin(x_ifu_V)])+1)*2/pix_s))
+    nly=int(round((np.nanmax([np.nanmax(y_ifu_V),-np.nanmin(y_ifu_V)])+1)*2/pix_s))
     nlx=int(nlx*fac_sizeX)
     nly=int(nly*fac_sizeY)
     
