@@ -611,8 +611,8 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
     wave_s=np.zeros(nw)
     for j in range(0, nw):
         wave_s[j]=(crval+cdelt*(j+1-crpix))*(1+zrf)
-        int_spec1[j]=np.sum(pdl_flux[j,:,:])#*clam/cdelt#/5500.#/cdelt
-        int_spec2[j]=np.sum(pdl_flux[j,:,:])*wave_s[j]**2.0/vel_light*ang/jans/3631.0#/cdelt*clam/cdelt
+        int_spec1[j]=np.nansum(pdl_flux[j,:,:])#*clam/cdelt#/5500.#/cdelt
+        int_spec2[j]=np.nansum(pdl_flux[j,:,:])*wave_s[j]**2.0/vel_light*ang/jans/3631.0#/cdelt*clam/cdelt
     file=['SDSS_u.txt','SDSS_u.txt','SDSS_u.txt','SDSS_u.txt','SDSS_z.txt','NUV_GALEX.txt','FUV_GALEX.txt','U_Johnson.txt','B_Johnson.txt','V_Johnson.txt','I_Cousins.txt','R_Cousins.txt','J_2MASS.txt','H_2MASS.txt','K_2MASS.txt','ha_filter_sh.txt']
     band=['u','g','r','i','z','NUV','FUV','U','B','V','I','R','J','H','K','ha']
     zerop=[3631.0,3631.0,3730.0,3730.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0,3631.0]
