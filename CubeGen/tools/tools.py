@@ -695,7 +695,10 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         max_val2=-2.5*np.log10(np.nanmax(int_spec2[nt_s])*1.85)
         import matplotlib.pyplot as plt
         fig, ax = plt.subplots(figsize=(8,5.5))
-        ax.set_ylim(0,max_val1)#0.75e-14)#
+        try:
+            ax.set_ylim(0,max_val1)
+        except:
+            continue
         ax.set_xlim(1500,20000)
         ax.set_xlabel("$Wavelength [A]$",fontsize=14)
         ax.set_ylabel("Flux $[erg/s/cm^2/A]$",fontsize=14)
@@ -707,7 +710,10 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
 
         import matplotlib.pyplot as plt
         fig, ax = plt.subplots(figsize=(8,5.5))
-        ax.set_ylim(0,max_val1)#0.75e-14)#
+        try:
+            ax.set_ylim(0,max_val1)
+        except:
+            continue
         ax.set_xlim(3800,9000)
         ax.set_xlabel("$Wavelength [A]$",fontsize=14)
         ax.set_ylabel("Flux $[erg/s/cm^2/A]$",fontsize=14)
