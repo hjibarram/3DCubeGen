@@ -751,7 +751,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         print(np.nanmax(pdl_00g),np.nanmax(pdl_00r),np.nanmax(pdl_00i))
         print(np.nanmin(pdl_00g),np.nanmin(pdl_00r),np.nanmin(pdl_00i))
         if len(pdl_00r[np.where(pdl_00r > 0)]) > 0:
-            max=24.0#np.nanmin(pdl_00r[np.where(pdl_00r > 0)])-0.5#24.0#17.5
+            max=17.5#np.nanmin(pdl_00r[np.where(pdl_00r > 0)])-0.5#24.0#17.5
         else:
             max=20.0
         min=25.0
