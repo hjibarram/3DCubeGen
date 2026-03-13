@@ -643,7 +643,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         for i in range(0, nx):
             for j in range(0, ny):
                 spec=pdl_flux[:,i,j]
-                if np.sum(spec) > 0:
+                if np.nanmin(spec) > 0:
                     spec1=interp1d(wave_s, spec,kind='linear',bounds_error=False,fill_value=0.)(wave)
                     flux_t=spec1*trans*d_wave#/5500.# **2.0#Por la mezcla de normalizaciones, si no se usa mezcla entoces usar d_wave
                     f_fin=simpson_r(flux_t*wave**2.0/d_wave/vel_light*ang,wave,0,len(wave)-2,typ=1)/simpson_r(trans,wave,0,len(wave)-2,typ=1)/jans/zerop[k]
