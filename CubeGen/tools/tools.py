@@ -679,9 +679,9 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
             h1.update_extend()
             h2.update_extend()
             h3.update_extend()
-            out_fit1=dir1+name_f+band[k]+'_'+str(np.int(age*1000))+'.fits'
-            out_fit2=dir1+name_f+band[k]+'_'+str(np.int(age*1000))+'_F.fits'
-            out_fit3=dir1+name_f+band[k]+'_'+str(np.int(age*1000))+'_L.fits'
+            out_fit1=dir1+name_f+band[k]+'_'+str(int(age*1000))+'.fits'
+            out_fit2=dir1+name_f+band[k]+'_'+str(int(age*1000))+'_F.fits'
+            out_fit3=dir1+name_f+band[k]+'_'+str(int(age*1000))+'_L.fits'
             h1.writeto(out_fit1,overwrite=True)
             h2.writeto(out_fit2,overwrite=True)
             h3.writeto(out_fit3,overwrite=True)
@@ -702,7 +702,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         plt.title("Age="+str(round(10**(age-6),2))+" Myr")
         plt.plot(wave_s,int_spec1)
         fig.tight_layout()
-        plt.savefig(dir1+name_f+'_'+str(np.int(age*1000))+'spec.jpg')
+        plt.savefig(dir1+name_f+'_'+str(int(age*1000))+'spec.jpg')
         plt.close()    
 
         import matplotlib.pyplot as plt
@@ -714,7 +714,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         plt.title("Age="+str(round(10**(age-6),2))+" Myr")
         plt.plot(wave_s,int_spec1)
         fig.tight_layout()
-        plt.savefig(dir1+name_f+'_'+str(np.int(age*1000))+'spec2.jpg')
+        plt.savefig(dir1+name_f+'_'+str(int(age*1000))+'spec2.jpg')
         plt.close()    
         
         fig, ax = plt.subplots(figsize=(8,5.5))
@@ -724,7 +724,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         plt.title("Age="+str(round(10**(age-6),2))+" Myr")
         plt.plot(wave_s,-2.5*np.log10(int_spec2))
         fig.tight_layout()
-        plt.savefig(dir1+name_f+'_'+str(np.int(age*1000))+'spec_Hz.jpg')
+        plt.savefig(dir1+name_f+'_'+str(int(age*1000))+'spec_Hz.jpg')
         plt.close()
 
 
@@ -735,7 +735,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         plt.title("Age="+str(round(10**(age-6),2))+" Myr")
         plt.plot(wave_s,-2.5*np.log10(int_spec2))
         fig.tight_layout()
-        plt.savefig(dir1+name_f+'_'+str(np.int(age*1000))+'spec_Hz2.jpg')
+        plt.savefig(dir1+name_f+'_'+str(int(age*1000))+'spec_Hz2.jpg')
         plt.close()
 
         pdl_00g=imag_F[0,1,:,:]
@@ -761,7 +761,7 @@ def band_cube(spec,age,name,crval,cdelt,crpix,hdr,dir='',dir1='',outs=0,fitsf=0,
         pdl_00[:,:,1]=pdl_00r
         pdl_00[:,:,2]=pdl_00g
         im = im2.fromarray(pdl_00)
-        im.save(dir1+name_f+'_'+str(np.int(age*1000))+"gri.jpeg",quality=100)
+        im.save(dir1+name_f+'_'+str(int(age*1000))+"gri.jpeg",quality=100)
     return imag_F    
 
 def twoD_interpolB(x,y,x1,x2,x3,y1,y2,y3,z1,z2,z3):
