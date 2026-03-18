@@ -571,6 +571,60 @@ def make_radec(xx0,yy0,ra,dec,pa):
     return ra_fib, dec_fib    
 
 def simpson_r(f,x,i1,i2,typ=0):
+    """
+    Compute the numerical integral of a function using Simpson's rule
+    over a specified index range.
+
+    This implementation applies the composite Simpson's 1/3 rule on
+    uniformly spaced samples between indices `i1` and `i2`. If the number
+    of intervals is odd, it is automatically increased by one to satisfy
+    Simpson's requirement of an even number of intervals.
+
+    Parameters
+    ----------
+    f : ndarray
+        1D array of function values to be integrated.
+    x : ndarray
+        1D array of coordinates corresponding to `f`. It is assumed to be
+        ordered and approximately uniformly spaced within the integration
+        range.
+    i1 : int
+        Starting index of the integration interval.
+    i2 : int
+        Ending index of the integration interval (inclusive).
+    typ : int, optional
+        Output type:
+        - 0 : Return the integral value (default).
+        - 1 : Return the average value over the interval, i.e.,
+              integral divided by (x[i2] - x[i1]).
+
+    Returns
+    -------
+    float
+        Numerical integral of `f` over the interval [x[i1], x[i2]] if
+        `typ=0`, or the mean value over the interval if `typ=1`.
+
+    Notes
+    -----
+    - Simpson's rule requires an even number of intervals. If the number
+      of intervals (`i2 - i1`) is odd, the function extends the upper
+      limit by one index.
+    - The spacing `h` is computed as (x[i2] - x[i1]) / n, assuming
+      approximately uniform sampling.
+    - No explicit checks are performed to ensure uniform spacing or
+      valid index bounds.
+    - The function does not handle NaNs or masked values explicitly.
+
+    Raises
+    ------
+    IndexError
+        If `i1` or `i2` are outside the valid range of the input arrays.
+
+    See Also
+    --------
+    scipy.integrate.simpson : More robust and general Simpson integration.
+
+    """
     n=(i2-i1)*1.0
     if n % 2:
         n=n+1.0
