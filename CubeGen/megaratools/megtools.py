@@ -1059,7 +1059,7 @@ def create_obsLcbImage(data,vph,redux_path='',ob_path=''):
                 tools.sycall(call)
     f.close()
     filetest=redux_path+'/data/'+filelists[0]
-    head=fits.getheader(file, 0)
+    head=fits.getheader(filetest, 0)
     insconfig=head['INSCONF']
     return insconfig
 
