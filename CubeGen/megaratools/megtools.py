@@ -1047,6 +1047,7 @@ def create_obsLcbImage(data,vph,redux_path='',ob_path=''):
     f.write('instrument: MEGARA\n')
     f.write('mode: MegaraLcbImage\n')
     f.write('images:\n')
+    ct=0
     for i in range(0, len(filelists)):
         if vphs[i] == vph:
             line='  - '+filelists[i]+'\n'
@@ -1057,9 +1058,11 @@ def create_obsLcbImage(data,vph,redux_path='',ob_path=''):
                 else:
                     call='cp '+ob_path+'object/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
-                filetest=redux_path+'/data/'+filelists[0]
-                head=fits.getheader(filetest, 0)
+                if ct == 0:
+                    filetest=redux_path+'/data/'+filelists[i]
+                    head=fits.getheader(filetest, 0)
                 insconfig=head['INSCONF']
+                ct=ct+1
     f.close()
     
     return insconfig
