@@ -1224,6 +1224,8 @@ def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/
     vph_list=get_vph(data)
     std_list=get_std(data)
     print(obj_list)
+    print(obser_path)
+    print(ob_path)
     vphext,exp_list=get_exptime(data)
     print('Creating MegaraBiasImage file')
     create_obsBIAS(data,redux_path=path_redux,ob_path=ob_path)
