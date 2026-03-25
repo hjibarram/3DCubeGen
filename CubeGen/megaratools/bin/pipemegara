@@ -226,16 +226,27 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             call14='cp '+redux_dirT+'ifu/'+basename.replace('NAME','*').replace('.fits','_'+vph+'.fits')+'.gz '+out_path+'/'+redux_ver+'/'
             call15='mkdir -p '+out_path.replace('cubes','spec1d')+'/'+redux_ver+'/'
             call16='cp '+redux_dirT+'ifu/megSpec-*_'+vph+'.fits.gz '+out_path.replace('cubes','spec1d')+'/'+redux_ver+'/'
+            print(call0)
             tools.sycall(call0)
+            print(call1)
             tools.sycall(call1)
+            print(call2)
             tools.sycall(call2)
+            print(call3)
             tools.sycall(call3)
+            print(call4)
             tools.sycall(call4)
+            print(call5)
             tools.sycall(call5)
+            print(call6)
             tools.sycall(call6)
+            print(call7)
             tools.sycall(call7)
+            print(call8)
             tools.sycall(call8)
+            print(call9)
             tools.sycall(call9)
+            print(call10)
             tools.sycall(call10)
             mapt,hdr=mmap.meggen_map(reduxL0,savefile=False,nameF=None,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,
                 sigm_s=sigm_s,alph_s=alph_s,out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=vph,basenameC='tNAME.fits')
@@ -246,6 +257,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
                 path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
             fact=mtools.calib_spec(phase=2,scfact=1.0,xo=xo,yo=yo,vph=vph,idp=idsA,stdar_t=stdar_t,r=aper_std,dpix=pix_s,pathwork=redux_dirT,
                 path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
+            print(call11)
             tools.sycall(call11)
             mcube.megmap_ifu(reduxL1,nameF=None,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
                 out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=vph,basenameC='NAME.fits')
@@ -253,11 +265,13 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
                 path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
             fact=mtools.calib_spec(phase=4,scfact=fact,xo=xo,yo=yo,vph=vph,idp=idsA,stdar_t=stdar_t,r=aper_std,dpix=pix_s,pathwork=redux_dirT,
                 path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
+            print(call11)
             tools.sycall(call11)
             mcube.megmap_ifu(reduxL1,nameF=None,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
                 out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=vph,basenameC='NAME.fits')
             fact=mtools.calib_spec(phase=5,scfact=1.0,xo=xo,yo=yo,vph=vph,idp=idsA,stdar_t=stdar_t,r=aper_std,dpix=pix_s,pathwork=redux_dirT,
                 path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
+            print(call12)
             tools.sycall(call12)
             mcube.megmap_ifu(reduxL2,nameF=name,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,sigm_s=sigm_s,alph_s=alph_s,
                 out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=varT+vph,basenameC=basename,headerInfo=headerInfo)
