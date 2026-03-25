@@ -1111,7 +1111,7 @@ def create_requirement(data,stds,vph,insconf,redux_path='',ob_path='',poly=False
         f.write('version: 1\n')
         f.write('products:\n')
         f.write('  MEGARA:\n')
-        f.write('    ca3558e3-e50d-4bbc-86bd-da50a0998a48: \n')
+        f.write('    INCONF: \n'.replace('INCONF',insconf))#ca3558e3-e50d-4bbc-86bd-da50a0998a48
         f.write("    - {id: 1, type: 'LinesCatalog', tags: {}, content: 'LAMP'}\n".replace('LAMP',lampname))
         f.write("    - {id: 2, type: 'MasterBias', tags: {}, content: 'master_bias.fits'}\n")
         f.write("    - {id: 3, type: 'TraceMap', tags: {}, content: 'master_tracesVPH.json'}\n".replace('VPH',vph))
