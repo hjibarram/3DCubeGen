@@ -1058,9 +1058,14 @@ def create_obsLcbImage(data,vph,redux_path='',ob_path=''):
                     call='cp '+ob_path+'object/'+filelists[i]+' '+redux_path+'/data/'+filelists[i]
                 tools.sycall(call)
     f.close()
+    filetest=redux_path+'/data/'+filelists[0]
+    head=fits.getheader(file, 0)
+    insconfig=head['INSCONF']
+    return insconfig
 
 
-def create_requirement(data,stds,vph,redux_path='',ob_path='',poly=False,calib_path='auxiliary/'):
+
+def create_requirement(data,stds,vph,insconf,redux_path='',ob_path='',poly=False,calib_path='auxiliary/'):
     """
     Creates the create_requirement files with the given path.
     Parameters:
@@ -1080,7 +1085,7 @@ def create_requirement(data,stds,vph,redux_path='',ob_path='',poly=False,calib_p
         f.write('version: 1\n')
         f.write('products:\n')
         f.write('  MEGARA:\n')
-        f.write('    ca3558e3-e50d-4bbc-86bd-da50a0998a48: \n')
+        f.write('    INCONF: \n'.replace('INCONF',insconf))#ca3558e3-e50d-4bbc-86bd-da50a0998a48
         f.write("    - {id: 1, type: 'LinesCatalog', tags: {}, content: 'LAMP'}\n".replace('LAMP',lampname))
         f.write("    - {id: 2, type: 'MasterBias', tags: {}, content: 'master_bias.fits'}\n")
         f.write("    - {id: 3, type: 'TraceMap', tags: {}, content: 'master_tracesVPH.json'}\n".replace('VPH',vph))
@@ -1226,6 +1231,7 @@ def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/
     print(obj_list)
     print(obser_path)
     print(ob_path)
+    insconfig=[]
     vphext,exp_list=get_exptime(data)
     print('Creating MegaraBiasImage file')
     create_obsBIAS(data,redux_path=path_redux,ob_path=ob_path)
@@ -1249,8 +1255,9 @@ def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/
         create_obsLcbImageStd(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
     for i in range(0, len(vph_list)):
         print('Creating MegaraLcbImage files for VPH: ', vph_list[i])
-        create_obsLcbImage(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
+        insconf=create_obsLcbImage(data,vph_list[i],redux_path=path_redux,ob_path=ob_path)
+        insconfig.extend([insconf])
     for i in range(0, len(vph_list)):
         print('Creating Requirement files for VPH: ', vph_list[i])
-        create_requirement(data,std_list,vph_list[i],redux_path=path_redux,ob_path=ob_path,calib_path=calib_path)
+        create_requirement(data,std_list,vph_list[i],insconfig[i],redux_path=path_redux,ob_path=ob_path,calib_path=calib_path)
     return obj_list,std_list,vph_list,vphext,exp_list
