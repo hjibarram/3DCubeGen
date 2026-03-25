@@ -1065,7 +1065,6 @@ def create_obsLcbImage(data,vph,redux_path='',ob_path=''):
                     insconfig=head['INSCONF']
                 ct=ct+1
     f.close()
-    
     return insconfig
 
 
