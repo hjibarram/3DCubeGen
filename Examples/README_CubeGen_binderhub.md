@@ -1,6 +1,6 @@
 # CubeGen Notebook — Data Cube Reconstruction Pipeline
 
-This notebook provides a complete workflow to:
+This notebook provides an example of how to use 3DCubeGen within a notebook environment using BinderHub and provides a complete workflow to:
 
 - Generate IFU data cubes  
 - Produce emission-line maps  
@@ -27,14 +27,14 @@ https://github.com/hjibarram/3DCubeGen
 # Requirements
 
 ```bash
-pip install numpy astropy matplotlib
+git clone https://github.com/hjibarram/3DCubeGen.git
+cd 3DCubeGen
+pip install .
 ```
 
 You also need:
 
-- CubeGen package
 - LVM DRP outputs
-- Access to agcam directory (optional)
 
 ---
 
