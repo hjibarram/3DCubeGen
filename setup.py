@@ -36,7 +36,7 @@ requirements = [
     'pyyaml',
     'click',
     'cloup',
-    'numina',
+#    'numina',
     'megaradrp',
 #    'scikit-image',
 ]
