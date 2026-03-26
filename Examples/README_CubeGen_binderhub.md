@@ -52,7 +52,25 @@ import CubeGen.tools.tools as tools
 
 # Step 1 — Generate Data Cube
 
-Generate IFU data cube using:
+The `map_ifu` function is used to reconstruct the IFU data cube.
+
+## Main Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| redux_dir | Directory containing reduced data |
+| redux_ver | Reduction version |
+| out_path | Output directory |
+| sigm_s | Spatial smoothing kernel |
+| pix_s | Pixel size |
+| alph_s | Kernel shape parameter |
+| flu16 | Output flux normalization |
+| use_slitmap | Use slitmap astrometry |
+| pbars | Show progress bars |
+| spec_range | Spectral range (optional) |
+| nameF | Output cube name |
+
+Example:
 
 ```python
 map_ifu(...)
@@ -68,6 +86,21 @@ lvmCube-*.fits
 
 # Step 2 — Generate Emission Line Maps
 
+he `gen_map` function generates emission-line maps from the reconstructed cube.
+
+## Available Emission Lines
+
+| Option | Emission Line |
+|--------|---------------|
+| 1 | [OIII] |
+| 2 | Hα |
+| 3 | [SII] |
+| 4 | Continuum |
+| 5 | Custom spectral range |
+
+Example:
+
+
 ```python
 gen_map(...)
 ```
@@ -78,17 +111,34 @@ Creates:
 - Hα maps
 - SII maps
 
+Output:
+
+```
+lvmMap-*.fits
+```
+
+
 ---
 
 # Step 3 — Create RGB Composite Image
+
+Create color composite images:
 
 ```python
 get_jpg(...)
 ```
 
+Output:
+
+```
+lvmMap-*_OHS.jpeg
+```
+
 ---
 
 # Step 4 — Apply Deconvolution
+
+Apply PSF deconvolution (optional):
 
 ```python
 deconvolve_2dfile(...)
