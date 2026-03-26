@@ -17,6 +17,7 @@ import numpy as np
 import CubeGen.tools.tools as tools
 import CubeGen.tools.kernel as kernel 
 import os.path as ptt
+import gc
 
 def map_ifu(expnumL,nameF=None,notebook=True,ofvel=[[0,0,0],[0,0,0],[0,0,0]],use_slitmap=True,errors=True,cent=False,coord_ast=[0,0],coord_cen=[0,0],pbars=True,flu16=False,multiT=False,nproc=3,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=18.5,sigm_s=18.5,alph_s=2.0,out_path='',agcam_dir='',redux_ver='1.0.2.dev0',redux_dir='',tilelist=['11111'],tileglist=['0011XX'],mjd=['0000'],scp=112.36748321030637,basename='lvmCFrame-NAME.fits',basenameC='lvmCube-NAME.fits',path_lvmcore=''):
     try:
@@ -362,3 +363,14 @@ def map_ifu(expnumL,nameF=None,notebook=True,ofvel=[[0,0,0],[0,0,0],[0,0,0]],use
     out_fit=file
     hlist.writeto(out_fit,overwrite=True)
     tools.sycall('gzip -f '+out_fit)
+    
+    del ifu
+    del ifu_e
+    del ifu_1
+    del ifu_m
+    del spec_ifu
+    del rss_f
+    if errors:
+        del specE_ifu
+        del rss_ef
+    gc.collect()
