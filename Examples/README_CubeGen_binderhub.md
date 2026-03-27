@@ -29,6 +29,7 @@ https://github.com/hjibarram/3DCubeGen
 ```bash
 git clone https://github.com/hjibarram/3DCubeGen.git
 cd 3DCubeGen
+git switch dev
 pip install .
 ```
 
