@@ -45,7 +45,6 @@ free_threading = sysconfig.get_config_var("Py_GIL_DISABLED") == 1
 if not free_threading:
     requirements += [
         'numina',
-#       'numina',
         'megaradrp',
     ]
 
