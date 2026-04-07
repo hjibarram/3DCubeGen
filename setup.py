@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 from setuptools import setup, find_packages
+import sysconfig
 
 def version(fn):
     v = ''
@@ -36,10 +37,18 @@ requirements = [
     'pyyaml',
     'click',
     'cloup',
-#    'numina',
-    'megaradrp',
 #    'scikit-image',
 ]
+
+free_threading = sysconfig.get_config_var("Py_GIL_DISABLED") == 1
+
+if not free_threading:
+    requirements += [
+        'numina',
+#       'numina',
+        'megaradrp',
+    ]
+
 
 #DATA_DIRNAME = 'legacy'
 #DATA_DIRS = ['legacy', 'megaratools/auxiliary']#megaradrp-calibrations-2018.1
