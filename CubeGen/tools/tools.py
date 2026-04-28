@@ -1,6 +1,7 @@
 import numpy as np
 from astropy.wcs import WCS
 from astropy.wcs.utils import skycoord_to_pixel
+from astropy.wcs.utils import pixel_to_skycoord
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from scipy.interpolate import interp1d
@@ -1042,6 +1043,41 @@ def interpolate_matrix(matrix_input,nt=4,ne=2,verbose=False,smoth=True,dx=0,dy=0
         PSF=Gaussian2DKernel(x_stddev=nt/2,y_stddev=nt/2)#4
         matrix_new=convolve(matrix_new, PSF)
     return matrix_new
+
+def map_resamp(map1,map2,hd1,hd2,pbars=False):
+    wcs1 = WCS(hd1)
+    wcs1=wcs1.celestial #image1
+    wcs2 = WCS(hd2)
+    wcs2=wcs2.celestial #image2
+    
+    try:
+        dx=np.sqrt((hd1['CD1_1'])**2.0+(hd1['CD1_2'])**2.0)*3600.0
+        dy=np.sqrt((hd1['CD2_1'])**2.0+(hd1['CD2_2'])**2.0)*3600.0
+    except:
+        dx=hd1['CDELT1']*3600.
+        dy=hd1['CDELT2']*3600.
+    pix1=np.sqrt(dx*dy)
+    A1=np.abs(dx*dy)
+    nx1,ny1=map1.shape
+    nx2,ny2=map2.shape
+    map_new=np.zeros([nx1,ny1])
+    if pbars:
+        pbar=tqdm(total=ny1)
+    for i in range(0, nx1):
+        for j in range(0, ny1):
+            sky1=pixel_to_skycoord(j,i,wcs1)
+            xpos,ypos=skycoord_to_pixel(sky1,wcs2)
+            try:
+                val=map_interpolB(map2,ypos,xpos)
+            except:
+                val=np.nan
+            map_new[i,j]=val
+            ct2=ct2+1
+        if pbars:
+            pbar.update(1)
+    if pbars:
+        pbar.close()  
+    return map_new
 
 def read_config_file(file):
     try:
