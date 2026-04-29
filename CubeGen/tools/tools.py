@@ -1072,7 +1072,6 @@ def map_resamp(map1,map2,hd1,hd2,pbars=False):
             except:
                 val=np.nan
             map_new[i,j]=val
-            ct2=ct2+1
         if pbars:
             pbar.update(1)
     if pbars:
