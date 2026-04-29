@@ -224,7 +224,7 @@ def matrix_const(spec_ifu,specE_ifu,specM_ifu,specEM_ifu,x_ifu_V,y_ifu_V,fibA,pi
     if sigm_s > fibA*3.5*2:
         radiT=sigm_s/2.0
     else:
-        radiT=fibA*3.5*2/2.0
+        radiT=fibA*3.5*2/2.0/2.2
     if len(x_ifu_V.shape) > 1:
         for j in range(a1, a2):
             #skycor = pixel_to_skycoord(it,j,wcs)
