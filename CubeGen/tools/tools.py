@@ -1062,7 +1062,7 @@ def map_resamp(map1,map2,hd1,hd2,pbars=False):
     nx2,ny2=map2.shape
     map_new=np.zeros([nx1,ny1])
     if pbars:
-        pbar=tqdm(total=ny1)
+        pbar=tqdm(total=nx1)
     for i in range(0, nx1):
         for j in range(0, ny1):
             sky1=pixel_to_skycoord(j,i,wcs1)
