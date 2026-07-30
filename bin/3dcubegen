@@ -168,6 +168,16 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
         inres=data['pipecube'][0]['index_reset']
     except:
         inres=0    
+    restart_m=False
+    try: 
+        restart_m=data['pipecube'][0]['restart_merge']
+    except:
+        restart_m=False
+    inrmerg=0    
+    try: 
+        inrmerg=data['pipecube'][0]['index_merge_reset']
+    except:
+        inrmerg=0     
             
     out_pathrss=out_pathrss+redux_ver+'/'+type+'/'
     out_path=out_path+redux_ver+'/'+type+'/'
@@ -232,8 +242,9 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
                         for jj in range(0, nsp):
                             mergcount=mergcount+1
                             if restart_m == True:
-                                if mergcount > rmerg_coun:
-                                    
+                                if mergcount > inrmerg:
+                                    print('Generate the Coadding and Tiling of the Cube in type '+type+' and for '+str(ii)+'-'+str(jj)+' of '+str(nsp)+'-'+str(nsp)) 
+                                    coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,nsplit=nsp,spt=[ii,jj],notebook=notebook,pbars=pbars)                                    
                             else:
                                 print('Generate the Coadding and Tiling of the Cube in type '+type+' and for '+str(ii)+'-'+str(jj)+' of '+str(nsp)+'-'+str(nsp)) 
                                 coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,nsplit=nsp,spt=[ii,jj],notebook=notebook,pbars=pbars)
