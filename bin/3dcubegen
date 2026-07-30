@@ -224,13 +224,19 @@ def pipecube(config_file,out_path,redux_ver,redux_dir,type,flu16,namel,use_slitm
                         alph_s=alph_s,agcam_dir=path_sas+'/sdsswork/data/agcam/lco',redux_dir=redux_dir,redux_ver=redux_ver,tilelist=tilelist,
                         tileglist=tileglist,mjd=mjd,basename=basename,notebook=notebook,nproc=nproc)
             if mergecube:
+                mergcount=0
                 nameR='lvmCube-NAME_id.fits.gz'.replace('NAME',nameF1+type)
                 nameT='lvmCube-NAME.fits.gz'.replace('NAME',nameF1+type)
                 if nsp > 1:
                     for ii in range(0, nsp):
                         for jj in range(0, nsp):
-                            print('Generate the Coadding and Tiling of the Cube in type '+type+' and for '+str(ii)+'-'+str(jj)+' of '+str(nsp)+'-'+str(nsp)) 
-                            coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,nsplit=nsp,spt=[ii,jj],notebook=notebook,pbars=pbars)
+                            mergcount=mergcount+1
+                            if restart_m == True:
+                                if mergcount > rmerg_coun:
+                                    
+                            else:
+                                print('Generate the Coadding and Tiling of the Cube in type '+type+' and for '+str(ii)+'-'+str(jj)+' of '+str(nsp)+'-'+str(nsp)) 
+                                coadd_cube(nameR,nameT,path=out_path,id_l=id_l,error=errors,nsplit=nsp,spt=[ii,jj],notebook=notebook,pbars=pbars)
                     if cube2rss:
                         for ii in range(0, nsp):
                             for jj in range(0, nsp):
