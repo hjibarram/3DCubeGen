@@ -247,6 +247,8 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
                 tools.sycall(call4c)
                 print(call4h)
                 tools.sycall(call4h)
+                print(call4)
+                tools.sycall(call4)
             print(call5)
             tools.sycall(call5)
             print(call6)
