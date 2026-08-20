@@ -162,10 +162,12 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
         path_work='--basedir '+redux_path+'/'
         redux_dirT=redux_path+'/'
         path_data='--datadir '+redux_path+'/data/'
+        redux_datT=redux_path+'/data/'
     else:
         path_work=''
         redux_dirT=''
-        path_data=''    
+        path_data=''  
+        redux_datT=''  
     calib_path=os.path.join(CubeGen.__path__[0], 'megaratools')+'/auxiliary/'
     objs,stds,vphs,vphe,expT=mtools.sort_megfiles(run_name,run_number,obser_path=obrun_path,path_redux=redux_path,calib_path=calib_path,forceAr=forcear)
     if name:
@@ -208,12 +210,16 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
                         'FAC_SIZEX':fac_sizex,
                         'APER_STD':aper_std}
             comand_base='numina run PATHWORK PATHDATA PWORKobsresult-NRVPH.yaml -r PWORKrequirements-STDVPH.yaml'.replace('PATHWORK',path_work).replace('PWORK',redux_dirT).replace('PATHDATA',path_data)
+            comand_heal='megaradrp-heal_traces PWORKobsid8LR-U_work/reduced_image.fits PDATAmaster_traces_LRU_20220325.json --global_offset 8.9,0.00060 --updated_traces PDATAmaster_tracesLR-U.json --pdffile PWORKobsid8LR-U_work/test.pdf'
             dir_base='obsidNRVPH_results'
             call0=comand_base.replace('NRVPH','1').replace('VPH',vph).replace('STD',stdar_t)
             call1='cp '+redux_dirT+dir_base.replace('NRVPH','1')+'/master_bias.fits PWORKdata/master_bias.fits'.replace('PWORK',redux_dirT)
             call2=comand_base.replace('NR','2').replace('VPH',vph).replace('STD',stdar_t)
             call3='cp '+redux_dirT+dir_base.replace('NR','2').replace('VPH',vph)+'/master_traces.json PWORKdata/master_tracesVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
             call4=comand_base.replace('NR','8').replace('VPH',vph).replace('STD',stdar_t)
+            if 'LR-U' in vph:
+                call4c='cp '+calib_path+'/master_traces_LRU_20220325.json PDATA'.replace('PDATA',redux_datT)
+                call4h=comand_heal.replace('PWORK',redux_dirT).replace('PDATA',redux_datT)
             call5='cp '+redux_dirT+dir_base.replace('NR','8').replace('VPH',vph)+'/master_model.json PWORKdata/master_modelVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
             call6=comand_base.replace('NR','3').replace('VPH',vph).replace('STD',stdar_t)
             call7='cp '+redux_dirT+dir_base.replace('NR','3').replace('VPH',vph)+'/master_wlcalib.json PWORKdata/master_wlcalibVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
@@ -236,6 +242,11 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             tools.sycall(call3)
             print(call4)
             tools.sycall(call4)
+            if 'LR-U' in vph:
+                print(call4c)
+                tools.sycall(call4c)
+                print(call4h)
+                tools.sycall(call4h)
             print(call5)
             tools.sycall(call5)
             print(call6)
