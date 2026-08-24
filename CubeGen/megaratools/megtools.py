@@ -1103,7 +1103,16 @@ def create_requirement(data,stds,vph,insconf,redux_path='',ob_path='',poly=False
         f.write("    - {id: 8, type: 'ReferenceSpectrumTable', tags: {}, content: 'mSTD.dat'}\n".replace('STD',stds[j]))
         f.write("    - {id: 9, type: 'ReferenceExtinctionTable', tags: {}, content: 'extintion_curve.txt'}\n")
         f.write("    - {id: 10, type: 'MasterSensitivity', tags: {}, content: 'master_sensitivityVPH_n.fits'}\n".replace('VPH',vph))
-        f.write('requirements: {} \n')
+        if 'LR-U' in vph:
+            f.write('requirements: \n')
+            f.write('  MEGARA: \n')
+            f.write('    default: \n')
+            f.write('      default: \n')
+            f.write('        MegaraArcImage: \n')
+            f.write("          - {name: 'polynomial_degree', tags: {}, content: 5} \n")
+            f.write("          - {name: 'nlines', tags: {}, content: [20, 20]} \n")
+        else:
+            f.write('requirements: {} \n')
         if poly:
             f.write('  MEGARA:\n')
             f.write('    MegaraArcCalibration:\n')
@@ -1124,7 +1133,16 @@ def create_requirement(data,stds,vph,insconf,redux_path='',ob_path='',poly=False
         f.write("    - {id: 7, type: 'ModelMap', tags: {}, content: 'master_modelVPH.json'}\n".replace('VPH',vph))
         f.write("    - {id: 8, type: 'ReferenceSpectrumTable', tags: {}, content: 'mSTD.dat'}\n".replace('STD',stds[j]))
         f.write("    - {id: 9, type: 'ReferenceExtinctionTable', tags: {}, content: 'extintion_curve.txt'}\n")
-        f.write('requirements: {} \n')
+        if 'LR-U' in vph:
+            f.write('requirements: \n')
+            f.write('  MEGARA: \n')
+            f.write('    default: \n')
+            f.write('      default: \n')
+            f.write('        MegaraArcImage: \n')
+            f.write("          - {name: 'polynomial_degree', tags: {}, content: 5} \n")
+            f.write("          - {name: 'nlines', tags: {}, content: [20, 20]} \n")
+        else:
+            f.write('requirements: {} \n')
         if poly:
             f.write('  MEGARA:\n')
             f.write('    MegaraArcCalibration:\n')
