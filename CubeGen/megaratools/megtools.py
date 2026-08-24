@@ -8,6 +8,9 @@ from astropy.time import Time
 from astropy import units as u
 from astropy.convolution import convolve, convolve_fft, Gaussian2DKernel
 import os.path as ptt
+import json
+import copy
+import shutil
 
 def extintion_c(wave,dir_tem='data',basename='extintion_curve'):
     f=open(dir_tem+'/'+basename+'.txt','r')
@@ -1262,3 +1265,146 @@ def sort_megfiles(run,ob,obser_path='',path_redux='redux',calib_path='auxiliary/
         print('Creating Requirement files for VPH: ', vph_list[i])
         create_requirement(data,std_list,vph_list[i],insconfig[i],redux_path=path_redux,ob_path=ob_path,calib_path=calib_path)
     return obj_list,std_list,vph_list,vphext,exp_list
+
+
+
+def fix_lru_wavelength_calibration(
+    filename,
+    backup=True,
+    bad_fibers=(1, 2, 604)
+):
+    """
+    Fix known invalid LR-U wavelength solutions in a MEGARADRP
+    WavelengthCalibration JSON file.
+
+    Fibers 1 and 2:
+        Copy the solution from fiber 3.
+
+    Fiber 604:
+        Interpolate the solution using fibers 603 and 605.
+
+    Parameters
+    ----------
+    filename : str
+        Path to master_wlcalibLR-U.json.
+
+    backup : bool, optional
+        If True, create filename + '.bak' before modifying.
+
+    bad_fibers : tuple, optional
+        Fibers to mark in error_fitting.
+
+    Returns
+    -------
+    dict
+        Modified wavelength calibration dictionary.
+    """
+
+    if backup:
+        shutil.copy2(filename, filename + ".bak")
+
+    with open(filename, "r") as f:
+        data = json.load(f)
+
+    by_fib = {
+        item["fibid"]: item
+        for item in data["contents"]
+    }
+
+    # ---------------------------------------------------------
+    # Fibers 1 and 2:
+    # copy wavelength solution from fiber 3
+    # ---------------------------------------------------------
+
+    for fib in (1, 2):
+        by_fib[fib]["solution"] = copy.deepcopy(
+            by_fib[3]["solution"]
+        )
+
+    # ---------------------------------------------------------
+    # Fiber 604:
+    # interpolate between fibers 603 and 605
+    # ---------------------------------------------------------
+
+    s603 = by_fib[603]["solution"]
+    s604 = by_fib[604]["solution"]
+    s605 = by_fib[605]["solution"]
+
+    # Polynomial coefficients
+    s604["coeff"] = [
+        0.5 * (a + b)
+        for a, b in zip(
+            s603["coeff"],
+            s605["coeff"]
+        )
+    ]
+
+    # Linear wavelength solution
+    for key in (
+        "crpix",
+        "crval",
+        "cdelt",
+        "crmin",
+        "crmax"
+    ):
+        s604["cr_linear"][key] = 0.5 * (
+            s603["cr_linear"][key]
+            + s605["cr_linear"][key]
+        )
+
+    # Diagnostic quantities
+    s604["residual_std"] = 0.5 * (
+        s603["residual_std"]
+        + s605["residual_std"]
+    )
+
+    s604["npoints_eff"] = int(
+        round(
+            0.5 * (
+                s603["npoints_eff"]
+                + s605["npoints_eff"]
+            )
+        )
+    )
+
+    s604["features"] = []
+
+    # ---------------------------------------------------------
+    # Mark fibers as problematic/interpolated
+    # ---------------------------------------------------------
+
+    previous_errors = set(
+        data.get("error_fitting", [])
+    )
+
+    data["error_fitting"] = sorted(
+        previous_errors | set(bad_fibers)
+    )
+
+    # ---------------------------------------------------------
+    # Validate result
+    # ---------------------------------------------------------
+
+    invalid = []
+
+    for item in data["contents"]:
+        fibid = item["fibid"]
+        cr_linear = item["solution"]["cr_linear"]
+
+        if cr_linear["cdelt"] <= 0:
+            invalid.append(fibid)
+
+    if invalid:
+        raise ValueError(
+            "Invalid wavelength solutions remain "
+            "for fibers: {}".format(invalid)
+        )
+
+    # ---------------------------------------------------------
+    # Save
+    # ---------------------------------------------------------
+
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=2)
+
+    #return data    

@@ -220,6 +220,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             if 'LR-U' in vph:
                 call4c='cp '+calib_path+'/master_traces_LRU_20220325.json PDATA'.replace('PDATA',redux_datT)
                 call4h=comand_heal.replace('PWORK',redux_dirT).replace('PDATA',redux_datT)
+                master_wcl='PWORKdata/master_wlcalibVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
             call5='cp '+redux_dirT+dir_base.replace('NR','8').replace('VPH',vph)+'/master_model.json PWORKdata/master_modelVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
             call6=comand_base.replace('NR','3').replace('VPH',vph).replace('STD',stdar_t)
             call7='cp '+redux_dirT+dir_base.replace('NR','3').replace('VPH',vph)+'/master_wlcalib.json PWORKdata/master_wlcalibVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
@@ -255,6 +256,8 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             tools.sycall(call6)
             print(call7)
             tools.sycall(call7)
+            if 'LR-U' in vph:
+                mtools.fix_lru_wavelength_calibration(master_wcl)
             print(call8)
             tools.sycall(call8)
             print(call9)
