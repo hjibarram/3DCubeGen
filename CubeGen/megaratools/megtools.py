@@ -1435,34 +1435,11 @@ def generate_lru_healing(
     traces_file,
     output_file="healing_LRU.yaml",
     offset=30.0,
-    xpoints=(100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000),
+    xpoints=(100, 500, 1000, 1500, 2000,
+             2500, 3000, 3500, 4000),
     poldeg=5,
     refit=True
 ):
-    """
-    Generate a MEGARADRP healing YAML for all fibers
-    from an existing LR-U TraceMap.
-
-    Parameters
-    ----------
-    traces_file : str
-        Input TraceMap JSON.
-
-    output_file : str
-        Output healing YAML.
-
-    offset : float
-        Vertical offset in pixels applied to the initial trace.
-
-    xpoints : sequence
-        X positions used as initial user points.
-
-    poldeg : int
-        Polynomial degree for the new trace fit.
-
-    refit : bool
-        If True, MEGARADRP refits the trace using the image.
-    """
 
     with open(traces_file, "r") as f:
         data = json.load(f)
@@ -1470,13 +1447,27 @@ def generate_lru_healing(
     traces = data["contents"]
 
     blocks = []
+    skipped = []
 
     for item in traces:
 
         fibid = item["fibid"]
-        coeff = np.asarray(item["fitparms"], dtype=float)
 
-        # Use the valid range stored in the TraceMap
+        coeff = np.asarray(
+            item.get("fitparms", []),
+            dtype=float
+        )
+
+        # Skip fibers without a valid trace polynomial
+        if coeff.size == 0:
+            print(
+                "WARNING: empty fitparms for fiber {}".format(
+                    fibid
+                )
+            )
+            skipped.append(fibid)
+            continue
+
         xstart = item.get("start", 4)
         xstop = item.get("stop", 4092)
 
@@ -1484,12 +1475,9 @@ def generate_lru_healing(
 
         for x in xpoints:
 
-            # Skip points outside the valid trace interval
             if x < xstart or x > xstop:
                 continue
 
-            # fitparms are polynomial coefficients in increasing order:
-            # y = c0 + c1*x + c2*x**2 + ...
             y = np.polynomial.polynomial.polyval(
                 float(x),
                 coeff
@@ -1497,16 +1485,29 @@ def generate_lru_healing(
 
             y += offset
 
+            # Extra safety
+            if not np.isfinite(y):
+                print(
+                    "WARNING: non-finite trace for fiber {} at x={}".format(
+                        fibid, x
+                    )
+                )
+                continue
+
             user_points.append(
                 (float(x), float(y))
             )
 
         if len(user_points) < poldeg + 1:
+
             print(
-                "WARNING: insufficient points for fiber {}".format(
-                    fibid
+                "WARNING: insufficient points for fiber {}: {}".format(
+                    fibid,
+                    len(user_points)
                 )
             )
+
+            skipped.append(fibid)
             continue
 
         block = []
@@ -1526,9 +1527,7 @@ def generate_lru_healing(
         block.append(
             "xstop: {}".format(xstop)
         )
-        block.append(
-            "user_points:"
-        )
+        block.append("user_points:")
 
         for x, y in user_points:
             block.append(
@@ -1546,14 +1545,25 @@ def generate_lru_healing(
         blocks.append("\n".join(block))
 
     with open(output_file, "w") as f:
-        f.write("\n---\n".join(blocks))
-        f.write("\n")
 
+        if blocks:
+            f.write("\n---\n".join(blocks))
+            f.write("\n")
+
+    print("")
     print(
         "Generated {} healing blocks in {}".format(
             len(blocks),
             output_file
         )
     )
+
+    if skipped:
+        print(
+            "Skipped {} fibers: {}".format(
+                len(skipped),
+                skipped
+            )
+        )
 
 #    return output_file
