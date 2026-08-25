@@ -1440,68 +1440,149 @@ def generate_lru_healing(
     poldeg=5,
     refit=True
 ):
+    """
+    Generate a MEGARADRP healing YAML for LR-U traces.
+
+    The initial trace positions are calculated from the polynomial
+    coefficients stored in 'fitparms' and shifted vertically by
+    `offset` pixels. Fibers without valid fitparms are skipped.
+
+    Parameters
+    ----------
+    traces_file : str
+        Input MEGARADRP TraceMap JSON file.
+
+    output_file : str, optional
+        Output healing YAML file.
+
+    offset : float, optional
+        Vertical offset in pixels applied to the initial traces.
+
+    xpoints : sequence, optional
+        X coordinates used to generate the initial user points.
+
+    poldeg : int, optional
+        Polynomial degree used by heal_traces.
+
+    refit : bool, optional
+        If True, ask MEGARADRP to refit each trace using the image.
+
+    Returns
+    -------
+    str
+        Name of the generated healing YAML file.
+    """
+
+    # ---------------------------------------------------------
+    # Read TraceMap
+    # ---------------------------------------------------------
 
     with open(traces_file, "r") as f:
         data = json.load(f)
+
+    if "contents" not in data:
+        raise KeyError(
+            "'contents' not found in {}".format(traces_file)
+        )
 
     traces = data["contents"]
 
     blocks = []
     skipped = []
 
+    # ---------------------------------------------------------
+    # Loop through fibers
+    # ---------------------------------------------------------
+
     for item in traces:
 
-        fibid = item["fibid"]
+        fibid = item.get("fibid")
 
+        if fibid is None:
+            continue
+
+        # Polynomial coefficients of the historical trace
         coeff = np.asarray(
             item.get("fitparms", []),
             dtype=float
         )
 
-        # Skip fibers without a valid trace polynomial
+        # Some fibers, such as fiber 623 in the historical
+        # LR-U TraceMap, may not have a fitted trace.
         if coeff.size == 0:
+
             print(
                 "WARNING: empty fitparms for fiber {}".format(
                     fibid
                 )
             )
+
             skipped.append(fibid)
             continue
 
+        # Check coefficients
+        if not np.all(np.isfinite(coeff)):
+
+            print(
+                "WARNING: non-finite coefficients for fiber {}".format(
+                    fibid
+                )
+            )
+
+            skipped.append(fibid)
+            continue
+
+        # Valid X range from the original TraceMap
         xstart = item.get("start", 4)
         xstop = item.get("stop", 4092)
 
         user_points = []
+
+        # -----------------------------------------------------
+        # Generate initial points
+        # -----------------------------------------------------
 
         for x in xpoints:
 
             if x < xstart or x > xstop:
                 continue
 
+            # MEGARADRP fitparms:
+            #
+            # y(x) = c0 + c1*x + c2*x^2 + ...
+            #
             y = np.polynomial.polynomial.polyval(
                 float(x),
                 coeff
             )
 
+            # Apply global vertical offset
             y += offset
 
-            # Extra safety
             if not np.isfinite(y):
+
                 print(
-                    "WARNING: non-finite trace for fiber {} at x={}".format(
+                    "WARNING: non-finite y for fiber {} "
+                    "at x={}".format(
                         fibid, x
                     )
                 )
+
                 continue
 
             user_points.append(
                 (float(x), float(y))
             )
 
+        # -----------------------------------------------------
+        # Need enough points for polynomial fit
+        # -----------------------------------------------------
+
         if len(user_points) < poldeg + 1:
 
             print(
-                "WARNING: insufficient points for fiber {}: {}".format(
+                "WARNING: insufficient points for fiber {} "
+                "({} points)".format(
                     fibid,
                     len(user_points)
                 )
@@ -1510,26 +1591,38 @@ def generate_lru_healing(
             skipped.append(fibid)
             continue
 
+        # -----------------------------------------------------
+        # Create YAML block
+        # -----------------------------------------------------
+
         block = []
 
         block.append(
             "description: fit_through_user_points"
         )
+
         block.append(
             "fibid: {}".format(fibid)
         )
+
         block.append(
             "poldeg: {}".format(poldeg)
         )
+
         block.append(
             "xstart: {}".format(xstart)
         )
+
         block.append(
             "xstop: {}".format(xstop)
         )
-        block.append("user_points:")
+
+        block.append(
+            "user_points:"
+        )
 
         for x, y in user_points:
+
             block.append(
                 "  - [{:.1f}, {:.6f}]".format(
                     x, y
@@ -1542,13 +1635,25 @@ def generate_lru_healing(
             )
         )
 
-        blocks.append("\n".join(block))
+        blocks.append(
+            "\n".join(block)
+        )
+
+    # ---------------------------------------------------------
+    # Write healing YAML
+    # ---------------------------------------------------------
 
     with open(output_file, "w") as f:
 
         if blocks:
-            f.write("\n---\n".join(blocks))
+            f.write(
+                "\n---\n".join(blocks)
+            )
             f.write("\n")
+
+    # ---------------------------------------------------------
+    # Summary
+    # ---------------------------------------------------------
 
     print("")
     print(
@@ -1559,6 +1664,7 @@ def generate_lru_healing(
     )
 
     if skipped:
+
         print(
             "Skipped {} fibers: {}".format(
                 len(skipped),
