@@ -210,7 +210,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
                         'FAC_SIZEX':fac_sizex,
                         'APER_STD':aper_std}
             comand_base='numina run PATHWORK PATHDATA PWORKobsresult-NRVPH.yaml -r PWORKrequirements-STDVPH.yaml'.replace('PATHWORK',path_work).replace('PWORK',redux_dirT).replace('PATHDATA',path_data)
-            comand_heal='megaradrp-heal_traces PWORKobsid8LR-U_work/reduced_image.fits PDATAmaster_traces_LRU_20220325.json --global_offset 8.9 0.00060 --updated_traces PDATAmaster_tracesLR-U.json --pdffile PWORKobsid8LR-U_work/test.pdf'
+            comand_heal='megaradrp-heal_traces PWORKobsid8LR-U_work/reduced_image.fits PDATAmaster_traces_LRU_20220325.json --global_offset 34.0 0.00060 --updated_traces PDATAmaster_tracesLR-U.json --pdffile PWORKobsid8LR-U_work/test.pdf'
             dir_base='obsidNRVPH_results'
             call0=comand_base.replace('NRVPH','1').replace('VPH',vph).replace('STD',stdar_t)
             call1='cp '+redux_dirT+dir_base.replace('NRVPH','1')+'/master_bias.fits PWORKdata/master_bias.fits'.replace('PWORK',redux_dirT)

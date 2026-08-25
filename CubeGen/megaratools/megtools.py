@@ -1426,3 +1426,172 @@ def fix_lru_wavelength_calibration(
         json.dump(data, f, indent=2)
 
     #return data    
+
+import json
+import numpy as np
+
+
+def generate_lru_healing(
+    traces_file,
+    output_file="healing_LRU.yaml",
+    offset=30.0,
+    xpoints=(100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000),
+    poldeg=5,
+    xstart=6,
+    xstop=4090,
+    refit=True
+):
+    """
+    Generate a MEGARADRP healing YAML for all fibers.
+
+    The initial user points are calculated from an existing TraceMap
+    and shifted vertically by `offset` pixels. MEGARADRP will then
+    recompute each trace using refit=True.
+
+    Parameters
+    ----------
+    traces_file : str
+        Historical TraceMap JSON, e.g.
+        master_traces_LRU_20220325.json
+
+    output_file : str
+        Output healing YAML.
+
+    offset : float
+        Initial vertical offset in pixels.
+
+    xpoints : sequence
+        X coordinates used to generate initial user points.
+
+    poldeg : int
+        Polynomial degree used for trace refitting.
+
+    xstart, xstop : int
+        Valid X range of the final trace.
+
+    refit : bool
+        If True, MEGARADRP re-determines the trace from the image.
+    """
+
+    with open(traces_file, "r") as f:
+        data = json.load(f)
+
+    # Different versions of MEGARADRP may use slightly
+    # different names for the trace list.
+    if "contents" in data:
+        traces = data["contents"]
+    elif "traces" in data:
+        traces = data["traces"]
+    else:
+        raise KeyError(
+            "Cannot find 'contents' or 'traces' in {}".format(
+                traces_file
+            )
+        )
+
+    blocks = []
+
+    for item in traces:
+
+        fibid = item.get("fibid")
+
+        if fibid is None:
+            continue
+
+        # Locate polynomial coefficients
+        coeff = None
+
+        if "fitparms" in item:
+            fp = item["fitparms"]
+
+            if isinstance(fp, dict):
+                coeff = (
+                    fp.get("coeff")
+                    or fp.get("coefficients")
+                    or fp.get("polynomial")
+                )
+
+        if coeff is None and "coeff" in item:
+            coeff = item["coeff"]
+
+        if coeff is None and "solution" in item:
+            sol = item["solution"]
+
+            if isinstance(sol, dict):
+                coeff = (
+                    sol.get("coeff")
+                    or sol.get("coefficients")
+                )
+
+        if coeff is None:
+            print(
+                "WARNING: no coefficients found for "
+                "fiber {}".format(fibid)
+            )
+            continue
+
+        coeff = np.asarray(coeff, dtype=float)
+
+        user_points = []
+
+        for x in xpoints:
+
+            # IMPORTANT:
+            # MEGARA trace coefficients are typically stored
+            # in increasing polynomial order:
+            #
+            # y = c0 + c1*x + c2*x^2 + ...
+            #
+            y = np.polynomial.polynomial.polyval(
+                float(x),
+                coeff
+            )
+
+            y += offset
+
+            user_points.append((float(x), float(y)))
+
+        block = []
+
+        block.append(
+            "description: fit_through_user_points"
+        )
+        block.append(
+            "fibid: {}".format(fibid)
+        )
+        block.append(
+            "poldeg: {}".format(poldeg)
+        )
+        block.append(
+            "xstart: {}".format(xstart)
+        )
+        block.append(
+            "xstop: {}".format(xstop)
+        )
+        block.append("user_points:")
+
+        for x, y in user_points:
+            block.append(
+                "  - [{:.1f}, {:.3f}]".format(x, y)
+            )
+
+        block.append(
+            "refit: {}".format(
+                "True" if refit else "False"
+            )
+        )
+
+        blocks.append("\n".join(block))
+
+    with open(output_file, "w") as f:
+        f.write("\n---\n".join(blocks))
+        f.write("\n")
+
+    print(
+        "Generated {} healing blocks in {}".format(
+            len(blocks),
+            output_file
+        )
+    )
+
+    #return output_file    
