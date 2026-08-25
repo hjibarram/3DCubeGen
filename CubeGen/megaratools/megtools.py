@@ -11,6 +11,9 @@ import os.path as ptt
 import json
 import copy
 import shutil
+import copy
+from scipy.ndimage import gaussian_filter1d
+from scipy.signal import find_peaks
 
 def extintion_c(wave,dir_tem='data',basename='extintion_curve'):
     f=open(dir_tem+'/'+basename+'.txt','r')
@@ -1427,9 +1430,6 @@ def fix_lru_wavelength_calibration(
 
     #return data    
 
-import json
-import numpy as np
-
 
 def generate_lru_healing(
     traces_file,
@@ -1673,3 +1673,676 @@ def generate_lru_healing(
         )
 
 #    return output_file
+
+
+
+def _local_centroid(profile, y0, half_window=3):
+    """
+    Measure the local centroid around y0 in a 1D spatial profile.
+    """
+
+    ny = len(profile)
+
+    yc = int(round(y0))
+
+    y1 = max(0, yc - half_window)
+    y2 = min(ny, yc + half_window + 1)
+
+    yy = np.arange(y1, y2, dtype=float)
+    ff = np.asarray(profile[y1:y2], dtype=float)
+
+    good = np.isfinite(ff)
+
+    if np.sum(good) < 3:
+        return np.nan
+
+    yy = yy[good]
+    ff = ff[good]
+
+    # Local background
+    bg = np.percentile(ff, 10.0)
+    ff = ff - bg
+
+    # Avoid negative weights
+    ff[ff < 0] = 0.0
+
+    if np.sum(ff) <= 0:
+        return np.nan
+
+    return np.sum(yy * ff) / np.sum(ff)
+
+
+def _detect_reference_fibers(
+    image,
+    xref,
+    n_fibers=622,
+    median_width=11,
+    smooth_sigma=1.0,
+    min_distance=4
+):
+    """
+    Detect fiber centers around a reference column.
+
+    A median of several adjacent columns is used to increase S/N.
+    """
+
+    ny, nx = image.shape
+
+    hw = median_width // 2
+
+    x1 = max(0, xref - hw)
+    x2 = min(nx, xref + hw + 1)
+
+    profile = np.nanmedian(image[:, x1:x2], axis=1)
+
+    # Remove slowly varying background
+    baseline = np.nanpercentile(profile, 10.0)
+    profile = profile - baseline
+
+    smooth = gaussian_filter1d(
+        np.nan_to_num(profile, nan=0.0),
+        smooth_sigma
+    )
+
+    # First find a generous set of peaks
+    peaks, properties = find_peaks(
+        smooth,
+        distance=min_distance,
+        prominence=0.0
+    )
+
+    if len(peaks) < n_fibers:
+        raise RuntimeError(
+            "Only {} candidate peaks found at x={}, "
+            "but {} fibers were requested.".format(
+                len(peaks), xref, n_fibers
+            )
+        )
+
+    # Keep the N most prominent peaks
+    prominences = properties["prominences"]
+
+    idx = np.argsort(prominences)[-n_fibers:]
+
+    peaks = peaks[idx]
+
+    # Fiber order = increasing detector Y
+    peaks = np.sort(peaks)
+
+    # Refine each position with a centroid
+    centers = []
+
+    for y in peaks:
+
+        yc = _local_centroid(
+            profile,
+            y,
+            half_window=3
+        )
+
+        if not np.isfinite(yc):
+            yc = float(y)
+
+        centers.append(yc)
+
+    centers = np.asarray(centers)
+
+    return centers, profile, smooth
+
+
+def _follow_single_trace(
+    image,
+    xref,
+    yref,
+    step=10,
+    half_window=3,
+    xmin=4,
+    xmax=None
+):
+    """
+    Follow one fiber from xref towards both sides of the detector.
+
+    No historical trace information is used.
+    """
+
+    ny, nx = image.shape
+
+    if xmax is None:
+        xmax = nx - 4
+
+    xdata = [float(xref)]
+    ydata = [float(yref)]
+
+    # ---------------------------------------------------------
+    # Right side
+    # ---------------------------------------------------------
+
+    yr = float(yref)
+
+    xr_data = []
+    yr_data = []
+
+    for x in range(xref + step, xmax + 1, step):
+
+        # Average a few columns for better S/N
+        xa = max(0, x - 1)
+        xb = min(nx, x + 2)
+
+        profile = np.nanmedian(
+            image[:, xa:xb],
+            axis=1
+        )
+
+        ynew = _local_centroid(
+            profile,
+            yr,
+            half_window=half_window
+        )
+
+        if np.isfinite(ynew):
+
+            # Do not allow absurd jumps
+            if abs(ynew - yr) <= half_window:
+                xr_data.append(float(x))
+                yr_data.append(float(ynew))
+                yr = ynew
+
+    # ---------------------------------------------------------
+    # Left side
+    # ---------------------------------------------------------
+
+    yl = float(yref)
+
+    xl_data = []
+    yl_data = []
+
+    for x in range(xref - step, xmin - 1, -step):
+
+        xa = max(0, x - 1)
+        xb = min(nx, x + 2)
+
+        profile = np.nanmedian(
+            image[:, xa:xb],
+            axis=1
+        )
+
+        ynew = _local_centroid(
+            profile,
+            yl,
+            half_window=half_window
+        )
+
+        if np.isfinite(ynew):
+
+            if abs(ynew - yl) <= half_window:
+                xl_data.append(float(x))
+                yl_data.append(float(ynew))
+                yl = ynew
+
+    # Combine left + reference + right
+    xdata = (
+        xl_data[::-1]
+        + xdata
+        + xr_data
+    )
+
+    ydata = (
+        yl_data[::-1]
+        + ydata
+        + yr_data
+    )
+
+    return (
+        np.asarray(xdata),
+        np.asarray(ydata)
+    )
+
+
+def _robust_trace_fit(
+    x,
+    y,
+    degree=5,
+    nsigma=3.0,
+    maxiter=5
+):
+    """
+    Robust polynomial fit using iterative sigma clipping.
+
+    Coefficients are returned in MEGARADRP order:
+    c0, c1, c2, ...
+    """
+
+    good = (
+        np.isfinite(x)
+        & np.isfinite(y)
+    )
+
+    xfit = np.asarray(x[good], dtype=float)
+    yfit = np.asarray(y[good], dtype=float)
+
+    if len(xfit) < degree + 1:
+        raise RuntimeError(
+            "Insufficient points for polynomial fit"
+        )
+
+    for iteration in range(maxiter):
+
+        coeff = np.polynomial.polynomial.polyfit(
+            xfit,
+            yfit,
+            degree
+        )
+
+        model = np.polynomial.polynomial.polyval(
+            xfit,
+            coeff
+        )
+
+        resid = yfit - model
+
+        # Robust sigma using MAD
+        med = np.median(resid)
+
+        mad = np.median(
+            np.abs(resid - med)
+        )
+
+        sigma = 1.4826 * mad
+
+        if sigma <= 0 or not np.isfinite(sigma):
+            break
+
+        keep = (
+            np.abs(resid - med)
+            < nsigma * sigma
+        )
+
+        if np.all(keep):
+            break
+
+        if np.sum(keep) < degree + 1:
+            break
+
+        xfit = xfit[keep]
+        yfit = yfit[keep]
+
+    coeff = np.polynomial.polynomial.polyfit(
+        xfit,
+        yfit,
+        degree
+    )
+
+    model = np.polynomial.polynomial.polyval(
+        xfit,
+        coeff
+    )
+
+    rms = np.sqrt(
+        np.mean(
+            (yfit - model) ** 2
+        )
+    )
+
+    return coeff, xfit, yfit, rms
+
+
+def generate_new_lru_tracemap(
+    fits_file,
+    template_json,
+    output_file="master_tracesLR-U_new.json",
+    xref=2000,
+    n_fibers=622,
+    degree=5,
+    step=10,
+    half_window=3,
+    xmin=4,
+    xmax=4092,
+    reverse_fibids=False,
+    max_rms=1.0,
+    verbose=True
+):
+    """
+    Generate a completely new LR-U TraceMap directly from a
+    reduced_image.fits.
+
+    The historical JSON is used ONLY as a MEGARADRP JSON template.
+    Its trace coefficients are NOT used.
+
+    Parameters
+    ----------
+    fits_file : str
+        reduced_image.fits from MegaraTraceMap.
+
+    template_json : str
+        Existing MEGARADRP TraceMap JSON used only as a structural
+        template.
+
+    output_file : str
+        New TraceMap JSON.
+
+    xref : int
+        Reference detector column where fibers are initially detected.
+
+    n_fibers : int
+        Number of actual fibers to trace.
+        For the LR-U data discussed here, 622 is appropriate.
+
+    degree : int
+        Polynomial degree.
+
+    step : int
+        Step in detector columns while following traces.
+
+    half_window : int
+        Half-width of local search window in pixels.
+
+    xmin, xmax : int
+        Trace range.
+
+    reverse_fibids : bool
+        If False, increasing Y corresponds to increasing fibid.
+        Set True if detector orientation is reversed.
+
+    max_rms : float
+        Trace fits with RMS above this value are reported.
+
+    Returns
+    -------
+    dict
+        Newly generated TraceMap.
+    """
+
+    # ---------------------------------------------------------
+    # Read image
+    # ---------------------------------------------------------
+
+    image = fits.getdata(
+        fits_file,
+        ext=0
+    ).astype(float)
+
+    if image.ndim != 2:
+        raise ValueError(
+            "Expected a 2D FITS image"
+        )
+
+    ny, nx = image.shape
+
+    if xmax >= nx:
+        xmax = nx - 4
+
+    if xref <= xmin or xref >= xmax:
+        raise ValueError(
+            "xref must lie between xmin and xmax"
+        )
+
+    # ---------------------------------------------------------
+    # Detect fibers completely independently
+    # ---------------------------------------------------------
+
+    centers, profile, smooth = _detect_reference_fibers(
+        image,
+        xref=xref,
+        n_fibers=n_fibers
+    )
+
+    if reverse_fibids:
+        centers = centers[::-1]
+
+    if verbose:
+        print(
+            "Detected {} fibers at x={}".format(
+                len(centers),
+                xref
+            )
+        )
+
+        print(
+            "Y range: {:.2f} -- {:.2f}".format(
+                np.min(centers),
+                np.max(centers)
+            )
+        )
+
+        print(
+            "Median separation: {:.3f} pix".format(
+                np.median(
+                    np.diff(
+                        np.sort(centers)
+                    )
+                )
+            )
+        )
+
+    # ---------------------------------------------------------
+    # Load template
+    # ---------------------------------------------------------
+
+    with open(template_json, "r") as f:
+        template = json.load(f)
+
+    result = copy.deepcopy(template)
+
+    old_contents = result["contents"]
+
+    old_by_fibid = {
+        x["fibid"]: x
+        for x in old_contents
+    }
+
+    new_contents = []
+
+    failed = []
+    suspicious = []
+
+    # ---------------------------------------------------------
+    # Trace every fiber
+    # ---------------------------------------------------------
+
+    for index, yref in enumerate(centers):
+
+        fibid = index + 1
+
+        if verbose and (
+            fibid == 1
+            or fibid % 50 == 0
+        ):
+            print(
+                "Tracing fiber {:3d}/{:3d}".format(
+                    fibid,
+                    n_fibers
+                )
+            )
+
+        x, y = _follow_single_trace(
+            image,
+            xref=xref,
+            yref=yref,
+            step=step,
+            half_window=half_window,
+            xmin=xmin,
+            xmax=xmax
+        )
+
+        try:
+
+            coeff, xfit, yfit, rms = _robust_trace_fit(
+                x,
+                y,
+                degree=degree
+            )
+
+        except Exception as exc:
+
+            print(
+                "WARNING: fiber {} failed: {}".format(
+                    fibid,
+                    exc
+                )
+            )
+
+            failed.append(fibid)
+            continue
+
+        if rms > max_rms:
+
+            suspicious.append(
+                (fibid, rms)
+            )
+
+            print(
+                "WARNING: fiber {} RMS = {:.3f} pix".format(
+                    fibid,
+                    rms
+                )
+            )
+
+        # Preserve non-geometrical metadata for this fiber,
+        # but replace the trace completely.
+        if fibid in old_by_fibid:
+
+            item = copy.deepcopy(
+                old_by_fibid[fibid]
+            )
+
+        else:
+
+            item = {
+                "fibid": fibid,
+                "boxid": 0
+            }
+
+        item["fibid"] = fibid
+
+        item["fitparms"] = [
+            float(v)
+            for v in coeff
+        ]
+
+        item["start"] = int(xmin)
+        item["stop"] = int(xmax)
+
+        new_contents.append(item)
+
+    # ---------------------------------------------------------
+    # Fiber 623 / fibers without a newly measured trace
+    # ---------------------------------------------------------
+
+    all_fibids = set(
+        range(
+            1,
+            result.get(
+                "total_fibers",
+                n_fibers
+            ) + 1
+        )
+    )
+
+    measured_fibids = set(
+        x["fibid"]
+        for x in new_contents
+    )
+
+    missing = sorted(
+        all_fibids - measured_fibids
+    )
+
+    # Preserve placeholder entries for missing fibers
+    for fibid in missing:
+
+        if fibid in old_by_fibid:
+
+            item = copy.deepcopy(
+                old_by_fibid[fibid]
+            )
+
+            item["fitparms"] = []
+
+            new_contents.append(item)
+
+    new_contents.sort(
+        key=lambda x: x["fibid"]
+    )
+
+    # ---------------------------------------------------------
+    # Replace calibration information
+    # ---------------------------------------------------------
+
+    result["contents"] = new_contents
+
+    result["missing_fibers"] = missing
+
+    result["error_fitting"] = sorted(
+        set(failed)
+    )
+
+    # This is a genuinely new trace solution,
+    # therefore no inherited global displacement.
+    result["global_offset"] = [0.0]
+
+    result["ref_column"] = int(xref)
+
+    # ---------------------------------------------------------
+    # Save
+    # ---------------------------------------------------------
+
+    with open(output_file, "w") as f:
+
+        json.dump(
+            result,
+            f,
+            indent=2
+        )
+
+    # ---------------------------------------------------------
+    # Report
+    # ---------------------------------------------------------
+
+    print("")
+    print("---------------------------------------")
+    print("New LR-U TraceMap")
+    print("---------------------------------------")
+    print(
+        "Output             : {}".format(
+            output_file
+        )
+    )
+    print(
+        "Detected fibers    : {}".format(
+            len(centers)
+        )
+    )
+    print(
+        "Successfully fitted: {}".format(
+            len(measured_fibids)
+        )
+    )
+    print(
+        "Missing fibers     : {}".format(
+            missing
+        )
+    )
+    print(
+        "Failed fits        : {}".format(
+            failed
+        )
+    )
+
+    if suspicious:
+
+        print(
+            "High-RMS traces:"
+        )
+
+        for fibid, rms in suspicious:
+
+            print(
+                "  fiber {:3d}: {:.3f} pix".format(
+                    fibid,
+                    rms
+                )
+            )
+
+    print("---------------------------------------")
+
+    return result
