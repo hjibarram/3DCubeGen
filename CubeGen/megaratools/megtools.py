@@ -2345,4 +2345,4 @@ def generate_new_lru_tracemap(
 
     print("---------------------------------------")
 
-    return result
+    #return result

@@ -210,7 +210,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
                         'FAC_SIZEX':fac_sizex,
                         'APER_STD':aper_std}
             comand_base='numina run PATHWORK PATHDATA PWORKobsresult-NRVPH.yaml -r PWORKrequirements-STDVPH.yaml'.replace('PATHWORK',path_work).replace('PWORK',redux_dirT).replace('PATHDATA',path_data)
-            comand_heal='megaradrp-heal_traces PWORKobsid8LR-U_work/reduced_image.fits PDATAmaster_traces_LRU_20220325.json --healing PDATAhealing_LRU.yaml --updated_traces PDATAmaster_tracesLR-U.json --pdffile PWORKobsid8LR-U_work/test.pdf --verbose --fibids'
+            comand_heal='megaradrp-heal_traces PWORKobsid8LR-U_work/reduced_image.fits PDATAmaster_tracesLR-U_new.json --healing PDATAhealing_LRU.yaml --updated_traces PDATAmaster_tracesLR-U.json --pdffile PWORKobsid8LR-U_work/test.pdf --verbose --fibids'
             dir_base='obsidNRVPH_results'
             call0=comand_base.replace('NRVPH','1').replace('VPH',vph).replace('STD',stdar_t)
             call1='cp '+redux_dirT+dir_base.replace('NRVPH','1')+'/master_bias.fits PWORKdata/master_bias.fits'.replace('PWORK',redux_dirT)
@@ -219,8 +219,9 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             call4=comand_base.replace('NR','8').replace('VPH',vph).replace('STD',stdar_t)
             if 'LR-U' in vph:
                 call4c='cp '+calib_path+'/master_traces_LRU_20220325.json PDATA'.replace('PDATA',redux_datT)
-                mtools.generate_lru_healing(redux_datT+'master_traces_LRU_20220325.json',output_file=redux_datT+'healing_LRU.yaml',offset=30.0)
-                call4h=comand_heal.replace('PWORK',redux_dirT).replace('PDATA',redux_datT)
+                mtools.generate_new_lru_tracemap(redux_dirT+'obsid8LR-U_work/reduced_image.fits',redux_datT+'master_traces_LRU_20220325.json',output_file=redux_datT+'master_tracesLR-U.json',xref=2000,n_fibers=622,step=10,half_window=3,degree=5)
+                #mtools.generate_lru_healing(redux_datT+'master_tracesLR-U_new.json',output_file=redux_datT+'healing_LRU.yaml',offset=30.0)
+                #call4h=comand_heal.replace('PWORK',redux_dirT).replace('PDATA',redux_datT)
                 master_wcl='PWORKdata/master_wlcalibVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
             call5='cp '+redux_dirT+dir_base.replace('NR','8').replace('VPH',vph)+'/master_model.json PWORKdata/master_modelVPH.json'.replace('VPH',vph).replace('PWORK',redux_dirT)
             call6=comand_base.replace('NR','3').replace('VPH',vph).replace('STD',stdar_t)
