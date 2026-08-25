@@ -1437,111 +1437,59 @@ def generate_lru_healing(
     offset=30.0,
     xpoints=(100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000),
     poldeg=5,
-    xstart=6,
-    xstop=4090,
     refit=True
 ):
     """
-    Generate a MEGARADRP healing YAML for all fibers.
-
-    The initial user points are calculated from an existing TraceMap
-    and shifted vertically by `offset` pixels. MEGARADRP will then
-    recompute each trace using refit=True.
+    Generate a MEGARADRP healing YAML for all fibers
+    from an existing LR-U TraceMap.
 
     Parameters
     ----------
     traces_file : str
-        Historical TraceMap JSON, e.g.
-        master_traces_LRU_20220325.json
+        Input TraceMap JSON.
 
     output_file : str
         Output healing YAML.
 
     offset : float
-        Initial vertical offset in pixels.
+        Vertical offset in pixels applied to the initial trace.
 
     xpoints : sequence
-        X coordinates used to generate initial user points.
+        X positions used as initial user points.
 
     poldeg : int
-        Polynomial degree used for trace refitting.
-
-    xstart, xstop : int
-        Valid X range of the final trace.
+        Polynomial degree for the new trace fit.
 
     refit : bool
-        If True, MEGARADRP re-determines the trace from the image.
+        If True, MEGARADRP refits the trace using the image.
     """
 
     with open(traces_file, "r") as f:
         data = json.load(f)
 
-    # Different versions of MEGARADRP may use slightly
-    # different names for the trace list.
-    if "contents" in data:
-        traces = data["contents"]
-    elif "traces" in data:
-        traces = data["traces"]
-    else:
-        raise KeyError(
-            "Cannot find 'contents' or 'traces' in {}".format(
-                traces_file
-            )
-        )
+    traces = data["contents"]
 
     blocks = []
 
     for item in traces:
 
-        fibid = item.get("fibid")
+        fibid = item["fibid"]
+        coeff = np.asarray(item["fitparms"], dtype=float)
 
-        if fibid is None:
-            continue
-
-        # Locate polynomial coefficients
-        coeff = None
-
-        if "fitparms" in item:
-            fp = item["fitparms"]
-
-            if isinstance(fp, dict):
-                coeff = (
-                    fp.get("coeff")
-                    or fp.get("coefficients")
-                    or fp.get("polynomial")
-                )
-
-        if coeff is None and "coeff" in item:
-            coeff = item["coeff"]
-
-        if coeff is None and "solution" in item:
-            sol = item["solution"]
-
-            if isinstance(sol, dict):
-                coeff = (
-                    sol.get("coeff")
-                    or sol.get("coefficients")
-                )
-
-        if coeff is None:
-            print(
-                "WARNING: no coefficients found for "
-                "fiber {}".format(fibid)
-            )
-            continue
-
-        coeff = np.asarray(coeff, dtype=float)
+        # Use the valid range stored in the TraceMap
+        xstart = item.get("start", 4)
+        xstop = item.get("stop", 4092)
 
         user_points = []
 
         for x in xpoints:
 
-            # IMPORTANT:
-            # MEGARA trace coefficients are typically stored
-            # in increasing polynomial order:
-            #
-            # y = c0 + c1*x + c2*x^2 + ...
-            #
+            # Skip points outside the valid trace interval
+            if x < xstart or x > xstop:
+                continue
+
+            # fitparms are polynomial coefficients in increasing order:
+            # y = c0 + c1*x + c2*x**2 + ...
             y = np.polynomial.polynomial.polyval(
                 float(x),
                 coeff
@@ -1549,7 +1497,17 @@ def generate_lru_healing(
 
             y += offset
 
-            user_points.append((float(x), float(y)))
+            user_points.append(
+                (float(x), float(y))
+            )
+
+        if len(user_points) < poldeg + 1:
+            print(
+                "WARNING: insufficient points for fiber {}".format(
+                    fibid
+                )
+            )
+            continue
 
         block = []
 
@@ -1568,11 +1526,15 @@ def generate_lru_healing(
         block.append(
             "xstop: {}".format(xstop)
         )
-        block.append("user_points:")
+        block.append(
+            "user_points:"
+        )
 
         for x, y in user_points:
             block.append(
-                "  - [{:.1f}, {:.3f}]".format(x, y)
+                "  - [{:.1f}, {:.6f}]".format(
+                    x, y
+                )
             )
 
         block.append(
@@ -1594,4 +1556,4 @@ def generate_lru_healing(
         )
     )
 
-    #return output_file    
+#    return output_file
