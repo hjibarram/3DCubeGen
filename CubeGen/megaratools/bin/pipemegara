@@ -260,7 +260,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
 #            tools.sycall(call7)
             if 'LR-U' in vph:
 #                mtools.fix_lru_wavelength_calibration(master_wcl)
-                spec_range=(3820,4300)
+                spec_range=(3820,3900)
             else:
                 spec_range=(None,None)
             print(call8)

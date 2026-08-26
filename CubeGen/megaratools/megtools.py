@@ -517,7 +517,6 @@ def evaluate_2dPSF(pf_map,model=True,sig=2,plotview=False,centroid=False):
         PSF=Gaussian2DKernel(x_stddev=sig,y_stddev=sig)
         pf_map_c=convolve(pf_map, PSF)
     min_in=np.unravel_index(np.nanargmax(pf_map_c), (nx,ny))
-    print(min_in)
     At=np.nanmax(pf_map)
     x_t=np.arange(ny)-min_in[1]
     y_t=np.arange(nx)-min_in[0]
