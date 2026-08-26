@@ -164,6 +164,7 @@ def get_rssflux_sens(r,xo=0,yo=0,path_block9='',path_sensfits='',path_data='data
         nt=np.where(wave >= 3820)
         flux=flux[nt]
         wave=wave[nt]
+        print(len(wave),len(s),s.shape)
         s=s[nt]
     return wave,flux,Xa,s,hdr2
 
