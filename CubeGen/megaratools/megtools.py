@@ -164,7 +164,7 @@ def get_rssflux_sens(r,xo=0,yo=0,path_block9='',path_sensfits='',path_data='data
         nt=np.where(wave < 3820)
         #flux=flux[nt]
         #wave=wave[nt]
-        s[nt]=0.0
+        s[nt]=np.nan
     return wave,flux,Xa,s,hdr2
 
 
@@ -392,7 +392,10 @@ def calib_spec(phase=0,scfact=1.0,xo=0,yo=0,vph='B',idp='9',stdar_t='Feige32',ve
     if cube == True:
         flux,wave,s=extract_cube(wave,s,r,xo=xo,yo=yo,stdar_t=stdar_t,path_ifu=path_ifu,vph=vph,dpix=dpix)
     maxwave=np.round(np.nanmax(wave)-70)
-    minwave=np.round(np.nanmin(wave)+70)
+    if 'LR-U' in vph:
+        minwave=3820
+    else:
+        minwave=np.round(np.nanmin(wave)+70)
     Kvl=extintion_c(wave,dir_tem=path_data)
     at_ext=10.0**(-0.4*Xa*Kvl)
     flux1=flux/s/at_ext
