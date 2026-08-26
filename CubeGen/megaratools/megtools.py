@@ -160,6 +160,10 @@ def get_rssflux_sens(r,xo=0,yo=0,path_block9='',path_sensfits='',path_data='data
         fluxf=fluxf+flux[int(fib_idt[i])-1,:]
     flux=fluxf
     wave=l0+np.arange(len(flux))*dl
+    if 'LR-U' in vph:
+        nt=np.where(wave >= 3820)
+        flux=flux[nt]
+        wave=wave[nt]
     return wave,flux,Xa,s,hdr2
 
 

@@ -260,6 +260,9 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             tools.sycall(call7)
             if 'LR-U' in vph:
                 mtools.fix_lru_wavelength_calibration(master_wcl)
+                spec_range=(3820,4300)
+            else:
+                spec_range=(None,None)
             print(call8)
             tools.sycall(call8)
             print(call9)
@@ -267,7 +270,7 @@ def runfulldrp(run_name,run_number,out_path,redux_ver,redux_path,obrun_path,sigm
             print(call10)
             tools.sycall(call10)
             mapt,hdr=mmap.meggen_map(reduxL0,savefile=False,nameF=None,flu16=flu16,fac_sizeX=fac_sizex,fac_sizeY=fac_sizey,pix_s=pix_s,
-                sigm_s=sigm_s,alph_s=alph_s,out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=vph,basenameC='tNAME.fits')
+                sigm_s=sigm_s,alph_s=alph_s,out_path=redux_dirT+'ifu/',redux_dir=redux_dirT,vph=vph,basenameC='tNAME.fits',spec_range=spec_range)
             xo,yo=mtools.evaluate_2dPSF(mapt,model=False,sig=0,plotview=False,centroid=True)
             fact=mtools.calib_spec(phase=0,scfact=1.0,xo=xo,yo=yo,vph=vph,idp=idsA,stdar_t=stdar_t,r=aper_std,dpix=pix_s,pathwork=redux_dirT,
                 path_ifu=redux_dirT+'ifu',path_data=redux_dirT+'data')
