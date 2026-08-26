@@ -574,6 +574,7 @@ def evaluate_2dPSF(pf_map,model=True,sig=2,plotview=False,centroid=False):
             xo=dx_m
             yo=dy_m
             return xo,yo
+            print('STD centroid detected at '+str(xo)+','+str(yo))
         else:
             return dx_m,dy_m,ds_m,psf,spec_t
     else:    
@@ -583,6 +584,7 @@ def evaluate_2dPSF(pf_map,model=True,sig=2,plotview=False,centroid=False):
         if centroid:
             xo=dx_m
             yo=dy_m
+            print('STD centroid detected at '+str(xo)+','+str(yo))
             return xo,yo
         else:
             return dx_m,dy_m,ds_m,psf
