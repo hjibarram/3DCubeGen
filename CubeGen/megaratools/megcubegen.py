@@ -33,10 +33,10 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
         n_fib,ny0=rss.shape
         if len(dxpix) == nlt:
             dxpixt=dxpix[ii]
-            dxpiyt=dxpiy[ii]
+            dypixt=dypix[ii]
         else:
             dxpixt=0
-            dxpiyt=0
+            dypixt=0
         if ii == 0:
             outf=hdr['OBJECT']+'_'+vph
             x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1)
@@ -90,7 +90,7 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
                 if errors:
                     rss_ef[i,:]=erss[fib,:]
                 x_ifu_V[i,:]=-R_adr[0,:]+x_ifu[i]+dxpixt*pix_s
-                y_ifu_V[i,:]=-R_adr[1,:]+y_ifu[i]+dxpiyt*pix_s
+                y_ifu_V[i,:]=-R_adr[1,:]+y_ifu[i]+dypixt*pix_s
             hdr['CRVAL1']=crval
             hdr['CDELT1']=cdelt
         else:
@@ -113,7 +113,7 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
                 if errors:
                     rss_ef[n_fib0*ii+i,:]=interp1d(wave,erss[fib,:],kind='linear',bounds_error=False)(wave0)
                 x_ifu_V[n_fib0*ii+i,:]=-R_adr[0,:]+x_ifu[i]+dxpixt*pix_s
-                y_ifu_V[n_fib0*ii+i,:]=-R_adr[1,:]+y_ifu[i]+dxpiyt*pix_s
+                y_ifu_V[n_fib0*ii+i,:]=-R_adr[1,:]+y_ifu[i]+dypixt*pix_s
             #nt=np.where((wave1 >= wave_1) & (wave1 <= wave_2))
             rss=rss_f[n_fib0*ii:n_fib0*(ii+1),:]
             hdr['CRVAL1']=crval
