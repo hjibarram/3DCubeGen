@@ -110,7 +110,6 @@ def astromatch(file0,file1,sig=2):
     --------
     CubeGen.megaratools.megtools.evaluate_2dPSF
         Fits a two-dimensional PSF model and determines its centroid.
-
     """
     [spec0, hdr0]=fits.getdata(file0, 0, header=True)
     nz0,nx0,ny0=spec0.shape
