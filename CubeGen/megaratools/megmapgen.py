@@ -96,8 +96,8 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
                 rss_f[n_fib0*ii+i]=np.nansum(interp1d(wave,rss[fib,:],kind='linear',bounds_error=False)(wave0))
                 if errors:
                     rss_ef[n_fib0*ii+i]=np.sqrt(np.nansum(interp1d(wave,erss[fib,:],kind='linear',bounds_error=False)(wave0)**2))
-                x_ifu_V[n_fib0*ii+i]=x_ifu[i]+x_ifu[i]+dxpixt*pix_s
-                y_ifu_V[n_fib0*ii+i]=y_ifu[i]+y_ifu[i]+dypixt*pix_s
+                x_ifu_V[n_fib0*ii+i]=x_ifu[i]+dxpixt*pix_s
+                y_ifu_V[n_fib0*ii+i]=y_ifu[i]+dypixt*pix_s
     yot=(np.nanmax(y_ifu_V)+np.nanmin(y_ifu_V))/2.0
     xot=(np.nanmax(x_ifu_V)+np.nanmin(x_ifu_V))/2.0
     x_ifu_V=x_ifu_V-xot
