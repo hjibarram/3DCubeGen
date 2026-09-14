@@ -8,7 +8,7 @@ import CubeGen.megaratools.megkernel as mkernel
 
 def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),headerInfo={},
     fac_sizeX=1.0,fac_sizeY=1.0,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',
-    vph='R',scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits',dxpix=[],dypix=[],facT=[]):
+    vph='R',scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits',dxpix=[],dypix=[],facT=[],dx=0,dy=0):
     """
     Generate a cube from MEGARA IFU data.
     
@@ -202,8 +202,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
         ht1.update()
         head_list.extend([h3])
         head_list.extend([h4])
-    dx=0#dxpix
-    dy=0#dypix
+    #dx=0#dxpix
+    #dy=0#dypix
     h=h1.header
     keys=list(hdr.keys())
     for i in range(0, len(keys)):
