@@ -6,7 +6,9 @@ import CubeGen.tools.tools as tools
 import CubeGen.megaratools.megtools as mtools
 import CubeGen.megaratools.megkernel as mkernel
 
-def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_range=(None,None),fac_sizeX=1.0,fac_sizeY=1.0,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',vph='R',scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits'):
+def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_range=(None,None),
+    fac_sizeX=1.0,fac_sizeY=1.0,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',vph='R',
+    scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits',dxpix=[],dypix=[],facT=[]):
     """
     Generate a map from MEGARA IFU data.
     
@@ -29,6 +31,17 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
         [erss, hdr1]=fits.getdata(file,1, header=True)
         print('Processing '+hdr['OBJECT'])
         n_fib,ny0=rss.shape
+        if len(dxpix) == nlt:
+            dxpixt=dxpix[ii]
+            dypixt=dypix[ii]
+        else:
+            dxpixt=0
+            dypixt=0
+        if len(facT) == nlt:
+            facTt=facT[ii]
+        else:
+            facTt=1.0
+        rss=rss*facTt
         if ii == 0:
             outf=hdr['OBJECT']+'_'+vph
             x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1)
@@ -73,8 +86,8 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
                 rss_f[i]=np.nansum(rss[fib,:])
                 if errors:
                     rss_ef[i]=np.sqrt(np.nansum(erss[fib,:]**2))
-                x_ifu_V[i]=x_ifu[i]
-                y_ifu_V[i]=y_ifu[i]
+                x_ifu_V[i]=x_ifu[i]+dxpixt*pix_s
+                y_ifu_V[i]=y_ifu[i]+dypixt*pix_s
         else:
             x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1)
             wave=hdr['CRVAL1']+np.arange(ny0)*hdr['CDELT1']
@@ -83,8 +96,8 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
                 rss_f[n_fib0*ii+i]=np.nansum(interp1d(wave,rss[fib,:],kind='linear',bounds_error=False)(wave0))
                 if errors:
                     rss_ef[n_fib0*ii+i]=np.sqrt(np.nansum(interp1d(wave,erss[fib,:],kind='linear',bounds_error=False)(wave0)**2))
-                x_ifu_V[n_fib0*ii+i]=x_ifu[i]
-                y_ifu_V[n_fib0*ii+i]=y_ifu[i]
+                x_ifu_V[n_fib0*ii+i]=x_ifu[i]+x_ifu[i]+dxpixt*pix_s
+                y_ifu_V[n_fib0*ii+i]=y_ifu[i]+y_ifu[i]+dypixt*pix_s
     yot=(np.nanmax(y_ifu_V)+np.nanmin(y_ifu_V))/2.0
     xot=(np.nanmax(x_ifu_V)+np.nanmin(x_ifu_V))/2.0
     x_ifu_V=x_ifu_V-xot
