@@ -112,19 +112,21 @@ def astromatch(file0,file1,sig=2):
         Fits a two-dimensional PSF model and determines its centroid.
     """
     [spec0, hdr0]=fits.getdata(file0, 0, header=True)
-    nz0,nx0,ny0=spec0.shape
     
     [spec1, hdr1]=fits.getdata(file1, 0, header=True)
-    nz1,nx1,ny1=spec1.shape
 
     # Collapse the cubes along the spectral axis.
     try:
+        nz0,nx0,ny0=spec0.shape
         map0=np.nansum(spec0,axis=0)
     except:
+        nx0,ny0=spec0.shape
         map0=np.copy(spec0)
     try:
+        nz1,nx1,ny1=spec1.shape
         map1=np.nansum(spec1,axis=0)
     except:
+        nx1,ny1=spec1.shape
         map1=np.copy(spec1)
     print(file0)
     print(file1)
