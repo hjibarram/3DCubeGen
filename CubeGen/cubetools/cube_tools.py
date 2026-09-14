@@ -7,7 +7,7 @@ import numpy as np
 
 
 def astromatch(file0,file1,sig=2):
-	"""
+    """
     Compare the astrometric registration of two reconstructed data cubes.
 
     The function collapses each input cube along the spectral axis to
