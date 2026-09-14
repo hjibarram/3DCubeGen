@@ -312,12 +312,14 @@ def crop_image(names, cube, dir1='.', dir2='.', apt='_gri'):
                  hdr1['CD2_2']**2.0) * 3600.0
     A0 = dx * dy
 
-    nz1, nx1, ny1 = spec1.shape
+    
 
     # Integrated image of the reference cube.
     try:
+        nz1, nx1, ny1 = spec1.shape
         map1 = np.nansum(spec1, axis=0)
     except:
+        nx1, ny1 = spec1.shape
         map1= np.copy(spec1)
 
     # Celestial WCS of the IFU cube.
