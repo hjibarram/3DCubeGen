@@ -118,9 +118,14 @@ def astromatch(file0,file1,sig=2):
     nz1,nx1,ny1=spec1.shape
 
     # Collapse the cubes along the spectral axis.
-
-    map0=np.nansum(spec0,axis=0)
-    map1=np.nansum(spec1,axis=0)
+    try:
+        map0=np.nansum(spec0,axis=0)
+    except:
+        map0=np.copy(spec0)
+    try:
+        map1=np.nansum(spec1,axis=0)
+    except:
+        map1=np.copy(spec1)
     print(file0)
     print(file1)
 
