@@ -41,7 +41,7 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
             facTt=facT[ii]
         else:
             facTt=1.0
-            rss=rss*facTt
+        rss=rss*facTt
         if ii == 0:
             outf=hdr['OBJECT']+'_'+vph
             x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1)
