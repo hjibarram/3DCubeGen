@@ -40,3 +40,4 @@ Local Volume Mapping), MEGARA (GTC), and VirusP (HET).
    algorithm
    outputs
    daptools
+   cube_tools
