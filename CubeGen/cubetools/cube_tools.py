@@ -168,7 +168,7 @@ def astromatch(file0,file1,sig=2):
     return dx, dy, dx_wcs, dy_wcs
 
 
-def crop_image(names, cube, dir1='.', dir2='.', apt='_gri'):
+def crop_image(names, cube, dir1='./', dir2='./', dir3='./', apt='_gri'):
     """
     Reproject imaging data onto the spatial grid of an IFU data cube.
 
@@ -409,7 +409,7 @@ def crop_image(names, cube, dir1='.', dir2='.', apt='_gri'):
 
     hlist = fits.HDUList([h1])
     hlist.writeto(
-        cube.replace('.fits.gz', apt) + '.fits',
+        dir3 + cube.replace('.fits.gz', apt) + '.fits',
         overwrite=True
     )
 
@@ -462,6 +462,6 @@ def crop_image(names, cube, dir1='.', dir2='.', apt='_gri'):
     im = Image.fromarray(rgb_cube)
 
     im.save(
-        cube.replace('.fits.gz', apt) + '.jpeg',
+        dir3 + cube.replace('.fits.gz', apt) + '.jpeg',
         quality=100
     )
