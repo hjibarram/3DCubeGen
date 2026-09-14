@@ -390,10 +390,13 @@ def crop_image(names, cube, dir1='.', dir2='.', apt='_gri'):
         h_k[key] = hdr1[key]
         h_k.comments[key] = hdr1.comments[key]
 
-    # Remove the original spectral-axis WCS.
-    del h_k['CDELT3']
-    del h_k['CRPIX3']
-    del h_k['CRVAL3']
+    try:
+        # Remove the original spectral-axis WCS.
+        del h_k['CDELT3']
+        del h_k['CRPIX3']
+        del h_k['CRVAL3']
+    except:
+        print('2D map')
 
     h_k['BUNIT'] = hdr0['BUNIT']
 
