@@ -191,8 +191,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
         ht1.update()
         head_list.extend([h3])
         head_list.extend([h4])
-    dx=0
-    dy=0
+    dx=dxpix
+    dy=dypix
     h=h1.header
     keys=list(hdr.keys())
     for i in range(0, len(keys)):
