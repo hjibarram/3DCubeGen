@@ -8,7 +8,7 @@ import CubeGen.megaratools.megkernel as mkernel
 
 def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),headerInfo={},
     fac_sizeX=1.0,fac_sizeY=1.0,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',
-    vph='R',scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits',dxpix=0,dypix=0):
+    vph='R',scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits',dxpix=[],dypix=[]):
     """
     Generate a cube from MEGARA IFU data.
     
@@ -31,6 +31,12 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
         [erss, hdr1]=fits.getdata(file,1, header=True)
         print('Processing '+hdr['OBJECT'])
         n_fib,ny0=rss.shape
+        if len(dxpix) == nlt:
+            dxpixt=dxpix[ii]
+            dxpiyt=dxpiy[ii]
+        else:
+            dxpixt=0
+            dxpiyt=0
         if ii == 0:
             outf=hdr['OBJECT']+'_'+vph
             x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1)
@@ -83,8 +89,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
                 rss_f[i,:]=rss[fib,:]
                 if errors:
                     rss_ef[i,:]=erss[fib,:]
-                x_ifu_V[i,:]=-R_adr[0,:]+x_ifu[i]
-                y_ifu_V[i,:]=-R_adr[1,:]+y_ifu[i]
+                x_ifu_V[i,:]=-R_adr[0,:]+x_ifu[i]+dxpixt*pix_s
+                y_ifu_V[i,:]=-R_adr[1,:]+y_ifu[i]+dxpiyt*pix_s
             hdr['CRVAL1']=crval
             hdr['CDELT1']=cdelt
         else:
@@ -106,8 +112,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
                 rss_f[n_fib0*ii+i,:]=interp1d(wave,rss[fib,:],kind='linear',bounds_error=False)(wave0)
                 if errors:
                     rss_ef[n_fib0*ii+i,:]=interp1d(wave,erss[fib,:],kind='linear',bounds_error=False)(wave0)
-                x_ifu_V[n_fib0*ii+i,:]=-R_adr[0,:]+x_ifu[i]
-                y_ifu_V[n_fib0*ii+i,:]=-R_adr[1,:]+y_ifu[i]
+                x_ifu_V[n_fib0*ii+i,:]=-R_adr[0,:]+x_ifu[i]+dxpixt*pix_s
+                y_ifu_V[n_fib0*ii+i,:]=-R_adr[1,:]+y_ifu[i]+dxpiyt*pix_s
             #nt=np.where((wave1 >= wave_1) & (wave1 <= wave_2))
             rss=rss_f[n_fib0*ii:n_fib0*(ii+1),:]
             hdr['CRVAL1']=crval
@@ -191,8 +197,8 @@ def megmap_ifu(reduxL,nameF=None,errors=False,flu16=True,spec_range=(None,None),
         ht1.update()
         head_list.extend([h3])
         head_list.extend([h4])
-    dx=dxpix
-    dy=dypix
+    dx=0#dxpix
+    dy=0#dypix
     h=h1.header
     keys=list(hdr.keys())
     for i in range(0, len(keys)):
