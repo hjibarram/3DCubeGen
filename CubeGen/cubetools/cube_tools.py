@@ -367,7 +367,7 @@ def crop_image(names, cube, dir1='.', dir2='.', apt='_gri'):
                     xpos
                 )
 
-                fig1[j, i] = val
+                fig1[i, j] = val
 
         pdl_cube_new[ct, :, :] = fig1
         ct += 1
