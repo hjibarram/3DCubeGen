@@ -92,15 +92,20 @@ def megarafiber_pos(hdr,verbose=False,astmet=True):
         y_ifu=y_posf*psc
     if verbose:
         fig = plt.figure(figsize=(6, 6)) 
-        ax = fig.add_subplot(111, projection='aitoff')
-        sc = ax.scatter(x_ifu/3600.,y_ifu/3600., c=fib_idt, cmap='inferno', s=15, alpha=0.8, edgecolor='k')
-        plt.colorbar(sc, label='FibID')
+        ax = fig.add_subplot(111)
+        sc = ax.scatter(x_ifu/3600., y_ifu/3600., c=fib_idt, cmap='inferno', s=15, alpha=0.8, edgecolor='k')
+        # 3. ¡CONVENCIONES ASTRONÓMICAS PARA IFU!
+        ax.invert_xaxis()      # El Este en el cielo va a la izquierda (RA aumenta a la izquierda)
+        ax.set_aspect('equal') # Fuerza a que 1 grado en X mida exactamente lo mismo que 1 grado en Y
+        # 4. Forzar que el recuadro de los ejes sea estrictamente un cuadrado perfecto
+        # Esto evita que matplotlib estire los límites de un eje más que el otro
+        ax.set_box_aspect(1) 
+        # 5. Estética y etiquetas
+        plt.colorbar(sc, label='FibID', shrink=0.8) # shrink hace que la barra combine con el tamaño del plano
         plt.title('Fiber Map')
-        plt.xlabel('RA')
-        plt.ylabel('DEC')
-        #ax.grid(True, linestyle=':', alpha=0.6)
-        #ax.set_xticklabels(['14h', '16h', '18h', '20h', '22h', '0h', '2h', '4h', '6h', '8h', '10h'])
-        plt.show()
+        plt.xlabel('RA (degrees)')
+        plt.ylabel('DEC (degrees)')
+        ax.grid(True, linestyle=':', alpha=0.6)
         #plt.plot(x_ifu/3600.,y_ifu/3600.,'o')
         #plt.show() 
     return x_ifu,y_ifu,fib_idt,fib_ids
