@@ -6,9 +6,10 @@ import CubeGen.tools.tools as tools
 import numpy as np
 from tqdm.notebook import tqdm
 from tqdm import tqdm as tqdmT
+from PIL import Image
 
 
-def astromatch(file0,file1,sig=2):
+def astromatch(file0,file1,sig=2,plotview=False):
     """
     Compare the astrometric registration of two reconstructed data cubes.
 
@@ -39,6 +40,9 @@ def astromatch(file0,file1,sig=2):
         Initial or characteristic sigma used by
         :func:`CubeGen.megaratools.megtools.evaluate_2dPSF`.
         The default is 2.
+
+    plotview : bool, optional
+        If True, display the integrated images and fitted PSF models.
 
     Returns
     -------
@@ -134,8 +138,8 @@ def astromatch(file0,file1,sig=2):
     print(file1)
 
     # Determine the PSF centroid in each reconstructed image.
-    x0,y0,ds_m0,psf0,model0=mtools.evaluate_2dPSF(map0,model=True,sig=sig)
-    x1,y1,ds_m1,psf1,model1=mtools.evaluate_2dPSF(map1,model=True,sig=sig)
+    x0,y0,ds_m0,psf0,model0=mtools.evaluate_2dPSF(map0,model=True,sig=sig,plotview=plotview)
+    x1,y1,ds_m1,psf1,model1=mtools.evaluate_2dPSF(map1,model=True,sig=sig,plotview=plotview)
 
     print("x_0=",x0,"y_0=",y0,"sigma_0=",ds_m0,"psf_0=",psf0)
     print("x_1=",x1,"y_1=",y1,"sigma_1=",ds_m1,"psf_1=",psf1)
@@ -459,7 +463,6 @@ def crop_image(names, cube, dir1='./', dir2='./', dir3='./', apt='_gri'):
 
         rgb_cube[:, :, i] = np.flipud(pdl_img)
 
-    from PIL import Image
 
     im = Image.fromarray(rgb_cube)
 

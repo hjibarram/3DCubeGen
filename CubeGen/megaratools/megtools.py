@@ -91,9 +91,15 @@ def megarafiber_pos(hdr,verbose=False,astmet=True):
         x_ifu=x_posf*psc
         y_ifu=y_posf*psc
     if verbose:
-        import matplotlib.pyplot as plt
-        plt.plot(x_ifu/3600.,y_ifu/3600.,'o')
-        plt.show() 
+        plt.figure(figsize=(8, 4))
+        sc = plt.scatter(x_ifu/3600.,y_ifu/3600., c=i, cmap='plasma', edgecolor='k')
+        plt.colorbar(sc, label='FibID')
+        plt.title('Fiber Map')
+        plt.xlabel('RA')
+        plt.ylabel('DEC')
+        plt.show()
+        #plt.plot(x_ifu/3600.,y_ifu/3600.,'o')
+        #plt.show() 
     return x_ifu,y_ifu,fib_idt,fib_ids
 
 def read_standar(path_data='data',stdar_t='Feige32',stdT='',fergs=True):
