@@ -82,10 +82,10 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True):
             if verbose:
                 print('Using WCS and IPA to correct the fiber positions')
             # 1. Extraer los datos del WCS y el ángulo IPA del encabezado
-            pc11=hdr['PC1_1']
-            pc12=hdr['PC1_2']
-            pc21=hdr['PC2_1']
-            pc22=hdr['PC2_2']
+            pc11=1#hdr['PC1_1']
+            pc12=0#hdr['PC1_2']
+            pc21=0#hdr['PC2_1']
+            pc22=1#hdr['PC2_2']
             cdelt1=hdr['CDELT1']
             cdelt2=hdr['CDELT2']
             # 2. Convertir el IPA a radianes para las funciones trigonométricas
