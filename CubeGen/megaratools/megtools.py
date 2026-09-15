@@ -92,7 +92,7 @@ def megarafiber_pos(hdr,verbose=False,astmet=True):
         y_ifu=y_posf*psc
     if verbose:
         plt.figure(figsize=(8, 4))
-        sc = plt.scatter(x_ifu/3600.,y_ifu/3600., c=fib_id, cmap='plasma', edgecolor='k')
+        sc = plt.scatter(x_ifu/3600.,y_ifu/3600., c=fib_ids, cmap='plasma', edgecolor='k')
         plt.colorbar(sc, label='FibID')
         plt.title('Fiber Map')
         plt.xlabel('RA')
