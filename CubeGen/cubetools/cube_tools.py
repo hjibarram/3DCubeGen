@@ -373,7 +373,7 @@ def crop_image(names, cube, dir1='./', dir2='./', dir3='./', apt='_gri'):
         for i in range(0, nx1):
             for j in range(0, ny1):
 
-                sky1 = pixel_to_skycoord(i, j, wcs1)
+                sky1 = pixel_to_skycoord(j, i, wcs1)
 
                 xpos, ypos = skycoord_to_pixel(
                     sky1, wcs0
