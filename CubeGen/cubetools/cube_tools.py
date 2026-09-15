@@ -465,3 +465,1452 @@ def crop_image(names, cube, dir1='./', dir2='./', dir3='./', apt='_gri'):
         dir3 + cube.replace('.fits.gz', apt) + '.jpeg',
         quality=100
     )
+
+
+
+def coad_cube(name, dir1='', dir2='', vphs=['B', 'G', 'R'],
+              ra='', dec='', rad=1.5, pix=0.35, noise=False,
+              dpix=0, zt=0, patch=True):
+    """
+    Co-add reconstructed IFU datacubes from multiple spectral bands into
+    a single wavelength-continuous datacube.
+
+    The function searches for reconstructed datacubes in ``dir1`` using
+    ``name`` as the common filename and the band identifiers specified
+    by ``vphs``. The individual cubes are spatially registered using
+    their WCS information and resampled onto a common spectral grid.
+
+    Fluxes in overlapping wavelength regions are combined and, when
+    required, multiplicative corrections are applied to match adjacent
+    spectral bands.
+
+    The resulting co-added cube is written to ``dir2`` as
+    ``name.fits.gz``. When ``patch=True``, an additional
+    ``name_patch.fits.gz`` file containing the correction-factor map
+    is generated.
+
+    Parameters
+    ----------
+    name : str
+        Common base filename of the input datacubes, excluding the
+        spectral-band suffix and ``.fits.gz`` extension.
+
+        For example, with::
+
+            name = 'MK883'
+            vphs = ['B', 'G', 'R']
+
+        the function searches for::
+
+            MK883_B.fits.gz
+            MK883_G.fits.gz
+            MK883_R.fits.gz
+
+    dir1 : str, optional
+        Directory containing the input reconstructed datacubes.
+        Default is ``''``, corresponding to the current directory.
+
+    dir2 : str, optional
+        Directory where the final co-added datacube and patch map are
+        written. Default is ``''``, corresponding to the current
+        directory.
+
+    vphs : list of str, optional
+        Ordered list containing the identifiers of the spectral bands
+        or VPHs.
+
+        The first, second, and third entries correspond respectively
+        to the blue, intermediate, and red spectral ranges used by the
+        original co-addition algorithm.
+
+        Default is::
+
+            ['B', 'G', 'R']
+
+        For example::
+
+            ['LR-B', 'LR-V', 'LR-R']
+
+        produces input filenames of the form::
+
+            <name>_LR-B.fits.gz
+            <name>_LR-V.fits.gz
+            <name>_LR-R.fits.gz
+
+    ra : str or float, optional
+        Right ascension associated with the target. Retained for
+        compatibility with the original implementation. Default is ``''``.
+
+    dec : str or float, optional
+        Declination associated with the target. Retained for
+        compatibility with the original implementation. Default is ``''``.
+
+    rad : float, optional
+        Aperture radius in arcseconds. Retained for compatibility with
+        the original implementation. Default is 1.5.
+
+    pix : float, optional
+        Spatial pixel scale in arcseconds per pixel. Retained for
+        compatibility with the original implementation. Default is 0.35.
+
+    noise : bool, optional
+        Noise-processing flag retained for compatibility with the
+        original implementation. Default is False.
+
+    dpix : float, optional
+        Additional pixel offset retained for compatibility with the
+        original implementation. Default is 0.
+
+    zt : float, optional
+        Redshift parameter retained for compatibility with the original
+        implementation. Default is 0.
+
+    patch : bool, optional
+        If True, calculate and save the multiplicative correction-factor
+        map used to match overlapping spectral bands. Default is True.
+
+    Returns
+    -------
+    None
+        The function writes the resulting FITS products to disk.
+
+    Notes
+    -----
+    At least two spectral bands are required.
+
+    The wavelength solution is obtained from ``CRPIX3``, ``CRVAL3`` and
+    either ``CD3_3`` or ``CDELT3`` in the FITS headers.
+
+    The output FITS file contains:
+
+    * Primary HDU
+        Co-added flux datacube.
+    * ``Error_cube``
+        Estimated uncertainty datacube.
+    * ``BADPIXELMASK``
+        Integer bad-pixel mask.
+    * ``match_F_cube``
+        Spatial map of the multiplicative matching factor.
+
+    Examples
+    --------
+    Co-add the default B, G, and R cubes::
+
+        >>> coad_cube(
+        ...     'MK883',
+        ...     dir1='/data/cubes/',
+        ...     dir2='/data/coadd/'
+        ... )
+
+    This searches for::
+
+        /data/cubes/MK883_B.fits.gz
+        /data/cubes/MK883_G.fits.gz
+        /data/cubes/MK883_R.fits.gz
+
+    and generates::
+
+        /data/coadd/MK883.fits.gz
+        /data/coadd/MK883_patch.fits.gz
+
+    Custom VPH/band identifiers can be supplied with::
+
+        >>> coad_cube(
+        ...     'MK883',
+        ...     dir1='/data/cubes/',
+        ...     dir2='/data/coadd/',
+        ...     vphs=['LR-B', 'LR-V', 'LR-R']
+        ... )
+    """
+
+    # ------------------------------------------------------------------
+    # Validate VPH/band definition
+    # ------------------------------------------------------------------
+
+    if len(vphs) < 2:
+        print("At least two VPHs/bands must be provided.")
+        return
+
+    if len(vphs) > 3:
+        print("A maximum of three VPHs/bands is currently supported.")
+        return
+
+    # Ensure directories end with "/".
+    if dir1 != '' and not dir1.endswith('/'):
+        dir1 += '/'
+
+    if dir2 != '' and not dir2.endswith('/'):
+        dir2 += '/'
+
+    # Band identifiers.
+    vph_B = vphs[0]
+
+    if len(vphs) >= 2:
+        vph_G = vphs[1]
+    else:
+        vph_G = None
+
+    if len(vphs) >= 3:
+        vph_R = vphs[2]
+    else:
+        vph_R = None
+
+    # ------------------------------------------------------------------
+    # Read available spectral-band cubes
+    # ------------------------------------------------------------------
+
+    try:
+        cube_file = dir1 + name + '_' + vph_B + '.fits.gz'
+        specB, hdrB = fits.getdata(cube_file, 0, header=True)
+
+        nz0, nx0, ny0 = specB.shape
+        band_B = True
+
+    except:
+        band_B = False
+
+    if vph_G is not None:
+
+        try:
+            cube_file = dir1 + name + '_' + vph_G + '.fits.gz'
+            specG, hdrG = fits.getdata(cube_file, 0, header=True)
+
+            ## Original empirical flux correction.
+            #specG = specG * 1.833
+
+            nz1, nx1, ny1 = specG.shape
+            band_G = True
+
+        except:
+            band_G = False
+
+    else:
+        band_G = False
+
+    if vph_R is not None:
+
+        try:
+            cube_file = dir1 + name + '_' + vph_R + '.fits.gz'
+            specR, hdrR = fits.getdata(cube_file, 0, header=True)
+
+            nz2, nx2, ny2 = specR.shape
+            band_R = True
+
+        except:
+            band_R = False
+
+    else:
+        band_R = False
+
+    # ------------------------------------------------------------------
+    # Determine first and last available spectral bands
+    # ------------------------------------------------------------------
+
+    if band_B:
+        nx = nx0
+        ny = ny0
+        init = 1
+
+    elif band_G:
+        nx = nx1
+        ny = ny1
+        init = 2
+
+    elif band_R:
+        nx = nx2
+        ny = ny2
+        init = 3
+
+    else:
+        print("No valid input cubes were found.")
+        return
+
+    if band_R:
+        fint = 3
+
+    elif band_G:
+        fint = 2
+
+    elif band_B:
+        fint = 1
+
+    else:
+        print("No valid input cubes were found.")
+        return
+
+    # ------------------------------------------------------------------
+    # Construct wavelength arrays and celestial WCS
+    # ------------------------------------------------------------------
+
+    if band_B:
+
+        wcsB = WCS(hdrB).celestial
+
+        crpix = hdrB["CRPIX3"]
+
+        try:
+            cdelt = hdrB["CD3_3"]
+        except:
+            cdelt = hdrB["CDELT3"]
+
+        crval = hdrB["CRVAL3"]
+
+        waveB = crval + cdelt * (
+            np.arange(nz0) + 1 - crpix
+        )
+
+        pixsB = cdelt
+
+    if band_G:
+
+        wcsG = WCS(hdrG).celestial
+
+        crpix = hdrG["CRPIX3"]
+
+        try:
+            cdelt = hdrG["CD3_3"]
+        except:
+            cdelt = hdrG["CDELT3"]
+
+        crval = hdrG["CRVAL3"]
+
+        waveG = crval + cdelt * (
+            np.arange(nz1) + 1 - crpix
+        )
+
+        pixsG = cdelt
+
+    if band_R:
+
+        wcsR = WCS(hdrR).celestial
+
+        crpix = hdrR["CRPIX3"]
+
+        try:
+            cdelt = hdrR["CD3_3"]
+        except:
+            cdelt = hdrR["CDELT3"]
+
+        crval = hdrR["CRVAL3"]
+
+        waveR = crval + cdelt * (
+            np.arange(nz2) + 1 - crpix
+        )
+
+        pixsR = cdelt
+
+    # ------------------------------------------------------------------
+    # Select reference cube
+    # ------------------------------------------------------------------
+
+    if init == 1:
+
+        wcs = wcsB
+        min_wave = np.nanmin(waveB)
+
+        hdr0 = hdrB
+
+        nxi = nx0
+        nyi = ny0
+        nzi = nz0
+
+    if init == 2:
+
+        wcs = wcsG
+        min_wave = np.nanmin(waveG)
+
+        hdr0 = hdrG
+
+        nxi = nx1
+        nyi = ny1
+        nzi = nz1
+
+    if init == 3:
+        print("Only one spectral band is available. Exiting.")
+        return
+
+    if fint == 3:
+
+        max_wave = np.nanmax(waveR)
+
+    if fint == 2:
+
+        if init == 2:
+            print("Only one spectral band is available. Exiting.")
+            return
+
+        max_wave = np.nanmax(waveG)
+
+    if fint == 1:
+        print("Only one spectral band is available. Exiting.")
+        return
+
+    # ------------------------------------------------------------------
+    # Determine common wavelength sampling
+    # ------------------------------------------------------------------
+
+    if band_B and band_R:
+
+        cdelt = np.amax(
+            np.array([pixsB, pixsR])
+        )
+
+        pix_mB = int(np.ceil(cdelt / pixsB))
+        pix_mR = int(np.ceil(cdelt / pixsR))
+
+    if band_B and band_G:
+
+        cdelt = np.amax(
+            np.array([pixsB, pixsG])
+        )
+
+        pix_mB = int(np.round(cdelt / pixsB))
+        pix_mG = int(np.round(cdelt / pixsG))
+
+    if band_G and band_R:
+
+        cdelt = np.amax(
+            np.array([pixsG, pixsR])
+        )
+
+        pix_mG = int(np.round(cdelt / pixsG))
+        pix_mR = int(np.round(cdelt / pixsR))
+
+    if band_B and band_G and band_R:
+
+        cdelt = np.amax(
+            np.array([pixsB, pixsG, pixsR])
+        )
+
+        pix_mB = int(np.round(cdelt / pixsB))
+        pix_mG = int(np.round(cdelt / pixsG))
+        pix_mR = int(np.round(cdelt / pixsR))
+
+    n_pix = int(
+        np.round(
+            (max_wave - min_wave) / cdelt
+        )
+    )
+
+    crval = min_wave
+    crpix = 1
+
+    waveF = crval + cdelt * (
+        np.arange(n_pix) + 1 - crpix
+    )
+
+    # ------------------------------------------------------------------
+    # Allocate output cubes
+    # ------------------------------------------------------------------
+
+    IFU_coadd = np.zeros(
+        [n_pix, nx, ny]
+    )
+
+    IFU_coaddE = np.zeros(
+        [n_pix, nx, ny]
+    )
+
+    IFU_coaddB = np.zeros(
+        [n_pix, nx, ny],
+        dtype=int
+    )
+
+    patch_map = np.zeros(
+        [nx, ny]
+    )
+
+    # ------------------------------------------------------------------
+    # Spatial loop
+    # ------------------------------------------------------------------
+
+    for i in range(nx):
+
+        for j in range(ny):
+
+            temp_spec = np.copy(
+                IFU_coadd[:, i, j]
+            )
+
+            pix1 = i
+            pix2 = j
+
+            sky1 = pixel_to_skycoord(
+                pix1,
+                pix2,
+                wcs
+            )
+
+            val1 = sky1.to_string(
+                'hmsdms'
+            )
+
+            print(
+                val1,
+                'RA,DEC'
+            )
+
+            xpos0, ypos0 = skycoord_to_pixel(
+                sky1,
+                wcs
+            )
+
+            xpos0 = int(
+                np.round(xpos0)
+            )
+
+            ypos0 = int(
+                np.round(ypos0)
+            )
+
+            # ----------------------------------------------------------
+            # Reference spectral band
+            # ----------------------------------------------------------
+
+            if (
+                xpos0 >= 0 and
+                xpos0 <= nxi - 1 and
+                ypos0 >= 0 and
+                ypos0 <= nyi - 1
+            ):
+
+                if init == 2:
+
+                    spec1 = specG[
+                        :, xpos0, ypos0
+                    ]
+
+                    if pix_mG > 1:
+                        spec1 = tools.median_a(
+                            spec1,
+                            lw=pix_mG
+                        )
+
+                else:
+
+                    spec0 = specB[
+                        :, xpos0, ypos0
+                    ]
+
+                    if pix_mB > 1:
+                        spec0 = tools.median_a(
+                            spec0,
+                            lw=pix_mB * 2
+                        )
+
+                print(
+                    xpos0,
+                    ypos0,
+                    'POS0',
+                    i,
+                    j
+                )
+
+            else:
+
+                if init == 2:
+                    spec1 = np.zeros(nzi)
+
+                else:
+                    spec0 = np.zeros(nzi)
+
+            # ----------------------------------------------------------
+            # Intermediate spectral band
+            # ----------------------------------------------------------
+
+            if band_G and init == 1:
+
+                xpos1a, ypos1a = skycoord_to_pixel(
+                    sky1,
+                    wcsG
+                )
+
+                xpos1 = int(
+                    np.round(xpos1a)
+                )
+
+                ypos1 = int(
+                    np.round(ypos1a)
+                )
+
+                if (
+                    xpos1 >= 0 and
+                    xpos1 <= nx1 - 1 and
+                    ypos1 >= 0 and
+                    ypos1 <= ny1 - 1
+                ):
+
+                    spec1 = specG[
+                        :, xpos1, ypos1
+                    ]
+
+                    if np.nansum(spec1) != 0:
+
+                        spec1 = tools.cube_interpolB(
+                            specG,
+                            xpos1a,
+                            ypos1a
+                        )
+
+                    if pix_mG > 1:
+
+                        spec1 = tools.median_a(
+                            spec1,
+                            lw=pix_mG
+                        )
+
+                    print(
+                        xpos1,
+                        ypos1,
+                        'POS1',
+                        i,
+                        j
+                    )
+
+                else:
+
+                    spec1 = np.zeros(nz1)
+
+            # ----------------------------------------------------------
+            # Red spectral band
+            # ----------------------------------------------------------
+
+            if band_R:
+
+                xpos2a, ypos2a = skycoord_to_pixel(
+                    sky1,
+                    wcsR
+                )
+
+                # Original empirical spatial offsets.
+                #ypos2a = ypos2a + 0.3999999999999986
+                #xpos2a = xpos2a - 0.1999999999999993 - 0.5
+
+                xpos2 = int(
+                    np.round(xpos2a)
+                )
+
+                ypos2 = int(
+                    np.round(ypos2a)
+                )
+
+                if (
+                    xpos2 >= 0 and
+                    xpos2 <= nx2 - 1 and
+                    ypos2 >= 0 and
+                    ypos2 <= ny2 - 1
+                ):
+
+                    spec2 = specR[
+                        :, xpos2, ypos2
+                    ]
+
+                    if np.nansum(spec2) != 0:
+
+                        spec2 = tools.cube_interpolB(
+                            specR,
+                            xpos2a,
+                            ypos2a
+                        )
+
+                    if pix_mR > 1:
+
+                        spec2 = tools.median_a(
+                            spec2,
+                            lw=pix_mR
+                        )
+
+                    print(
+                        xpos2a,
+                        ypos2a,
+                        'POS2',
+                        i,
+                        j
+                    )
+
+                else:
+
+                    spec2 = np.zeros(nz2)
+
+            # ----------------------------------------------------------
+            # B + R
+            # ----------------------------------------------------------
+
+            if band_B and band_R and not band_G:
+
+                nt1 = np.where(
+                    waveB >= np.nanmin(waveR)
+                )
+
+                nt2 = np.where(
+                    waveR <= np.nanmax(waveB)
+                )
+
+                nt1i = np.where(
+                    waveB <= np.nanmin(waveR) + 13
+                )
+
+                nt2s = np.where(
+                    waveR >= np.nanmax(waveB) - 13
+                )
+
+                ntF = np.where(
+                    (waveF <= np.nanmax(waveB)) &
+                    (waveF >= np.nanmin(waveR))
+                )
+
+                ntFs = np.where(
+                    waveF >= np.nanmax(waveB) - 13
+                )
+
+                ntFi = np.where(
+                    waveF <= np.nanmin(waveR) + 13
+                )
+
+                fc = 1.0
+
+                if len(nt1[0]) > 0:
+
+                    specBF = np.interp(
+                        waveF[ntF],
+                        waveB[nt1],
+                        spec0[nt1],
+                        left=0.,
+                        right=0.
+                    )
+
+                    specRF = np.interp(
+                        waveF[ntF],
+                        waveR[nt2],
+                        spec2[nt2],
+                        left=0.,
+                        right=0.
+                    )
+
+                    Bflux = np.nanmean(specBF)
+                    Rflux = np.nanmean(specRF)
+
+                    ft = Rflux / Bflux
+
+                    if 0.1 <= ft <= 5.5:
+                        fc = ft
+                    else:
+                        fc = 1.0
+
+                    if patch:
+                        patch_map[i, j] = fc
+
+                    print(
+                        "factor=",
+                        fc
+                    )
+
+                    specBRF = (
+                        specBF * fc + specRF
+                    ) / 2.0
+
+                    temp_spec[ntF] = specBRF
+
+                if len(nt1i[0]) > 0:
+
+                    specBFi = np.interp(
+                        waveF[ntFi],
+                        waveB[nt1i],
+                        spec0[nt1i],
+                        left=0.,
+                        right=0.
+                    )
+
+                    temp_spec[ntFi] = (
+                        specBFi * fc
+                    )
+
+                if len(nt2s[0]) > 0:
+
+                    specRFs = np.interp(
+                        waveF[ntFs],
+                        waveR[nt2s],
+                        spec2[nt2s],
+                        left=0.,
+                        right=0.
+                    )
+
+                    temp_spec[ntFs] = specRFs
+
+            # ----------------------------------------------------------
+            # B + G
+            # ----------------------------------------------------------
+
+            if band_B and band_G and not band_R:
+
+                nt1 = np.where(
+                    waveB >= np.nanmin(waveG)
+                )
+
+                nt2 = np.where(
+                    waveG <= np.nanmax(waveB)
+                )
+
+                nt1i = np.where(
+                    waveB <= np.nanmin(waveG) + 3
+                )
+
+                nt2s = np.where(
+                    waveG >= np.nanmax(waveB) - 3
+                )
+
+                ntF = np.where(
+                    (waveF <= np.nanmax(waveB)) &
+                    (waveF >= np.nanmin(waveG))
+                )
+
+                ntFs = np.where(
+                    waveF >= np.nanmax(waveB) - 3
+                )
+
+                ntFi = np.where(
+                    waveF <= np.nanmin(waveG) + 3
+                )
+
+                fc = 1.0
+
+                if len(nt1[0]) > 0:
+
+                    specBF = np.interp(
+                        waveF[ntF],
+                        waveB[nt1],
+                        spec0[nt1],
+                        left=0.,
+                        right=0.
+                    )
+
+                    specGF = np.interp(
+                        waveF[ntF],
+                        waveG[nt2],
+                        spec1[nt2],
+                        left=0.,
+                        right=0.
+                    )
+
+                    Bflux = np.nanmean(specBF)
+                    Gflux = np.nanmean(specGF)
+
+                    ft = Gflux / Bflux
+
+                    if 0.1 <= ft <= 15.5:
+                        fc = ft
+                    else:
+                        fc = 1.0
+
+                    if patch:
+                        patch_map[i, j] = fc
+
+                    print(
+                        "factor=",
+                        fc
+                    )
+
+                    specBGF = (
+                        specBF * fc + specGF
+                    ) / 2.0
+
+                    temp_spec[ntF] = specBGF
+
+                if len(nt1i[0]) > 0:
+
+                    specBFi = np.interp(
+                        waveF[ntFi],
+                        waveB[nt1i],
+                        spec0[nt1i],
+                        left=0.,
+                        right=0.
+                    )
+
+                    temp_spec[ntFi] = (
+                        specBFi * fc
+                    )
+
+                if len(nt2s[0]) > 0:
+
+                    specGFs = np.interp(
+                        waveF[ntFs],
+                        waveG[nt2s],
+                        spec1[nt2s],
+                        left=0.,
+                        right=0.
+                    )
+
+                    temp_spec[ntFs] = specGFs
+
+            # ----------------------------------------------------------
+            # G + R
+            # ----------------------------------------------------------
+
+            if band_G and band_R and not band_B:
+
+                nt1 = np.where(
+                    waveG >= np.nanmin(waveR)
+                )
+
+                nt2 = np.where(
+                    waveR <= np.nanmax(waveG)
+                )
+
+                nt1i = np.where(
+                    waveG <= np.nanmin(waveR) + 1
+                )
+
+                nt2s = np.where(
+                    waveR >= np.nanmax(waveG) - 1
+                )
+
+                ntF = np.where(
+                    (waveF <= np.nanmax(waveG)) &
+                    (waveF >= np.nanmin(waveR))
+                )
+
+                ntFs = np.where(
+                    waveF >= np.nanmax(waveG) - 1
+                )
+
+                ntFi = np.where(
+                    waveF <= np.nanmin(waveR) + 1
+                )
+
+                if len(nt1[0]) > 0:
+
+                    specGF = np.interp(
+                        waveF[ntF],
+                        waveG[nt1],
+                        spec1[nt1],
+                        left=0.,
+                        right=0.
+                    )
+
+                    specRF = np.interp(
+                        waveF[ntF],
+                        waveR[nt2],
+                        spec2[nt2],
+                        left=0.,
+                        right=0.
+                    )
+
+                    specGRF = (
+                        specGF + specRF
+                    ) / 2.0
+
+                    temp_spec[ntF] = specGRF
+
+                if len(nt1i[0]) > 0:
+
+                    specGFi = np.interp(
+                        waveF[ntFi],
+                        waveG[nt1i],
+                        spec1[nt1i],
+                        left=0.,
+                        right=0.
+                    )
+
+                    temp_spec[ntFi] = specGFi
+
+                if len(nt2s[0]) > 0:
+
+                    specRFs = np.interp(
+                        waveF[ntFs],
+                        waveR[nt2s],
+                        spec2[nt2s],
+                        left=0.,
+                        right=0.
+                    )
+
+                    temp_spec[ntFs] = specRFs
+
+            # ----------------------------------------------------------
+            # B + G + R
+            # ----------------------------------------------------------
+
+            if band_B and band_G and band_R:
+
+                nt1a = np.where(
+                    waveB >= np.nanmin(waveG)
+                )
+
+                nt2a = np.where(
+                    waveG <= np.nanmax(waveB)
+                )
+
+                ntFa = np.where(
+                    (waveF <= np.nanmax(waveB)) &
+                    (waveF >= np.nanmin(waveG))
+                )
+
+                fc = 1.0
+
+                if len(nt1a[0]) > 0:
+
+                    specBFa = np.interp(
+                        waveF[ntFa],
+                        waveB[nt1a],
+                        spec0[nt1a],
+                        left=0.,
+                        right=0.
+                    )
+
+                    specGFa = np.interp(
+                        waveF[ntFa],
+                        waveG[nt2a],
+                        spec1[nt2a],
+                        left=0.,
+                        right=0.
+                    )
+
+                    Bflux = np.nanmean(specBFa)
+                    Gflux = np.nanmean(specGFa)
+
+                    ft = Gflux / Bflux
+
+                    if 0.1 <= ft <= 3.0:
+                        fc = ft
+                    else:
+                        fc = 1.0
+
+                    if patch:
+                        patch_map[i, j] = fc
+
+                    print(
+                        "factorGB=",
+                        fc
+                    )
+
+                    specBGFa = (
+                        specBFa * fc + specGFa
+                    ) / 2.0
+
+                    temp_spec[ntFa] = specBGFa
+
+                nt1b = np.where(
+                    waveB >= np.nanmin(waveR)
+                )
+
+                nt2b = np.where(
+                    waveR <= np.nanmax(waveB)
+                )
+
+                ntFb = np.where(
+                    (waveF <= np.nanmax(waveB)) &
+                    (waveF >= np.nanmin(waveR))
+                )
+
+                if len(nt1b[0]) > 0:
+
+                    specBFb = np.interp(
+                        waveF[ntFb],
+                        waveB[nt1b],
+                        spec0[nt1b],
+                        left=0.,
+                        right=0.
+                    )
+
+                    specRFb = np.interp(
+                        waveF[ntFb],
+                        waveR[nt2b],
+                        spec2[nt2b],
+                        left=0.,
+                        right=0.
+                    )
+
+                    specBRFb = (
+                        specBFb + specRFb
+                    ) / 2.0
+
+                    temp_spec[ntFb] = specBRFb
+
+                nt1c = np.where(
+                    waveG >= np.nanmin(waveR)
+                )
+
+                nt2c = np.where(
+                    waveR <= np.nanmax(waveG)
+                )
+
+                ntFc = np.where(
+                    (waveF <= np.nanmax(waveG)) &
+                    (waveF >= np.nanmin(waveR))
+                )
+
+                if len(nt1c[0]) > 0:
+
+                    specGFc = np.interp(
+                        waveF[ntFc],
+                        waveG[nt1c],
+                        spec1[nt1c],
+                        left=0.,
+                        right=0.
+                    )
+
+                    specRFc = np.interp(
+                        waveF[ntFc],
+                        waveR[nt2c],
+                        spec2[nt2c],
+                        left=0.,
+                        right=0.
+                    )
+
+                    specGRFc = (
+                        specGFc + specRFc
+                    ) / 2.0
+
+                    temp_spec[ntFc] = specGRFc
+
+                nt1bc = np.where(
+                    (waveB <= np.nanmin(waveG) + 1) &
+                    (waveB <= np.nanmin(waveR) + 1)
+                )
+
+                ntFbc = np.where(
+                    (waveF <= np.nanmin(waveG) + 1) &
+                    (waveF <= np.nanmin(waveR) + 1)
+                )
+
+                if len(nt1bc[0]) > 0:
+
+                    specB_GRFbc = np.interp(
+                        waveF[ntFbc],
+                        waveB[nt1bc],
+                        spec0[nt1bc],
+                        left=0.,
+                        right=0.
+                    )
+
+                    temp_spec[ntFbc] = (
+                        specB_GRFbc * fc
+                    )
+
+                nt1ac = np.where(
+                    (waveG <= np.nanmin(waveR) + 1) &
+                    (waveG >= np.nanmax(waveB))
+                )
+
+                ntFac = np.where(
+                    (waveF <= np.nanmin(waveR) + 1) &
+                    (waveF >= np.nanmax(waveB))
+                )
+
+                if len(nt1ac[0]) > 0:
+
+                    specG_BRFac = np.interp(
+                        waveF[ntFac],
+                        waveG[nt1ac],
+                        spec1[nt1ac],
+                        left=0.,
+                        right=0.
+                    )
+
+                    temp_spec[ntFac] = specG_BRFac
+
+                nt1ab = np.where(
+                    (waveR >= np.nanmax(waveB)) &
+                    (waveR >= np.nanmax(waveG))
+                )
+
+                ntFab = np.where(
+                    (waveF >= np.nanmax(waveB)) &
+                    (waveF >= np.nanmax(waveG))
+                )
+
+                if len(nt1ab[0]) > 0:
+
+                    specR_BGFab = np.interp(
+                        waveF[ntFab],
+                        waveR[nt1ab],
+                        spec2[nt1ab],
+                        left=0.,
+                        right=0.
+                    )
+
+                    temp_spec[ntFab] = specR_BGFab
+
+            # ----------------------------------------------------------
+            # Store combined spectrum
+            # ----------------------------------------------------------
+
+            IFU_coadd[:, i, j] = temp_spec
+
+            # ----------------------------------------------------------
+            # Estimate uncertainty
+            # ----------------------------------------------------------
+
+            nt_z = np.where(
+                temp_spec != 0
+            )
+
+            if len(nt_z[0]) > 0:
+
+                temp_specM = tools.conv(
+                    temp_spec,
+                    ke=5
+                )
+
+                temp_specE = np.abs(
+                    temp_spec - temp_specM
+                )
+
+                temp_specE = np.sqrt(
+                    tools.conv(
+                        temp_specE**2.0,
+                        ke=50
+                    )
+                )
+
+                IFU_coaddE[:, i, j] = (
+                    temp_specE * 0.1
+                )
+
+                ntp = np.where(
+                    temp_spec == 0
+                )
+
+                if len(ntp[0]) > 0:
+
+                    IFU_coaddE[
+                        ntp, i, j
+                    ] = 0.002
+
+            else:
+
+                IFU_coaddE[
+                    :, i, j
+                ] = 1.0
+
+            # ----------------------------------------------------------
+            # Bad-pixel mask
+            # ----------------------------------------------------------
+
+            nt_z = np.where(
+                temp_spec == 0
+            )
+
+            if len(nt_z[0]) > 0:
+
+                IFU_coaddB[
+                    nt_z, i, j
+                ] = 1
+
+    # ------------------------------------------------------------------
+    # Generate output FITS file
+    # ------------------------------------------------------------------
+
+    dx = 0
+    dy = 0
+
+    h1 = fits.PrimaryHDU(
+        IFU_coadd
+    )
+
+    h2 = fits.ImageHDU(
+        IFU_coaddE
+    )
+
+    h3 = fits.ImageHDU(
+        IFU_coaddB
+    )
+
+    h4 = fits.ImageHDU(
+        patch_map
+    )
+
+    keys = list(
+        hdr0.keys()
+    )
+
+    # ------------------------------------------------------------------
+    # Primary HDU
+    # ------------------------------------------------------------------
+
+    h_k = h1.header
+
+    for key in keys:
+
+        h_k[key] = hdr0[key]
+        h_k.comments[key] = (
+            hdr0.comments[key]
+        )
+
+    h_k['CDELT3'] = cdelt
+    h_k['CRPIX3'] = crpix
+    h_k['CRVAL3'] = crval
+
+    h_k['CRPIX1'] = (
+        h_k['CRPIX1'] + dx
+    )
+
+    h_k['CRPIX2'] = (
+        h_k['CRPIX2'] + dy
+    )
+
+    # ------------------------------------------------------------------
+    # Error cube
+    # ------------------------------------------------------------------
+
+    h_t = h2.header
+
+    for key in keys:
+
+        h_t[key] = hdr0[key]
+        h_t.comments[key] = (
+            hdr0.comments[key]
+        )
+
+    h_t['EXTNAME'] = 'Error_cube'
+
+    h_t['CDELT3'] = cdelt
+    h_t['CRPIX3'] = crpix
+    h_t['CRVAL3'] = crval
+
+    h_t['CRPIX1'] = (
+        h_t['CRPIX1'] + dx
+    )
+
+    h_t['CRPIX2'] = (
+        h_t['CRPIX2'] + dy
+    )
+
+    # ------------------------------------------------------------------
+    # Bad-pixel mask
+    # ------------------------------------------------------------------
+
+    h_r = h3.header
+
+    for key in keys:
+
+        h_r[key] = hdr0[key]
+        h_r.comments[key] = (
+            hdr0.comments[key]
+        )
+
+    h_r['EXTNAME'] = 'BADPIXELMASK'
+
+    h_r['CDELT3'] = cdelt
+    h_r['CRPIX3'] = crpix
+    h_r['CRVAL3'] = crval
+
+    h_r['CRPIX1'] = (
+        h_r['CRPIX1'] + dx
+    )
+
+    h_r['CRPIX2'] = (
+        h_r['CRPIX2'] + dy
+    )
+
+    # ------------------------------------------------------------------
+    # Matching-factor map
+    # ------------------------------------------------------------------
+
+    h_w = h4.header
+
+    for key in keys:
+
+        h_w[key] = hdr0[key]
+        h_w.comments[key] = (
+            hdr0.comments[key]
+        )
+
+    h_w['EXTNAME'] = 'match_F_cube'
+
+    for key in (
+        'CDELT3',
+        'CRPIX3',
+        'CRVAL3'
+    ):
+
+        if key in h_w:
+            del h_w[key]
+
+    h_w['CRPIX1'] = (
+        h_w['CRPIX1'] + dx
+    )
+
+    h_w['CRPIX2'] = (
+        h_w['CRPIX2'] + dy
+    )
+
+    # ------------------------------------------------------------------
+    # Write combined cube
+    # ------------------------------------------------------------------
+
+    output_file = (
+        dir2 + name + '.fits'
+    )
+
+    hlist = fits.HDUList(
+        [h1, h2, h3, h4]
+    )
+
+    hlist.update_extend()
+
+    hlist.writeto(
+        output_file,
+        overwrite=True
+    )
+
+    tools.sycall(
+        'gzip -f ' + output_file
+    )
+
+    # ------------------------------------------------------------------
+    # Write standalone patch map
+    # ------------------------------------------------------------------
+
+    if patch:
+
+        hp = fits.PrimaryHDU(
+            patch_map
+        )
+
+        h_k = hp.header
+
+        for key in keys:
+
+            h_k[key] = hdr0[key]
+
+            h_k.comments[key] = (
+                hdr0.comments[key]
+            )
+
+        for key in (
+            'CDELT3',
+            'CRPIX3',
+            'CRVAL3'
+        ):
+
+            if key in h_k:
+                del h_k[key]
+
+        h_k['CRPIX1'] = (
+            h_k['CRPIX1'] + dx
+        )
+
+        h_k['CRPIX2'] = (
+            h_k['CRPIX2'] + dy
+        )
+
+        patch_file = (
+            dir2 +
+            name +
+            '_patch.fits'
+        )
+
+        hlist = fits.HDUList(
+            [hp]
+        )
+
+        hlist.update_extend()
+
+        hlist.writeto(
+            patch_file,
+            overwrite=True
+        )
+
+        tools.sycall(
+            'gzip -f ' + patch_file
+        )
