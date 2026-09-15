@@ -45,7 +45,7 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
         rss=rss*facTt
         if ii == 0:
             outf=hdr['OBJECT']+'_'+vph
-            x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1,hdr1,verbose=verbose)
+            x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1,hdr,verbose=verbose)
             crval=hdr['CRVAL1']
             cdelt=hdr['CDELT1']
             crpix=hdr['CRPIX1']
