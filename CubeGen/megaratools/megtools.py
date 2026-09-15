@@ -91,7 +91,7 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True):
             # 2. Convertir el IPA a radianes para las funciones trigonométricas
             # NOTA: En astronomía, el Este está a la izquierda (antihorario). 
             # Si tu reducción de MEGARA queda invertida, cambia el signo a: ipa_rad = -np.radians(ipa_deg)
-            ipa_rad = np.radians(ipa_deg)
+            ipa_rad = -np.radians(ipa_deg)
             cos_ipa = np.cos(ipa_rad)
             sin_ipa = np.sin(ipa_rad)
             # 3. Aplicar primero la matriz del WCS (PC) a las posiciones físicas de la fibra
