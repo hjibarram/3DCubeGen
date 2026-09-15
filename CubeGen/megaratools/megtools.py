@@ -79,6 +79,8 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True):
     fib_ids=fib_id[nt]
     if astmet:
         try:
+            if verbose:
+                print('Using WCS and IPA to correct the fiber positions')
             # 1. Extraer los datos del WCS y el ángulo IPA del encabezado
             pc11=hdr['PC1_1']
             pc12=hdr['PC1_2']
@@ -101,6 +103,8 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True):
             x_ifu =x_rot+(hdr['CRVAL1']*3600.0)
             y_ifu =y_rot+(hdr['CRVAL2']*3600.0)
         except:
+            if verbose:
+                print('WCS or IPA not found in header, using simple scaling')
             x_ifu=x_posf*psc+hdr['CRVAL1']*3600.0
             y_ifu=y_posf*psc+hdr['CRVAL2']*3600.0 
     else:
