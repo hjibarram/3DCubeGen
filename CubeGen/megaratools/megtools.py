@@ -103,7 +103,7 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True):
             y_rot=x_wcs*sin_ipa+y_wcs*cos_ipa
             # 5. Sumar el centro de referencia (CRVAL) convertido a arcosegundos
             x_ifu =x_rot+(hdr['CRVAL1']*3600.0)
-            y_ifu =y_rot+(hdr['CRVAL2']*3600.0)
+            y_ifu =-y_rot+(hdr['CRVAL2']*3600.0)
         except:
             if verbose:
                 print('WCS or IPA not found in header, using simple scaling')
