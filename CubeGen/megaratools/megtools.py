@@ -86,6 +86,8 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True):
             pc12=hdr['PC1_2']
             pc21=hdr['PC2_1']
             pc22=hdr['PC2_2']
+            cdelt1=hdr['CDELT1']
+            cdelt2=hdr['CDELT2']
             # 2. Convertir el IPA a radianes para las funciones trigonométricas
             # NOTA: En astronomía, el Este está a la izquierda (antihorario). 
             # Si tu reducción de MEGARA queda invertida, cambia el signo a: ipa_rad = -np.radians(ipa_deg)
@@ -93,8 +95,8 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True):
             cos_ipa = np.cos(ipa_rad)
             sin_ipa = np.sin(ipa_rad)
             # 3. Aplicar primero la matriz del WCS (PC) a las posiciones físicas de la fibra
-            x_wcs=(x_posf*pc11+y_posf*pc21)*psc
-            y_wcs=(x_posf*pc12+y_posf*pc22)*psc
+            x_wcs=(x_posf*pc11+y_posf*pc21)*(cdelt1*3600.0)
+            y_wcs=(x_posf*pc12+y_posf*pc22)*(cdelt2*3600.0)
             # 4. Proyectar la rotación del IPA sobre el plano corregido por el WCS
             # Esta es una matriz de rotación estándar de dos dimensiones
             x_rot=x_wcs*cos_ipa-y_wcs*sin_ipa
