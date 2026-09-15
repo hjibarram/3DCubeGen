@@ -471,14 +471,16 @@ def crop_image(names, cube, dir1='./', dir2='./', dir3='./', apt='_gri'):
 def coad_cube(name, dir1='', dir2='', vphs=['B', 'G', 'R'],
               ra='', dec='', rad=1.5, pix=0.35, noise=False,
               dpix=0, zt=0, patch=True):
-    """
+def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
+     """
     Co-add reconstructed IFU datacubes from multiple spectral bands into
     a single wavelength-continuous datacube.
 
-    The function searches for reconstructed datacubes in ``dir1`` using
-    ``name`` as the common filename and the band identifiers specified
-    by ``vphs``. The individual cubes are spatially registered using
-    their WCS information and resampled onto a common spectral grid.
+    The function reads reconstructed datacubes from ``dir1`` using
+    ``name`` as the common filename and the spectral-band or VPH
+    identifiers specified in ``vphs``. The individual cubes are spatially
+    registered using their WCS information and resampled onto a common
+    wavelength grid.
 
     Fluxes in overlapping wavelength regions are combined and, when
     required, multiplicative corrections are applied to match adjacent
@@ -492,10 +494,10 @@ def coad_cube(name, dir1='', dir2='', vphs=['B', 'G', 'R'],
     Parameters
     ----------
     name : str
-        Common base filename of the input datacubes, excluding the
-        spectral-band suffix and ``.fits.gz`` extension.
+        Common base filename of the input datacubes, excluding the VPH
+        suffix and ``.fits.gz`` extension.
 
-        For example, with::
+        For example, if::
 
             name = 'MK883'
             vphs = ['B', 'G', 'R']
@@ -511,59 +513,34 @@ def coad_cube(name, dir1='', dir2='', vphs=['B', 'G', 'R'],
         Default is ``''``, corresponding to the current directory.
 
     dir2 : str, optional
-        Directory where the final co-added datacube and patch map are
-        written. Default is ``''``, corresponding to the current
+        Directory where the final co-added datacube and optional patch
+        map are written. Default is ``''``, corresponding to the current
         directory.
 
-    vphs : list of str, optional
+    vphs : list of str or None, optional
         Ordered list containing the identifiers of the spectral bands
-        or VPHs.
+        or VPHs to be co-added. At least two bands must be provided and
+        a maximum of three bands is currently supported.
 
-        The first, second, and third entries correspond respectively
-        to the blue, intermediate, and red spectral ranges used by the
-        original co-addition algorithm.
-
-        Default is::
-
-            ['B', 'G', 'R']
+        The order of the entries must follow increasing wavelength.
+        For a three-band configuration, the first, second, and third
+        entries correspond to the blue, intermediate, and red spectral
+        ranges, respectively.
 
         For example::
 
-            ['LR-B', 'LR-V', 'LR-R']
+            vphs = ['B', 'G', 'R']
 
-        produces input filenames of the form::
+        or::
 
-            <name>_LR-B.fits.gz
-            <name>_LR-V.fits.gz
-            <name>_LR-R.fits.gz
+            vphs = ['LR-B', 'LR-V', 'LR-R']
 
-    ra : str or float, optional
-        Right ascension associated with the target. Retained for
-        compatibility with the original implementation. Default is ``''``.
+        The identifiers are used to construct the input filenames as::
 
-    dec : str or float, optional
-        Declination associated with the target. Retained for
-        compatibility with the original implementation. Default is ``''``.
+            <name>_<vph>.fits.gz
 
-    rad : float, optional
-        Aperture radius in arcseconds. Retained for compatibility with
-        the original implementation. Default is 1.5.
-
-    pix : float, optional
-        Spatial pixel scale in arcseconds per pixel. Retained for
-        compatibility with the original implementation. Default is 0.35.
-
-    noise : bool, optional
-        Noise-processing flag retained for compatibility with the
-        original implementation. Default is False.
-
-    dpix : float, optional
-        Additional pixel offset retained for compatibility with the
-        original implementation. Default is 0.
-
-    zt : float, optional
-        Redshift parameter retained for compatibility with the original
-        implementation. Default is 0.
+        If ``None``, the function prints a message requesting the VPH
+        definition and returns without processing the cubes.
 
     patch : bool, optional
         If True, calculate and save the multiplicative correction-factor
@@ -572,14 +549,21 @@ def coad_cube(name, dir1='', dir2='', vphs=['B', 'G', 'R'],
     Returns
     -------
     None
-        The function writes the resulting FITS products to disk.
+        The function writes the resulting FITS products to disk. If the
+        VPH list is not defined or fewer than two valid spectral bands
+        are available, the function returns without generating an output
+        cube.
 
     Notes
     -----
-    At least two spectral bands are required.
+    The input datacubes are expected to contain a three-dimensional
+    primary HDU with wavelength along the third FITS axis.
 
     The wavelength solution is obtained from ``CRPIX3``, ``CRVAL3`` and
     either ``CD3_3`` or ``CDELT3`` in the FITS headers.
+
+    The spectral bands supplied in ``vphs`` must be ordered from shorter
+    to longer wavelengths.
 
     The output FITS file contains:
 
@@ -594,12 +578,13 @@ def coad_cube(name, dir1='', dir2='', vphs=['B', 'G', 'R'],
 
     Examples
     --------
-    Co-add the default B, G, and R cubes::
+    Co-add three spectral bands::
 
         >>> coad_cube(
         ...     'MK883',
         ...     dir1='/data/cubes/',
-        ...     dir2='/data/coadd/'
+        ...     dir2='/data/coadd/',
+        ...     vphs=['B', 'G', 'R']
         ... )
 
     This searches for::
@@ -613,7 +598,7 @@ def coad_cube(name, dir1='', dir2='', vphs=['B', 'G', 'R'],
         /data/coadd/MK883.fits.gz
         /data/coadd/MK883_patch.fits.gz
 
-    Custom VPH/band identifiers can be supplied with::
+    Different VPH identifiers can be specified, for example::
 
         >>> coad_cube(
         ...     'MK883',
@@ -621,11 +606,18 @@ def coad_cube(name, dir1='', dir2='', vphs=['B', 'G', 'R'],
         ...     dir2='/data/coadd/',
         ...     vphs=['LR-B', 'LR-V', 'LR-R']
         ... )
-    """
 
+    If the VPH list is omitted::
+
+        >>> coad_cube('MK883')
+        Define at least two VPHs/bands.
+    """
     # ------------------------------------------------------------------
     # Validate VPH/band definition
     # ------------------------------------------------------------------
+    if vphs is None:
+        print("Define at least two VPHs/bands.")
+        return
 
     if len(vphs) < 2:
         print("At least two VPHs/bands must be provided.")
