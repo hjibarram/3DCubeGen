@@ -87,7 +87,7 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True):
             pc21=hdr['PC2_1']
             pc22=hdr['PC2_2']
             cdelt1=hdr['CDELT1']
-            cdelt2=-hdr['CDELT2']
+            cdelt2=hdr['CDELT2']
             # 2. Convertir el IPA a radianes para las funciones trigonométricas
             # NOTA: En astronomía, el Este está a la izquierda (antihorario). 
             # Si tu reducción de MEGARA queda invertida, cambia el signo a: ipa_rad = -np.radians(ipa_deg)
