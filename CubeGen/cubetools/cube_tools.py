@@ -469,7 +469,7 @@ def crop_image(names, cube, dir1='./', dir2='./', dir3='./', apt='_gri'):
 
 
 def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
-     """
+    """
     Co-add reconstructed IFU datacubes from multiple spectral bands into
     a single wavelength-continuous datacube.
 
