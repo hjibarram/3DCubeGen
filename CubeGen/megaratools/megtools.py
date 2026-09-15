@@ -56,9 +56,10 @@ def id_str(id,n_z=2):
             idt=str(id)        
     return idt
 
-def megarafiber_pos(hdr,verbose=False,astmet=True):
+def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True):
     nfib=hdr['NFIBERS']
     psc=hdr['PSCALE']
+    ipa=hdr0['IPA']
     x_pos=np.zeros(nfib)
     y_pos=np.zeros(nfib)
     fib_a=np.zeros(nfib)
@@ -78,12 +79,27 @@ def megarafiber_pos(hdr,verbose=False,astmet=True):
     fib_ids=fib_id[nt]
     if astmet:
         try:
+            # 1. Extraer los datos del WCS y el ángulo IPA del encabezado
             pc11=hdr['PC1_1']
             pc12=hdr['PC1_2']
             pc21=hdr['PC2_1']
             pc22=hdr['PC2_2']
-            x_ifu=(x_posf*pc11+y_posf*pc21)*psc+hdr['CRVAL1']*3600.0    
-            y_ifu=(x_posf*pc12+y_posf*pc22)*psc+hdr['CRVAL2']*3600.0
+            # 2. Convertir el IPA a radianes para las funciones trigonométricas
+            # NOTA: En astronomía, el Este está a la izquierda (antihorario). 
+            # Si tu reducción de MEGARA queda invertida, cambia el signo a: ipa_rad = -np.radians(ipa_deg)
+            ipa_rad = np.radians(ipa_deg)
+            cos_ipa = np.cos(ipa_rad)
+            sin_ipa = np.sin(ipa_rad)
+            # 3. Aplicar primero la matriz del WCS (PC) a las posiciones físicas de la fibra
+            x_wcs=(x_posf*pc11+y_posf*pc21)*psc
+            y_wcs=(x_posf*pc12+y_posf*pc22)*psc
+            # 4. Proyectar la rotación del IPA sobre el plano corregido por el WCS
+            # Esta es una matriz de rotación estándar de dos dimensiones
+            x_rot=x_wcs*cos_ipa-y_wcs*sin_ipa
+            y_rot=x_wcs*sin_ipa+y_wcs*cos_ipa
+            # 5. Sumar el centro de referencia (CRVAL) convertido a arcosegundos
+            x_ifu =x_rot+(hdr['CRVAL1']*3600.0)
+            y_ifu =y_rot+(hdr['CRVAL2']*3600.0)
         except:
             x_ifu=x_posf*psc+hdr['CRVAL1']*3600.0
             y_ifu=y_posf*psc+hdr['CRVAL2']*3600.0 
@@ -164,7 +180,7 @@ def get_rssflux_sens(r,xo=0,yo=0,path_block9='',path_sensfits='',path_data='data
     dl=hdr0['CDELT1']
     Xa=hdr0['AIRMASS']
     [flux0, hdr1]=fits.getdata(file, 1, header=True)
-    x_ifu,y_ifu,fib_idt,fib_ids=megarafiber_pos(hdr1,astmet=False)
+    x_ifu,y_ifu,fib_idt,fib_ids=megarafiber_pos(hdr1,hdr0,astmet=False)
     xs=xo*dpix-12.5/2#7 #-npix/2*dpix IFU
     ys=yo*dpix-11.3/2#7 #-npix/2*dpix IFU
     nt=np.where(np.sqrt((x_ifu-xs)**2.0+(y_ifu-ys)**2.0) <= r)
