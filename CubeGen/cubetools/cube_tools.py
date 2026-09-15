@@ -4,6 +4,8 @@ from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import CubeGen.megaratools.megtools as mtools
 import CubeGen.tools.tools as tools
 import numpy as np
+from tqdm.notebook import tqdm
+from tqdm import tqdm as tqdmT
 
 
 def astromatch(file0,file1,sig=2):
@@ -468,7 +470,8 @@ def crop_image(names, cube, dir1='./', dir2='./', dir3='./', apt='_gri'):
 
 
 
-def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
+def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
+              pbars=True, notebook=True):
     """
     Co-add reconstructed IFU datacubes from multiple spectral bands into
     a single wavelength-continuous datacube.
@@ -542,6 +545,15 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
     patch : bool, optional
         If True, calculate and save the multiplicative correction-factor
         map used to match overlapping spectral bands. Default is True.
+
+    verbose : bool, optional
+        If True, print additional information about the processing steps
+
+    pbar : bool, optional
+        If True, display a progress bar during the spatial loop. Default is True.
+
+    notebook : bool, optional
+        If True, use the Jupyter notebook version of the progress bar.
 
     Returns
     -------
@@ -912,9 +924,12 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
     # ------------------------------------------------------------------
     # Spatial loop
     # ------------------------------------------------------------------
-
+    if pbars:
+        if notebook:
+            pbar=tqdm(total=nx)
+        else:     
+            pbar=tqdmT(total=nx)  
     for i in range(nx):
-
         for j in range(ny):
 
             temp_spec = np.copy(
@@ -933,11 +948,11 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
             val1 = sky1.to_string(
                 'hmsdms'
             )
-
-            print(
-                val1,
-                'RA,DEC'
-            )
+            if verbose:
+                print(
+                    val1,
+                    'RA,DEC'
+                )
 
             xpos0, ypos0 = skycoord_to_pixel(
                 sky1,
@@ -986,14 +1001,14 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
                             spec0,
                             lw=pix_mB * 2
                         )
-
-                print(
-                    xpos0,
-                    ypos0,
-                    'POS0',
-                    i,
-                    j
-                )
+                if verbose:
+                    print(
+                        xpos0,
+                        ypos0,
+                        'POS0',
+                        i,
+                        j
+                    )
 
             else:
 
@@ -1047,14 +1062,14 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
                             spec1,
                             lw=pix_mG
                         )
-
-                    print(
-                        xpos1,
-                        ypos1,
-                        'POS1',
-                        i,
-                        j
-                    )
+                    if verbose:
+                        print(
+                            xpos1,
+                            ypos1,
+                            'POS1',
+                            i,
+                            j
+                        )
 
                 else:
 
@@ -1108,14 +1123,14 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
                             spec2,
                             lw=pix_mR
                         )
-
-                    print(
-                        xpos2a,
-                        ypos2a,
-                        'POS2',
-                        i,
-                        j
-                    )
+                    if verbose:
+                        print(
+                            xpos2a,
+                            ypos2a,
+                            'POS2',
+                            i,
+                            j
+                        )
 
                 else:
 
@@ -1188,11 +1203,11 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
 
                     if patch:
                         patch_map[i, j] = fc
-
-                    print(
-                        "factor=",
-                        fc
-                    )
+                    if verbose:
+                        print(
+                            "factor=",
+                            fc
+                        )
 
                     specBRF = (
                         specBF * fc + specRF
@@ -1293,11 +1308,11 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
 
                     if patch:
                         patch_map[i, j] = fc
-
-                    print(
-                        "factor=",
-                        fc
-                    )
+                    if verbose:
+                        print(
+                            "factor=",
+                            fc
+                        )
 
                     specBGF = (
                         specBF * fc + specGF
@@ -1465,11 +1480,11 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
 
                     if patch:
                         patch_map[i, j] = fc
-
-                    print(
-                        "factorGB=",
-                        fc
-                    )
+                    if verbose:
+                        print(
+                            "factorGB=",
+                            fc
+                        )
 
                     specBGFa = (
                         specBFa * fc + specGFa
@@ -1684,7 +1699,10 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True):
                 IFU_coaddB[
                     nt_z, i, j
                 ] = 1
-
+        if pbars:
+            pbar.update(1)
+    if pbars:
+        pbar.close()        
     # ------------------------------------------------------------------
     # Generate output FITS file
     # ------------------------------------------------------------------
