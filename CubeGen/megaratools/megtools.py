@@ -56,10 +56,10 @@ def id_str(id,n_z=2):
             idt=str(id)        
     return idt
 
-def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True):
+def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True,dtheta_ipa=0.0):
     nfib=hdr['NFIBERS']
     psc=hdr['PSCALE']
-    ipa_deg=hdr0['IPA']
+    ipa_deg=hdr0['IPA']+dtheta_ipa
     x_pos=np.zeros(nfib)
     y_pos=np.zeros(nfib)
     fib_a=np.zeros(nfib)
@@ -83,8 +83,8 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True):
                 print('Using WCS and IPA to correct the fiber positions')
             # 1. Extraer los datos del WCS y el ángulo IPA del encabezado
             pc11=hdr['PC1_1']
-            pc12=-hdr['PC1_2']
-            pc21=-hdr['PC2_1']
+            pc12=hdr['PC1_2']
+            pc21=hdr['PC2_1']
             pc22=hdr['PC2_2']
             cdelt1=hdr['CDELT1']
             cdelt2=hdr['CDELT2']

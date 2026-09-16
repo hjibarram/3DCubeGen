@@ -9,7 +9,7 @@ import CubeGen.megaratools.megkernel as mkernel
 def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_range=(None,None),
     fac_sizeX=1.0,fac_sizeY=1.0,pix_s=0.35,sigm_s=0.35,alph_s=2.0,out_path='',redux_dir='',vph='R',
     scp=112.36748321030637,basename='final_rss.fits',basenameC='megCube-NAME.fits',dxpix=[],dypix=[],
-    facT=[],dx=0,dy=0,verbose=False):
+    facT=[],dx=0,dy=0,verbose=False,dtheta_ipa=0.0):
     """
     Generate a map from MEGARA IFU data.
     
@@ -45,7 +45,7 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
         rss=rss*facTt
         if ii == 0:
             outf=hdr['OBJECT']+'_'+vph
-            x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1,hdr,verbose=verbose)
+            x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1,hdr,verbose=verbose,dtheta_ipa=dtheta_ipa)
             crval=hdr['CRVAL1']
             cdelt=hdr['CDELT1']
             crpix=hdr['CRPIX1']
@@ -90,7 +90,7 @@ def meggen_map(reduxL,savefile=False,nameF=None,errors=False,flu16=True,spec_ran
                 x_ifu_V[i]=x_ifu[i]+dxpixt*pix_s
                 y_ifu_V[i]=y_ifu[i]+dypixt*pix_s
         else:
-            x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1,hdr,verbose=verbose)
+            x_ifu,y_ifu,fib_idt,fib_ids=mtools.megarafiber_pos(hdr1,hdr,verbose=verbose,dtheta_ipa=dtheta_ipa)
             wave=hdr['CRVAL1']+np.arange(ny0)*hdr['CDELT1']
             for i in range(0, len(x_ifu)):
                 fib=int(fib_idt[i])-1
