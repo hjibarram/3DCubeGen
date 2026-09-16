@@ -56,7 +56,7 @@ def id_str(id,n_z=2):
             idt=str(id)        
     return idt
 
-def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True,dtheta_ipa=0.0):
+def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True,dtheta_ipa=0.0,flipy=False,flipx=False):
     nfib=hdr['NFIBERS']
     psc=hdr['PSCALE']
     ipa_deg=hdr0['IPA']+dtheta_ipa-16.146
@@ -78,6 +78,15 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True,dtheta_ipa=0.0):
     nt=np.where((np.abs(x_pos) > 10) & (np.abs(y_pos) > 10))
     fib_ids=fib_id[nt]
     if astmet:
+        #FLips the FOV
+        if flipy:
+            yfl=1
+        else:
+            yfl=-1
+        if flipx:
+            xfl=-1
+        else:
+            xfl=1
         try:
             if verbose:
                 print('Using WCS and IPA to correct the fiber positions')
@@ -102,8 +111,8 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True,dtheta_ipa=0.0):
             x_rot=x_wcs*cos_ipa-y_wcs*sin_ipa
             y_rot=x_wcs*sin_ipa+y_wcs*cos_ipa
             # 5. Sumar el centro de referencia (CRVAL) convertido a arcosegundos
-            x_ifu =x_rot+(hdr['CRVAL1']*3600.0)
-            y_ifu =-y_rot+(hdr['CRVAL2']*3600.0)
+            x_ifu =xfl*x_rot+(hdr['CRVAL1']*3600.0)
+            y_ifu =yfl*y_rot+(hdr['CRVAL2']*3600.0)
         except:
             if verbose:
                 print('WCS or IPA not found in header, using simple scaling')
