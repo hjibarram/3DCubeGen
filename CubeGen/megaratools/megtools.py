@@ -59,7 +59,7 @@ def id_str(id,n_z=2):
 def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True,dtheta_ipa=0.0):
     nfib=hdr['NFIBERS']
     psc=hdr['PSCALE']
-    ipa_deg=hdr0['IPA']+dtheta_ipa
+    ipa_deg=hdr0['IPA']+dtheta_ipa-16.146
     x_pos=np.zeros(nfib)
     y_pos=np.zeros(nfib)
     fib_a=np.zeros(nfib)
