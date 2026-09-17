@@ -1590,7 +1590,7 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
                     )
 
                     temp_spec[ntFbc] = (
-                        specB_GRFbc * fc
+                        specB_GRFbc# * fc
                     )
 
                 nt1ac = np.where(
@@ -1613,7 +1613,7 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
                         right=0.
                     )
 
-                    temp_spec[ntFac] = specG_BRFac
+                    temp_spec[ntFac] = specG_BRFac * fc
 
                 nt1ab = np.where(
                     (waveR >= np.nanmax(waveB)) &
