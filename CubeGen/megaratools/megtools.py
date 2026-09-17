@@ -124,8 +124,8 @@ def megarafiber_pos(hdr,hdr0,verbose=False,astmet=True,dtheta_ipa=0.0,flipy=Fals
     if verbose:
         fig = plt.figure(figsize=(6, 6)) 
         ax = fig.add_subplot(111)
-        sc = ax.scatter(x_ifu/3600., y_ifu/3600., c=fib_idt, cmap='inferno', s=15, alpha=0.8, edgecolor='k')
-        # 3. ¡CONVENCIONES ASTRONÓMICAS PARA IFU!
+        sc = ax.scatter(x_ifu/3600., y_ifu/3600., c=fib_idt, cmap='jet', s=15, alpha=0.8, edgecolor='k')
+        # 3. ¡CONVENCIONES ASTRONÓMICAS PARA IFU! cmap='inferno'
         ax.invert_xaxis()      # El Este en el cielo va a la izquierda (RA aumenta a la izquierda)
         ax.set_aspect('equal') # Fuerza a que 1 grado en X mida exactamente lo mismo que 1 grado en Y
         # 4. Forzar que el recuadro de los ejes sea estrictamente un cuadrado perfecto
