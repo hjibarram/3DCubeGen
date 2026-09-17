@@ -1490,7 +1490,7 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
                         )
 
                     specBGFa = (
-                        specBFa * fc + specGFa
+                        specGFa * fc + specBFa
                     ) / 2.0
 
                     temp_spec[ntFa] = specBGFa
