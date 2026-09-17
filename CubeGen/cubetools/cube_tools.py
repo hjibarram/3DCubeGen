@@ -1055,8 +1055,8 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
 
                         spec1 = tools.cube_interpolB(
                             specG,
-                            ypos1a,
-                            xpos1a
+                            xpos1a,
+                            ypos1a
                         )
 
                     if pix_mG > 1:
