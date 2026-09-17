@@ -1476,7 +1476,7 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
 
                     ft = Bflux / Gflux
 
-                    if 0.01 <= ft <= 4.0:
+                    if 0.01 <= ft <= 5.0:
                         fc = ft
                     else:
                         fc = 1.0
