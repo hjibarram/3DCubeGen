@@ -932,10 +932,6 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
     xr, yr = skycoord_to_pixel(skyB, wcsR)
     skyR = pixel_to_skycoord(xr, yr, wcsR)
 
-    print("B sky:", skyB)
-    print("R pixel:", xr, yr)
-    print("R sky:", skyR)
-    print("separation:", skyB.separation(skyR).arcsec, "arcsec")
     # ------------------------------------------------------------------
     # Spatial loop
     # ------------------------------------------------------------------
@@ -1145,6 +1141,11 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
                             'POS2',
                             i,
                             j
+                        )
+                        print(
+                            xpos2, ypos2,
+                            'POS2_ROUND',
+                            i, j
                         )
 
                 else:
