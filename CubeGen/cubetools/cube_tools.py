@@ -924,14 +924,6 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
         [nx, ny]
     )
 
-    i = nx0 // 2
-    j = ny0 // 2
-
-    skyB = pixel_to_skycoord(i, j, wcsB)
-
-    xr, yr = skycoord_to_pixel(skyB, wcsR)
-    skyR = pixel_to_skycoord(xr, yr, wcsR)
-
     # ------------------------------------------------------------------
     # Spatial loop
     # ------------------------------------------------------------------
@@ -951,8 +943,8 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
             pix2 = j
 
             sky1 = pixel_to_skycoord(
-                pix1,
                 pix2,
+                pix1,
                 wcs
             )
 
@@ -965,7 +957,7 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
                     'RA,DEC'
                 )
 
-            xpos0, ypos0 = skycoord_to_pixel(
+            ypos0, xpos0 = skycoord_to_pixel(
                 sky1,
                 wcs
             )
@@ -1035,7 +1027,7 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
 
             if band_G and init == 1:
 
-                xpos1a, ypos1a = skycoord_to_pixel(
+                ypos1a, xpos1a = skycoord_to_pixel(
                     sky1,
                     wcsG
                 )
@@ -1092,7 +1084,7 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
 
             if band_R:
 
-                xpos2a, ypos2a = skycoord_to_pixel(
+                ypos2a, xpos2a = skycoord_to_pixel(
                     sky1,
                     wcsR
                 )
