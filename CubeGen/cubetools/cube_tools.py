@@ -1474,9 +1474,9 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
                     Bflux = np.nanmean(specBFa)
                     Gflux = np.nanmean(specGFa)
 
-                    ft = Gflux / Bflux
+                    ft = Bflux / Gflux
 
-                    if 0.1 <= ft <= 3.0:
+                    if 0.01 <= ft <= 4.0:
                         fc = ft
                     else:
                         fc = 1.0
