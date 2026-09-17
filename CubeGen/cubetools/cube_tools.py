@@ -1048,15 +1048,15 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
                 ):
 
                     spec1 = specG[
-                        :, xpos1, ypos1
+                        :, ypos1, xpos1
                     ]
 
                     if np.nansum(spec1) != 0:
 
                         spec1 = tools.cube_interpolB(
                             specG,
-                            xpos1a,
-                            ypos1a
+                            ypos1a,
+                            xpos1a
                         )
 
                     if pix_mG > 1:
@@ -1109,15 +1109,15 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
                 ):
 
                     spec2 = specR[
-                        :, ypos2, xpos2
+                        :, xpos2, ypos2
                     ]
 
                     if np.nansum(spec2) != 0:
 
                         spec2 = tools.cube_interpolB(
                             specR,
-                            ypos2a,
-                            xpos2a
+                            xpos2a,
+                            ypos2a
                         )
 
                     if pix_mR > 1:
