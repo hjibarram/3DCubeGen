@@ -1048,7 +1048,7 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
                 ):
 
                     spec1 = specG[
-                        :, ypos1, xpos1
+                        :, xpos1, ypos1
                     ]
 
                     if np.nansum(spec1) != 0:
