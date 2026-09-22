@@ -2050,11 +2050,11 @@ def crop_cube(file0, file1, file2):
     print("Reading input cube:", file1)
 
     cube1, hdr1 = fits.getdata(
-        file1, 0, header=True
+        file1, 1, header=True
     )
 
     cube1E = fits.getdata(
-        file1, 1, header=False
+        file1, 2, header=False
     )
 
     if cube1.ndim != 3:
