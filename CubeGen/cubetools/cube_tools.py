@@ -1929,3 +1929,817 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
         tools.sycall(
             'gzip -f ' + patch_file
         )
+
+
+def crop_cube(file0, file1, file2):
+    """
+    Crop a datacube using the field of view of another datacube.
+
+    The spatial field of view (FoV) of a reference datacube is used to
+    determine the corresponding spatial region in a second datacube.
+    The overlapping region is then extracted from the second cube while
+    preserving its complete spectral axis.
+
+    The function uses the celestial WCS information from both cubes to
+    transform the spatial limits of the reference cube into the pixel
+    coordinate system of the cube to be cropped.
+
+    The output cube preserves the spectral sampling and spatial pixel
+    scale of ``file1``. Only its spatial dimensions are modified.
+
+    Parameters
+    ----------
+    file0 : str or path-like
+        Reference FITS datacube. Its spatial field of view defines the
+        celestial region to extract from ``file1``.
+
+    file1 : str or path-like
+        Input FITS datacube to be cropped. The primary HDU must contain
+        the flux cube with dimensions ``(wavelength, x, y)``.
+
+        Extension 1 is assumed to contain the corresponding uncertainty
+        cube with the same dimensions as the primary HDU.
+
+    file2 : str or path-like
+        Output filename for the cropped datacube. The ``.fits`` or
+        ``.fits.gz`` extension may be included or omitted.
+
+    Returns
+    -------
+    None
+        The cropped datacube is written directly to disk.
+
+    Outputs
+    -------
+    Primary HDU
+        Flux datacube extracted from ``file1``.
+
+    ``Error_cube``
+        Corresponding uncertainty datacube.
+
+    ``BADPIXELMASK``
+        Integer mask with a value of 1 for pixels contained in the
+        extracted cube.
+
+    Notes
+    -----
+    ``file0`` is used only to determine the celestial field of view.
+    No flux values are copied from the reference cube.
+
+    The output spatial sampling is therefore that of ``file1`` rather
+    than that of ``file0``. This function performs a spatial crop, not
+    a reprojection.
+
+    The celestial coordinates of the spatial corners of ``file0`` are
+    calculated using its WCS and transformed into the pixel coordinate
+    system of ``file1``. The minimum and maximum transformed coordinates
+    define the extraction limits.
+
+    The reference pixels of the output WCS are shifted according to the
+    origin of the extracted region so that the celestial coordinate
+    system remains consistent with ``file1``.
+
+    Unlike :func:`crop_image`, this function operates directly on
+    three-dimensional datacubes and preserves the complete spectral
+    dimension of the cube being cropped.
+
+    Examples
+    --------
+    Crop a large datacube to approximately the same FoV as a smaller
+    reference cube::
+
+        >>> crop_cube(
+        ...     'reference_cube.fits.gz',
+        ...     'large_cube.fits.gz',
+        ...     'large_cube_crop.fits.gz'
+        ... )
+
+    See Also
+    --------
+    crop_image
+        Reproject external images onto the spatial footprint of a cube.
+
+    coad_cube
+        Co-add datacubes from multiple spectral bands.
+    """
+
+    # ---------------------------------------------------------
+    # Read reference cube
+    # ---------------------------------------------------------
+
+    print("Reading reference cube:", file0)
+
+    cube0, hdr0 = fits.getdata(
+        file0, 0, header=True
+    )
+
+    if cube0.ndim != 3:
+        raise ValueError(
+            "The primary HDU of file0 must contain a 3D datacube."
+        )
+
+    nz0, nx0, ny0 = cube0.shape
+
+    # Celestial WCS of the reference cube.
+    wcs0 = WCS(hdr0).celestial
+
+    # ---------------------------------------------------------
+    # Read cube to crop
+    # ---------------------------------------------------------
+
+    print("Reading input cube:", file1)
+
+    cube1, hdr1 = fits.getdata(
+        file1, 0, header=True
+    )
+
+    cube1E = fits.getdata(
+        file1, 1, header=False
+    )
+
+    if cube1.ndim != 3:
+        raise ValueError(
+            "The primary HDU of file1 must contain a 3D datacube."
+        )
+
+    if cube1E.shape != cube1.shape:
+        raise ValueError(
+            "The uncertainty cube must have the same shape "
+            "as the flux cube."
+        )
+
+    nz1, nx1, ny1 = cube1.shape
+
+    # Celestial WCS of the cube to crop.
+    wcs1 = WCS(hdr1).celestial
+
+    # ---------------------------------------------------------
+    # Determine the celestial FoV of file0
+    # ---------------------------------------------------------
+    #
+    # Use the four spatial corners rather than only two opposite
+    # corners. This is safer for rotated WCS solutions.
+    # ---------------------------------------------------------
+
+    corners_x = np.array([
+        0,
+        ny0 - 1,
+        ny0 - 1,
+        0
+    ])
+
+    corners_y = np.array([
+        0,
+        0,
+        nx0 - 1,
+        nx0 - 1
+    ])
+
+    sky_corners = pixel_to_skycoord(
+        corners_x,
+        corners_y,
+        wcs0
+    )
+
+    # ---------------------------------------------------------
+    # Transform FoV into the pixel system of file1
+    # ---------------------------------------------------------
+
+    xpos, ypos = skycoord_to_pixel(
+        sky_corners,
+        wcs1
+    )
+
+    # Ignore non-finite WCS transformations.
+    valid = (
+        np.isfinite(xpos)
+        & np.isfinite(ypos)
+    )
+
+    if not np.any(valid):
+        raise ValueError(
+            "The FoV of file0 cannot be transformed "
+            "into the WCS of file1."
+        )
+
+    xpos = xpos[valid]
+    ypos = ypos[valid]
+
+    # ---------------------------------------------------------
+    # Determine extraction limits
+    # ---------------------------------------------------------
+
+    # floor/ceil ensure that the complete reference FoV is
+    # contained in the output cube.
+    xmin = int(np.floor(np.min(ypos)))
+    xmax = int(np.ceil(np.max(ypos))) + 1
+
+    ymin = int(np.floor(np.min(xpos)))
+    ymax = int(np.ceil(np.max(xpos))) + 1
+
+    # ---------------------------------------------------------
+    # Check overlap with file1
+    # ---------------------------------------------------------
+
+    if (
+        xmax <= 0
+        or ymax <= 0
+        or xmin >= nx1
+        or ymin >= ny1
+    ):
+        raise ValueError(
+            "The two datacubes do not spatially overlap."
+        )
+
+    # Restrict extraction to the boundaries of file1.
+    xmin = max(0, xmin)
+    xmax = min(nx1, xmax)
+
+    ymin = max(0, ymin)
+    ymax = min(ny1, ymax)
+
+    print(
+        "Cropping limits in file1: "
+        "x=[{}, {}], y=[{}, {}]".format(
+            xmin,
+            xmax,
+            ymin,
+            ymax
+        )
+    )
+
+    # ---------------------------------------------------------
+    # Extract cube
+    # ---------------------------------------------------------
+
+    cube_out = cube1[
+        :,
+        xmin:xmax,
+        ymin:ymax
+    ].copy()
+
+    cube_outE = cube1E[
+        :,
+        xmin:xmax,
+        ymin:ymax
+    ].copy()
+
+    # Initially all extracted pixels are valid.
+    cube_outB = np.ones(
+        cube_out.shape,
+        dtype=int
+    )
+
+    # ---------------------------------------------------------
+    # Create output HDUs
+    # ---------------------------------------------------------
+
+    h1 = fits.PrimaryHDU(
+        cube_out,
+        header=hdr1.copy()
+    )
+
+    h2 = fits.ImageHDU(
+        cube_outE,
+        name='Error_cube'
+    )
+
+    h3 = fits.ImageHDU(
+        cube_outB,
+        name='BADPIXELMASK'
+    )
+
+    # Copy WCS/header information to extensions.
+    h2.header = hdr1.copy()
+    h3.header = hdr1.copy()
+
+    h2.header['EXTNAME'] = 'Error_cube'
+    h3.header['EXTNAME'] = 'BADPIXELMASK'
+
+    # ---------------------------------------------------------
+    # Update WCS reference pixels
+    # ---------------------------------------------------------
+    #
+    # FITS:
+    #   axis 1 -> NumPy third dimension
+    #   axis 2 -> NumPy second dimension
+    #
+    # Therefore:
+    #
+    #   CRPIX1 -> ymin
+    #   CRPIX2 -> xmin
+    # ---------------------------------------------------------
+
+    for hdu in (h1, h2, h3):
+
+        if 'CRPIX1' in hdu.header:
+            hdu.header['CRPIX1'] -= ymin
+
+        if 'CRPIX2' in hdu.header:
+            hdu.header['CRPIX2'] -= xmin
+
+    # ---------------------------------------------------------
+    # Output filename
+    # ---------------------------------------------------------
+
+    output_file = str(file2)
+
+    if not (
+        output_file.endswith('.fits')
+        or output_file.endswith('.fits.gz')
+    ):
+        output_file += '.fits'
+
+    # ---------------------------------------------------------
+    # Write output cube
+    # ---------------------------------------------------------
+
+    hlist = fits.HDUList([
+        h1,
+        h2,
+        h3
+    ])
+
+    hlist.writeto(
+        output_file,
+        overwrite=True
+    )
+
+    print("Output cube:", output_file)
+
+
+def extract_cube_region(file0, file2, file1=None, reg_file='Reg.reg',
+                        dir_reg='./', mask=False, pbar=True,
+                        notebook=True):
+    """
+    Extract a spatial subcube from an IFU datacube using a DS9 region.
+
+    The function reads a rectangular DS9 region, converts its celestial
+    coordinates to the pixel coordinate system of the input datacube,
+    and extracts the corresponding spatial region while preserving the
+    complete spectral axis.
+
+    The flux, uncertainty, and bad-pixel-mask cubes are written to a new
+    FITS file. The spatial WCS reference pixels are updated so that the
+    celestial coordinates of the extracted cube remain consistent with
+    those of the original datacube.
+
+    Optionally, a second reference cube can be used as a spatial mask.
+    Pixels in the extracted region that do not overlap valid data in the
+    reference cube are set to NaN and flagged in the bad-pixel mask.
+
+    Parameters
+    ----------
+    file0 : str or path-like
+        Input FITS datacube. The primary HDU must contain the flux cube
+        with dimensions ``(wavelength, x, y)``.
+
+        Extension 1 is expected to contain the corresponding uncertainty
+        cube with the same dimensions as the primary HDU.
+
+    file2 : str or path-like
+        Output filename. The ``.fits`` or ``.fits.gz`` extension may be
+        included or omitted. The output file is written directly as a
+        FITS file.
+
+    file1 : str or path-like, optional
+        Reference datacube used to define a spatial validity mask when
+        ``mask=True``. Its primary HDU is collapsed along the spectral
+        axis and reprojected through the WCS to determine whether each
+        output spatial pixel overlaps valid reference data.
+
+        If ``mask=False``, this parameter is ignored. Default is None.
+
+    reg_file : str, optional
+        Name of the DS9 region file defining the spatial region to
+        extract. The first region in the file is used. The current
+        implementation expects a rectangular/box aperture for which
+        ``get_apertures`` provides the central coordinates and spatial
+        dimensions. Default is ``'Reg.reg'``.
+
+    dir_reg : str or path-like, optional
+        Directory containing ``reg_file``. Default is ``'./'``.
+
+    mask : bool, optional
+        If True, use ``file1`` to determine which spatial pixels overlap
+        valid data in the reference cube. Pixels outside the reference
+        data footprint are set to NaN and flagged in the bad-pixel mask.
+        Default is False.
+
+    pbar : bool, optional
+        If True, display a progress bar during the spatial extraction.
+        Default is True.
+
+    notebook : bool, optional
+        If True, use the Jupyter notebook version of the tqdm progress
+        bar. If False, use the terminal version. Default is True.
+
+    Returns
+    -------
+    None
+        The function writes the extracted datacube directly to disk.
+
+    Outputs
+    -------
+    Primary HDU
+        Extracted flux datacube.
+
+    ``Error_cube``
+        Extracted uncertainty datacube.
+
+    ``BADPIXELMASK``
+        Integer mask with a value of 1 for retained pixels and 0 for
+        pixels rejected by the optional reference-cube mask.
+
+    Notes
+    -----
+    The celestial limits of the extraction are calculated from the
+    centre and dimensions of the first aperture returned by
+    :func:`CubeGen.tools.tools.get_apertures`.
+
+    The region limits are transformed from celestial coordinates to
+    pixels using the celestial WCS of the input cube.
+
+    After extraction, the FITS reference pixels are shifted according
+    to the origin of the extracted region,
+
+    .. math::
+
+        \\mathrm{CRPIX1}_{new}
+        =
+        \\mathrm{CRPIX1}_{old} - y_{min}
+
+    and
+
+    .. math::
+
+        \\mathrm{CRPIX2}_{new}
+        =
+        \\mathrm{CRPIX2}_{old} - x_{min}.
+
+    This preserves the original celestial coordinate system in the
+    extracted datacube.
+
+    When ``mask=True``, every spatial pixel is transformed from the
+    input-cube WCS to the reference-cube WCS. The collapsed reference
+    image is evaluated using
+    :func:`CubeGen.tools.tools.map_interpolB`.
+
+    Examples
+    --------
+    Extract a region without applying an external spatial mask::
+
+        >>> extract_cube_region(
+        ...     'galaxy_cube.fits.gz',
+        ...     'galaxy_region.fits.gz',
+        ...     reg_file='Reg.reg'
+        ... )
+
+    Extract a region and restrict it to the footprint of another cube::
+
+        >>> extract_cube_region(
+        ...     'galaxy_cube.fits.gz',
+        ...     'galaxy_region.fits.gz',
+        ...     file1='reference_cube.fits.gz',
+        ...     reg_file='Reg.reg',
+        ...     mask=True
+        ... )
+
+    See Also
+    --------
+    crop_image
+        Reproject external imaging onto the spatial grid of an IFU cube.
+
+    coad_cube
+        Co-add reconstructed datacubes from multiple spectral bands.
+    """
+
+    # ---------------------------------------------------------
+    # Read DS9 aperture
+    # ---------------------------------------------------------
+
+    reg_path = dir_reg + reg_file
+
+    ra_R, dec_R, rad_R, l1_R, l2_R, th_R, color, names, typ = \
+        tools.get_apertures(reg_path)
+
+    if len(ra_R) == 0:
+        raise ValueError(
+            "No valid aperture was found in {}".format(reg_path)
+        )
+
+    # Use the first aperture.
+    ra = ra_R[0]
+    dec = dec_R[0]
+    l1 = l1_R[0]
+    l2 = l2_R[0]
+
+    # ---------------------------------------------------------
+    # Read input cube
+    # ---------------------------------------------------------
+
+    print("Reading cube:", file0)
+
+    pdl_cube0, hdr0 = fits.getdata(
+        file0, 0, header=True
+    )
+
+    pdl_cube0E = fits.getdata(
+        file0, 1, header=False
+    )
+
+    if pdl_cube0.ndim != 3:
+        raise ValueError(
+            "The primary HDU of file0 must contain a 3D datacube."
+        )
+
+    if pdl_cube0E.shape != pdl_cube0.shape:
+        raise ValueError(
+            "The uncertainty cube must have the same shape "
+            "as the flux cube."
+        )
+
+    nz0, nx0, ny0 = pdl_cube0.shape
+
+    # ---------------------------------------------------------
+    # Convert region centre and limits to celestial coordinates
+    # ---------------------------------------------------------
+
+    # Local imports required by this function.
+    from astropy.coordinates import SkyCoord, FK5
+    from astropy import units as u
+
+    sky_centre = SkyCoord(
+        ra + ' ' + dec,
+        frame=FK5,
+        unit=(u.hourangle, u.deg)
+    )
+
+    ra_deg = sky_centre.ra.deg
+    dec_deg = sky_centre.dec.deg
+
+    # Region dimensions are given in arcseconds.
+    ra1 = ra_deg - l1 / 2.0 / 3600.0
+    ra2 = ra_deg + l1 / 2.0 / 3600.0
+
+    dec1 = dec_deg - l2 / 2.0 / 3600.0
+    dec2 = dec_deg + l2 / 2.0 / 3600.0
+
+    sky00 = SkyCoord(
+        ra1, dec1,
+        frame=FK5,
+        unit=(u.deg, u.deg)
+    )
+
+    sky11 = SkyCoord(
+        ra2, dec2,
+        frame=FK5,
+        unit=(u.deg, u.deg)
+    )
+
+    # ---------------------------------------------------------
+    # Transform region limits to input-cube pixels
+    # ---------------------------------------------------------
+
+    wcs0 = WCS(hdr0).celestial
+
+    ypos00, xpos00 = skycoord_to_pixel(
+        sky00, wcs0
+    )
+
+    ypos11, xpos11 = skycoord_to_pixel(
+        sky11, wcs0
+    )
+
+    xpos00 = int(np.round(xpos00))
+    ypos00 = int(np.round(ypos00))
+
+    xpos11 = int(np.round(xpos11))
+    ypos11 = int(np.round(ypos11))
+
+    # Ensure increasing array limits.
+    xmin = min(xpos00, xpos11)
+    xmax = max(xpos00, xpos11)
+
+    ymin = min(ypos00, ypos11)
+    ymax = max(ypos00, ypos11)
+
+    # Restrict extraction to the input-cube boundaries.
+    xmin = max(0, xmin)
+    xmax = min(nx0, xmax)
+
+    ymin = max(0, ymin)
+    ymax = min(ny0, ymax)
+
+    if xmax <= xmin or ymax <= ymin:
+        raise ValueError(
+            "The requested region does not overlap the input cube."
+        )
+
+    print(
+        "Extraction limits: "
+        "x=[{}, {}], y=[{}, {}]".format(
+            xmin, xmax, ymin, ymax
+        )
+    )
+
+    # ---------------------------------------------------------
+    # Allocate output cubes
+    # ---------------------------------------------------------
+
+    nx2 = xmax - xmin
+    ny2 = ymax - ymin
+
+    seg = np.full(
+        (nz0, nx2, ny2),
+        np.nan,
+        dtype=float
+    )
+
+    seg_e = np.full(
+        (nz0, nx2, ny2),
+        np.nan,
+        dtype=float
+    )
+
+    seg_B = np.ones(
+        (nz0, nx2, ny2),
+        dtype=int
+    )
+
+    # ---------------------------------------------------------
+    # Optional reference-cube mask
+    # ---------------------------------------------------------
+
+    if mask:
+
+        if file1 is None:
+            raise ValueError(
+                "file1 must be provided when mask=True."
+            )
+
+        print("Reading reference cube:", file1)
+
+        pdl_cube1, hdr1 = fits.getdata(
+            file1, 0, header=True
+        )
+
+        if pdl_cube1.ndim == 3:
+            map1 = np.nansum(
+                pdl_cube1,
+                axis=0
+            )
+        elif pdl_cube1.ndim == 2:
+            map1 = np.copy(pdl_cube1)
+        else:
+            raise ValueError(
+                "file1 must contain either a 2D image "
+                "or a 3D datacube."
+            )
+
+        nx1, ny1 = map1.shape
+
+        wcs1 = WCS(hdr1).celestial
+
+    # ---------------------------------------------------------
+    # Extract region
+    # ---------------------------------------------------------
+
+    iterator = range(xmin, xmax)
+
+    if pbar:
+
+        if notebook:
+            iterator = tqdm(
+                iterator,
+                total=nx2,
+                desc='Extracting cube'
+            )
+        else:
+            iterator = tqdmT(
+                iterator,
+                total=nx2,
+                desc='Extracting cube'
+            )
+
+    for i in iterator:
+
+        for j in range(ymin, ymax):
+
+            valid = True
+
+            # -------------------------------------------------
+            # Check reference-cube footprint
+            # -------------------------------------------------
+
+            if mask:
+
+                sky = pixel_to_skycoord(
+                    j, i, wcs0
+                )
+
+                xpos_ref, ypos_ref = skycoord_to_pixel(
+                    sky, wcs1
+                )
+
+                if (
+                    xpos_ref < 0
+                    or xpos_ref >= ny1
+                    or ypos_ref < 0
+                    or ypos_ref >= nx1
+                ):
+
+                    valid = False
+
+                else:
+
+                    val = tools.map_interpolB(
+                        map1,
+                        ypos_ref,
+                        xpos_ref
+                    )
+
+                    if (
+                        not np.isfinite(val)
+                        or val == 0
+                    ):
+                        valid = False
+
+            # -------------------------------------------------
+            # Copy flux and uncertainty
+            # -------------------------------------------------
+
+            ii = i - xmin
+            jj = j - ymin
+
+            if valid:
+
+                seg[:, ii, jj] = \
+                    pdl_cube0[:, i, j]
+
+                seg_e[:, ii, jj] = \
+                    pdl_cube0E[:, i, j]
+
+            else:
+
+                seg[:, ii, jj] = np.nan
+                seg_e[:, ii, jj] = np.nan
+                seg_B[:, ii, jj] = 0
+
+    # ---------------------------------------------------------
+    # Construct FITS output
+    # ---------------------------------------------------------
+
+    h1 = fits.PrimaryHDU(seg)
+    h2 = fits.ImageHDU(seg_e)
+    h3 = fits.ImageHDU(seg_B)
+
+    # Copy original header.
+    keys = list(hdr0.keys())
+
+    for hdu in (h1, h2, h3):
+
+        hdr = hdu.header
+
+        for key in keys:
+
+            try:
+                hdr[key] = hdr0[key]
+                hdr.comments[key] = hdr0.comments[key]
+            except:
+                pass
+
+        # Shift reference pixels to the new spatial origin.
+        hdr['CRPIX1'] = hdr0['CRPIX1'] - ymin
+        hdr['CRPIX2'] = hdr0['CRPIX2'] - xmin
+
+    h2.header['EXTNAME'] = 'Error_cube'
+    h3.header['EXTNAME'] = 'BADPIXELMASK'
+
+    # ---------------------------------------------------------
+    # Output filename
+    # ---------------------------------------------------------
+
+    output_file = str(file2)
+
+    if output_file.endswith('.fits.gz'):
+        pass
+    elif output_file.endswith('.fits'):
+        pass
+    else:
+        output_file += '.fits'
+
+    # ---------------------------------------------------------
+    # Write cube
+    # ---------------------------------------------------------
+
+    hlist = fits.HDUList(
+        [h1, h2, h3]
+    )
+
+    hlist.writeto(
+        output_file,
+        overwrite=True
+    )
+
+    print("Output cube:", output_file)
