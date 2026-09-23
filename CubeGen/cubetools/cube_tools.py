@@ -1931,97 +1931,165 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
         )
 
 
-def crop_cube(file0, file1, file2):
+def crop_cube(file0, file1, file2, spsample_copy=False,
+              fac_sizeX=1.0, fac_sizeY=1.0, dx=0, dy=0):
     """
-    Crop a datacube using the field of view of another datacube.
+    Crop a datacube using the field of view of a reference datacube.
 
-    The spatial field of view (FoV) of a reference datacube is used to
-    determine the corresponding spatial region in a second datacube.
-    The overlapping region is then extracted from the second cube while
-    preserving its complete spectral axis.
+    The spatial field of view (FoV) and astrometry of ``file0`` are used
+    to define the celestial region extracted from ``file1``. The output
+    can either preserve the spatial sampling of ``file1`` or be
+    resampled onto the spatial grid defined by ``file0``.
 
-    The function uses the celestial WCS information from both cubes to
-    transform the spatial limits of the reference cube into the pixel
-    coordinate system of the cube to be cropped.
-
-    The output cube preserves the spectral sampling and spatial pixel
-    scale of ``file1``. Only its spatial dimensions are modified.
+    The FoV can be enlarged independently along the two spatial axes
+    using ``fac_sizeX`` and ``fac_sizeY``. In addition, the reference
+    astrometry can be shifted by ``dx`` and ``dy`` pixels before defining
+    the output FoV.
 
     Parameters
     ----------
     file0 : str or path-like
-        Reference FITS datacube. Its spatial field of view defines the
-        celestial region to extract from ``file1``.
+        Reference FITS datacube. Its celestial WCS, spatial sampling,
+        orientation, and FoV define the region to extract from ``file1``.
 
     file1 : str or path-like
-        Input FITS datacube to be cropped. The primary HDU must contain
-        the flux cube with dimensions ``(wavelength, x, y)``.
-
-        Extension 1 is assumed to contain the corresponding uncertainty
-        cube with the same dimensions as the primary HDU.
+        FITS datacube to crop. The primary HDU must contain the flux cube
+        with dimensions ``(wavelength, x, y)``. Extension 1 is assumed
+        to contain the corresponding uncertainty cube.
 
     file2 : str or path-like
-        Output filename for the cropped datacube. The ``.fits`` or
-        ``.fits.gz`` extension may be included or omitted.
+        Output filename. The ``.fits`` or ``.fits.gz`` extension may be
+        included or omitted.
+
+    spsample_copy : bool, optional
+        If False, preserve the native spatial sampling, orientation, and
+        WCS of ``file1`` and perform a simple spatial crop.
+
+        If True, resample ``file1`` onto the spatial grid defined by
+        ``file0`` using ``tools.map_interpolB``. In this mode the output
+        inherits the spatial pixel scale and orientation of the reference
+        cube. Default is False.
+
+    fac_sizeX : float, optional
+        Multiplicative factor applied to the FoV along the NumPy second
+        spatial dimension (FITS axis 2). A value of 1.0 reproduces the
+        reference FoV, while values greater than 1 enlarge it around its
+        centre. Default is 1.0.
+
+    fac_sizeY : float, optional
+        Multiplicative factor applied to the FoV along the NumPy third
+        spatial dimension (FITS axis 1). A value of 1.0 reproduces the
+        reference FoV, while values greater than 1 enlarge it around its
+        centre. Default is 1.0.
+
+    dx : float, optional
+        Astrometric displacement along the FITS x direction (axis 1),
+        expressed in pixels of the reference cube. Positive values shift
+        the reference FoV toward increasing x pixel coordinates.
+        Default is 0.
+
+    dy : float, optional
+        Astrometric displacement along the FITS y direction (axis 2),
+        expressed in pixels of the reference cube. Positive values shift
+        the reference FoV toward increasing y pixel coordinates.
+        Default is 0.
 
     Returns
     -------
     None
-        The cropped datacube is written directly to disk.
+        The resulting datacube is written directly to disk.
 
     Outputs
     -------
     Primary HDU
-        Flux datacube extracted from ``file1``.
+        Cropped or spatially resampled flux datacube.
 
     ``Error_cube``
         Corresponding uncertainty datacube.
 
     ``BADPIXELMASK``
-        Integer mask with a value of 1 for pixels contained in the
-        extracted cube.
+        Integer mask containing 1 for pixels mapped inside ``file1`` and
+        0 for pixels outside its spatial footprint.
 
     Notes
     -----
-    ``file0`` is used only to determine the celestial field of view.
-    No flux values are copied from the reference cube.
+    When ``spsample_copy=False``, the FoV defined by ``file0`` is
+    transformed into the pixel coordinate system of ``file1`` and the
+    corresponding rectangular section of ``file1`` is extracted. The
+    output therefore retains the spatial sampling and orientation of
+    ``file1``.
 
-    The output spatial sampling is therefore that of ``file1`` rather
-    than that of ``file0``. This function performs a spatial crop, not
-    a reprojection.
+    When ``spsample_copy=True``, an output spatial grid is constructed
+    from the WCS of ``file0``. Each output pixel is transformed to sky
+    coordinates and subsequently into the pixel system of ``file1``.
+    Flux and uncertainty values are evaluated using
+    ``tools.map_interpolB``.
 
-    The celestial coordinates of the spatial corners of ``file0`` are
-    calculated using its WCS and transformed into the pixel coordinate
-    system of ``file1``. The minimum and maximum transformed coordinates
-    define the extraction limits.
+    ``fac_sizeX`` and ``fac_sizeY`` modify the dimensions of the
+    reference grid while keeping its central position fixed.
 
-    The reference pixels of the output WCS are shifted according to the
-    origin of the extracted region so that the celestial coordinate
-    system remains consistent with ``file1``.
-
-    Unlike :func:`crop_image`, this function operates directly on
-    three-dimensional datacubes and preserves the complete spectral
-    dimension of the cube being cropped.
+    ``dx`` and ``dy`` shift the astrometric centre of the reference FoV
+    in units of reference-cube pixels before either cropping or
+    resampling is performed.
 
     Examples
     --------
-    Crop a large datacube to approximately the same FoV as a smaller
-    reference cube::
+    Crop ``file1`` using the FoV of ``file0`` while preserving the
+    spatial sampling of ``file1``::
 
         >>> crop_cube(
-        ...     'reference_cube.fits.gz',
-        ...     'large_cube.fits.gz',
-        ...     'large_cube_crop.fits.gz'
+        ...     'reference.fits.gz',
+        ...     'input.fits.gz',
+        ...     'crop.fits.gz'
+        ... )
+
+    Resample the output onto the spatial grid of the reference cube::
+
+        >>> crop_cube(
+        ...     'reference.fits.gz',
+        ...     'input.fits.gz',
+        ...     'crop.fits.gz',
+        ...     spsample_copy=True
+        ... )
+
+    Use a FoV 1.5 times larger than the reference FoV::
+
+        >>> crop_cube(
+        ...     'reference.fits.gz',
+        ...     'input.fits.gz',
+        ...     'crop.fits.gz',
+        ...     fac_sizeX=1.5,
+        ...     fac_sizeY=1.5
+        ... )
+
+    Apply an astrometric displacement of two pixels in x and -1 pixel
+    in y::
+
+        >>> crop_cube(
+        ...     'reference.fits.gz',
+        ...     'input.fits.gz',
+        ...     'crop.fits.gz',
+        ...     dx=2,
+        ...     dy=-1
         ... )
 
     See Also
     --------
     crop_image
-        Reproject external images onto the spatial footprint of a cube.
+        Reproject external images onto the spatial grid of a datacube.
 
     coad_cube
         Co-add datacubes from multiple spectral bands.
     """
+
+    # ---------------------------------------------------------
+    # Check input parameters
+    # ---------------------------------------------------------
+
+    if fac_sizeX <= 0 or fac_sizeY <= 0:
+        raise ValueError(
+            "fac_sizeX and fac_sizeY must be greater than zero."
+        )
 
     # ---------------------------------------------------------
     # Read reference cube
@@ -2040,21 +2108,20 @@ def crop_cube(file0, file1, file2):
 
     nz0, nx0, ny0 = cube0.shape
 
-    # Celestial WCS of the reference cube.
     wcs0 = WCS(hdr0).celestial
 
     # ---------------------------------------------------------
-    # Read cube to crop
+    # Read input cube
     # ---------------------------------------------------------
 
     print("Reading input cube:", file1)
 
     cube1, hdr1 = fits.getdata(
-        file1, 1, header=True
+        file1, 0, header=True
     )
 
     cube1E = fits.getdata(
-        file1, 2, header=False
+        file1, 1, header=False
     )
 
     if cube1.ndim != 3:
@@ -2070,29 +2137,44 @@ def crop_cube(file0, file1, file2):
 
     nz1, nx1, ny1 = cube1.shape
 
-    # Celestial WCS of the cube to crop.
     wcs1 = WCS(hdr1).celestial
 
     # ---------------------------------------------------------
-    # Determine the celestial FoV of file0
+    # Define reference FoV
     # ---------------------------------------------------------
     #
-    # Use the four spatial corners rather than only two opposite
-    # corners. This is safer for rotated WCS solutions.
+    # FITS x corresponds to the third NumPy dimension (ny).
+    # FITS y corresponds to the second NumPy dimension (nx).
+    #
+    # The geometrical centre is shifted by dx/dy reference pixels.
     # ---------------------------------------------------------
 
+    xcen = (ny0 - 1) / 2.0 + dx
+    ycen = (nx0 - 1) / 2.0 + dy
+
+    size_x = ny0 * fac_sizeX
+    size_y = nx0 * fac_sizeY
+
+    # Pixel edges of the desired FoV.
+    x_min_ref = xcen - size_x / 2.0
+    x_max_ref = xcen + size_x / 2.0
+
+    y_min_ref = ycen - size_y / 2.0
+    y_max_ref = ycen + size_y / 2.0
+
+    # Four corners are used to support rotated WCS solutions.
     corners_x = np.array([
-        0,
-        ny0 - 1,
-        ny0 - 1,
-        0
+        x_min_ref,
+        x_max_ref,
+        x_max_ref,
+        x_min_ref
     ])
 
     corners_y = np.array([
-        0,
-        0,
-        nx0 - 1,
-        nx0 - 1
+        y_min_ref,
+        y_min_ref,
+        y_max_ref,
+        y_max_ref
     ])
 
     sky_corners = pixel_to_skycoord(
@@ -2101,142 +2183,279 @@ def crop_cube(file0, file1, file2):
         wcs0
     )
 
-    # ---------------------------------------------------------
-    # Transform FoV into the pixel system of file1
-    # ---------------------------------------------------------
+    # =========================================================
+    # MODE 1: preserve spatial sampling of file1
+    # =========================================================
 
-    xpos, ypos = skycoord_to_pixel(
-        sky_corners,
-        wcs1
-    )
+    if not spsample_copy:
 
-    # Ignore non-finite WCS transformations.
-    valid = (
-        np.isfinite(xpos)
-        & np.isfinite(ypos)
-    )
-
-    if not np.any(valid):
-        raise ValueError(
-            "The FoV of file0 cannot be transformed "
-            "into the WCS of file1."
+        xpos, ypos = skycoord_to_pixel(
+            sky_corners,
+            wcs1
         )
 
-    xpos = xpos[valid]
-    ypos = ypos[valid]
-
-    # ---------------------------------------------------------
-    # Determine extraction limits
-    # ---------------------------------------------------------
-
-    # floor/ceil ensure that the complete reference FoV is
-    # contained in the output cube.
-    xmin = int(np.floor(np.min(ypos)))
-    xmax = int(np.ceil(np.max(ypos))) + 1
-
-    ymin = int(np.floor(np.min(xpos)))
-    ymax = int(np.ceil(np.max(xpos))) + 1
-
-    # ---------------------------------------------------------
-    # Check overlap with file1
-    # ---------------------------------------------------------
-
-    if (
-        xmax <= 0
-        or ymax <= 0
-        or xmin >= nx1
-        or ymin >= ny1
-    ):
-        raise ValueError(
-            "The two datacubes do not spatially overlap."
+        valid = (
+            np.isfinite(xpos)
+            & np.isfinite(ypos)
         )
 
-    # Restrict extraction to the boundaries of file1.
-    xmin = max(0, xmin)
-    xmax = min(nx1, xmax)
+        if not np.any(valid):
+            raise ValueError(
+                "The requested FoV cannot be transformed "
+                "into the WCS of file1."
+            )
 
-    ymin = max(0, ymin)
-    ymax = min(ny1, ymax)
+        xpos = xpos[valid]
+        ypos = ypos[valid]
 
-    print(
-        "Cropping limits in file1: "
-        "x=[{}, {}], y=[{}, {}]".format(
-            xmin,
-            xmax,
-            ymin,
-            ymax
+        # Spatial limits in file1.
+        ymin = int(np.floor(np.min(xpos)))
+        ymax = int(np.ceil(np.max(xpos))) + 1
+
+        xmin = int(np.floor(np.min(ypos)))
+        xmax = int(np.ceil(np.max(ypos))) + 1
+
+        # Check whether the two FoVs overlap.
+        if (
+            xmax <= 0
+            or ymax <= 0
+            or xmin >= nx1
+            or ymin >= ny1
+        ):
+            raise ValueError(
+                "The requested FoV does not overlap file1."
+            )
+
+        # Restrict to file1 boundaries.
+        xmin = max(0, xmin)
+        xmax = min(nx1, xmax)
+
+        ymin = max(0, ymin)
+        ymax = min(ny1, ymax)
+
+        print(
+            "Cropping limits in file1: "
+            "x=[{}, {}], y=[{}, {}]".format(
+                xmin,
+                xmax,
+                ymin,
+                ymax
+            )
         )
-    )
+
+        # Direct NumPy extraction.
+        cube_out = cube1[
+            :,
+            xmin:xmax,
+            ymin:ymax
+        ].copy()
+
+        cube_outE = cube1E[
+            :,
+            xmin:xmax,
+            ymin:ymax
+        ].copy()
+
+        cube_outB = np.ones(
+            cube_out.shape,
+            dtype=int
+        )
+
+        # Output header follows file1.
+        hdr_out = hdr1.copy()
+
+        if 'CRPIX1' in hdr_out:
+            hdr_out['CRPIX1'] -= ymin
+
+        if 'CRPIX2' in hdr_out:
+            hdr_out['CRPIX2'] -= xmin
+
+    # =========================================================
+    # MODE 2: copy spatial sampling of file0
+    # =========================================================
+
+    else:
+
+        # Number of output pixels.
+        ny_out = max(
+            1,
+            int(np.round(ny0 * fac_sizeX))
+        )
+
+        nx_out = max(
+            1,
+            int(np.round(nx0 * fac_sizeY))
+        )
+
+        print(
+            "Resampling cube to reference spatial grid: "
+            "{} x {} pixels".format(
+                nx_out,
+                ny_out
+            )
+        )
+
+        # -----------------------------------------------------
+        # Construct output header
+        # -----------------------------------------------------
+        #
+        # Spectral WCS comes from file1.
+        # Spatial WCS comes from file0.
+        # -----------------------------------------------------
+
+        hdr_out = hdr1.copy()
+
+        # Copy the celestial WCS keywords from file0.
+        spatial_keys = [
+            'CTYPE1', 'CTYPE2',
+            'CUNIT1', 'CUNIT2',
+            'CRVAL1', 'CRVAL2',
+            'CRPIX1', 'CRPIX2',
+            'CDELT1', 'CDELT2',
+            'CD1_1', 'CD1_2',
+            'CD2_1', 'CD2_2',
+            'PC1_1', 'PC1_2',
+            'PC2_1', 'PC2_2'
+        ]
+
+        for key in spatial_keys:
+
+            if key in hdr0:
+                hdr_out[key] = hdr0[key]
+
+        # -----------------------------------------------------
+        # Adjust CRPIX for enlarged FoV and astrometric shift
+        # -----------------------------------------------------
+        #
+        # The new array is centred on the shifted reference
+        # position.
+        # -----------------------------------------------------
+
+        xcen_out = (ny_out - 1) / 2.0
+        ycen_out = (nx_out - 1) / 2.0
+
+        # Sky coordinate of the shifted reference centre.
+        sky_centre = pixel_to_skycoord(
+            xcen,
+            ycen,
+            wcs0
+        )
+
+        # Build an intermediate celestial WCS with the same
+        # scale/orientation as file0.
+        wcs_out = WCS(hdr_out).celestial
+
+        # Determine where the desired centre currently lies.
+        x_tmp, y_tmp = skycoord_to_pixel(
+            sky_centre,
+            wcs_out
+        )
+
+        # Shift CRPIX so that sky_centre falls exactly at the
+        # geometrical centre of the output cube.
+        hdr_out['CRPIX1'] += (
+            xcen_out - x_tmp
+        )
+
+        hdr_out['CRPIX2'] += (
+            ycen_out - y_tmp
+        )
+
+        # Reconstruct WCS after changing CRPIX.
+        wcs_out = WCS(hdr_out).celestial
+
+        # -----------------------------------------------------
+        # Allocate output arrays
+        # -----------------------------------------------------
+
+        cube_out = np.full(
+            (nz1, nx_out, ny_out),
+            np.nan,
+            dtype=float
+        )
+
+        cube_outE = np.full(
+            (nz1, nx_out, ny_out),
+            np.nan,
+            dtype=float
+        )
+
+        cube_outB = np.zeros(
+            (nz1, nx_out, ny_out),
+            dtype=int
+        )
+
+        # -----------------------------------------------------
+        # Spatial resampling
+        # -----------------------------------------------------
+
+        for i in range(nx_out):
+
+            for j in range(ny_out):
+
+                # Output pixel -> sky.
+                sky = pixel_to_skycoord(
+                    j,
+                    i,
+                    wcs_out
+                )
+
+                # Sky -> input cube pixel.
+                xpos, ypos = skycoord_to_pixel(
+                    sky,
+                    wcs1
+                )
+
+                # Require enough space for interpolation.
+                if (
+                    xpos >= 0
+                    and xpos < ny1
+                    and ypos >= 0
+                    and ypos < nx1
+                ):
+
+                    # Interpolate every wavelength plane.
+                    for k in range(nz1):
+
+                        cube_out[k, i, j] = \
+                            tools.map_interpolB(
+                                cube1[k, :, :],
+                                ypos,
+                                xpos
+                            )
+
+                        cube_outE[k, i, j] = \
+                            tools.map_interpolB(
+                                cube1E[k, :, :],
+                                ypos,
+                                xpos
+                            )
+
+                    cube_outB[:, i, j] = 1
 
     # ---------------------------------------------------------
-    # Extract cube
-    # ---------------------------------------------------------
-
-    cube_out = cube1[
-        :,
-        xmin:xmax,
-        ymin:ymax
-    ].copy()
-
-    cube_outE = cube1E[
-        :,
-        xmin:xmax,
-        ymin:ymax
-    ].copy()
-
-    # Initially all extracted pixels are valid.
-    cube_outB = np.ones(
-        cube_out.shape,
-        dtype=int
-    )
-
-    # ---------------------------------------------------------
-    # Create output HDUs
+    # Construct FITS HDUs
     # ---------------------------------------------------------
 
     h1 = fits.PrimaryHDU(
         cube_out,
-        header=hdr1.copy()
+        header=hdr_out.copy()
     )
 
     h2 = fits.ImageHDU(
         cube_outE,
+        header=hdr_out.copy(),
         name='Error_cube'
     )
 
     h3 = fits.ImageHDU(
         cube_outB,
+        header=hdr_out.copy(),
         name='BADPIXELMASK'
     )
 
-    # Copy WCS/header information to extensions.
-    h2.header = hdr1.copy()
-    h3.header = hdr1.copy()
-
     h2.header['EXTNAME'] = 'Error_cube'
     h3.header['EXTNAME'] = 'BADPIXELMASK'
-
-    # ---------------------------------------------------------
-    # Update WCS reference pixels
-    # ---------------------------------------------------------
-    #
-    # FITS:
-    #   axis 1 -> NumPy third dimension
-    #   axis 2 -> NumPy second dimension
-    #
-    # Therefore:
-    #
-    #   CRPIX1 -> ymin
-    #   CRPIX2 -> xmin
-    # ---------------------------------------------------------
-
-    for hdu in (h1, h2, h3):
-
-        if 'CRPIX1' in hdu.header:
-            hdu.header['CRPIX1'] -= ymin
-
-        if 'CRPIX2' in hdu.header:
-            hdu.header['CRPIX2'] -= xmin
 
     # ---------------------------------------------------------
     # Output filename
@@ -2251,7 +2470,7 @@ def crop_cube(file0, file1, file2):
         output_file += '.fits'
 
     # ---------------------------------------------------------
-    # Write output cube
+    # Write output
     # ---------------------------------------------------------
 
     hlist = fits.HDUList([
