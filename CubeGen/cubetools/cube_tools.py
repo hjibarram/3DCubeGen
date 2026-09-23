@@ -2094,12 +2094,14 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
     # ---------------------------------------------------------
     # Read reference cube
     # ---------------------------------------------------------
-
+    
     print("Reading reference cube:", file0)
-
-    cube0, hdr0 = fits.getdata(
-        file0, 0, header=True
-    )
+    try:
+        cube0, hdr0 = fits.getdata(
+            file0, 0, header=True)
+    except
+        cube0, hdr0 = fits.getdata(
+            file0, 1, header=True)
 
     if cube0.ndim != 3:
         raise ValueError(
@@ -2115,14 +2117,23 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
     # ---------------------------------------------------------
 
     print("Reading input cube:", file1)
+    
+    try:
+        cube1, hdr1 = fits.getdata(
+            file1, 0, header=True
+        )
 
-    cube1, hdr1 = fits.getdata(
-        file1, 0, header=True
-    )
+        cube1E = fits.getdata(
+            file1, 1, header=False
+        )
+    except:
+        cube1, hdr1 = fits.getdata(
+            file1, 1, header=True
+        )
 
-    cube1E = fits.getdata(
-        file1, 1, header=False
-    )
+        cube1E = fits.getdata(
+            file1, 2, header=False
+        )
 
     if cube1.ndim != 3:
         raise ValueError(
