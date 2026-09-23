@@ -2120,6 +2120,14 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
 
     wcs0 = WCS(hdr0).celestial
 
+    # Determine input-reference pixel area.
+        dx = np.sqrt(hdr0['CD1_1']**2.0 +
+                     hdr0['CD1_2']**2.0) * 3600.0
+        dy = np.sqrt(hdr0['CD2_1']**2.0 +
+                     hdr0['CD2_2']**2.0) * 3600.0
+
+        A0 = dx * dy
+
     # ---------------------------------------------------------
     # Read input cube
     # ---------------------------------------------------------
@@ -2157,6 +2165,13 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
     nz1, nx1, ny1 = cube1.shape
 
     wcs1 = WCS(hdr1).celestial
+
+    # Determine the reference pixel scale and pixel area.
+    dx = np.sqrt(hdr1['CD1_1']**2.0 +
+                 hdr1['CD1_2']**2.0) * 3600.0
+    dy = np.sqrt(hdr1['CD2_1']**2.0 +
+                 hdr1['CD2_2']**2.0) * 3600.0
+    A1 = dx * dy
 
     # ---------------------------------------------------------
     # Define reference FoV
@@ -2446,14 +2461,14 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
                             cube1,
                             ypos,
                             xpos
-                        )
+                        ) * A1 / A0
 
                     cube_outE[:, i, j] = \
                         tools.cube_interpolB(
                             cube1E,
                             ypos,
                             xpos
-                        )
+                        ) * A1 / A0
 
                     cube_outB[:, i, j] = 1
             if pbars:
@@ -2510,6 +2525,10 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
     hlist.writeto(
         output_file,
         overwrite=True
+    )
+
+    tools.sycall(
+        'gzip -f ' + output_file
     )
 
     print("Output cube:", output_file)
