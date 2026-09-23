@@ -1932,7 +1932,8 @@ def coad_cube(name, dir1='', dir2='', vphs=None, patch=True, verbose=False,
 
 
 def crop_cube(file0, file1, file2, spsample_copy=False,
-              fac_sizeX=1.0, fac_sizeY=1.0, dx=0, dy=0):
+              fac_sizeX=1.0, fac_sizeY=1.0, dx=0, dy=0,
+              pbars=True, notebook=True):
     """
     Crop a datacube using the field of view of a reference datacube.
 
@@ -1993,6 +1994,13 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
         expressed in pixels of the reference cube. Positive values shift
         the reference FoV toward increasing y pixel coordinates.
         Default is 0.
+
+    pbar : bool, optional
+        If True, display a progress bar during the spatial loop. Default is True.
+
+    notebook : bool, optional
+        If True, use the Jupyter notebook version of the progress bar.
+    
 
     Returns
     -------
@@ -2400,6 +2408,12 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
         # Spatial resampling
         # -----------------------------------------------------
 
+        if pbars:
+            if notebook:
+                pbar=tqdm(total=nx_out)
+            else:     
+                pbar=tqdmT(total=nx_out) 
+
         for i in range(nx_out):
 
             for j in range(ny_out):
@@ -2426,23 +2440,26 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
                 ):
 
                     # Interpolate every wavelength plane.
-                    for k in range(nz1):
 
-                        cube_out[k, i, j] = \
-                            tools.map_interpolB(
-                                cube1[k, :, :],
-                                ypos,
-                                xpos
-                            )
+                    cube_out[:, i, j] = \
+                        tools.cube_interpolB(
+                            cube1,
+                            ypos,
+                            xpos
+                        )
 
-                        cube_outE[k, i, j] = \
-                            tools.map_interpolB(
-                                cube1E[k, :, :],
-                                ypos,
-                                xpos
-                            )
+                    cube_outE[:, i, j] = \
+                        tools.cube_interpolB(
+                            cube1E,
+                            ypos,
+                            xpos
+                        )
 
                     cube_outB[:, i, j] = 1
+            if pbars:
+                pbar.update(1)
+        if pbars:
+            pbar.close()          
 
     # ---------------------------------------------------------
     # Construct FITS HDUs
