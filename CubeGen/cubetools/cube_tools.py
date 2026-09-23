@@ -2370,8 +2370,8 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
 
         # Sky coordinate of the shifted reference centre.
         sky_centre = pixel_to_skycoord(
-            xcen,
-            ycen,
+            xcen - dx,
+            ycen - dy,
             wcs0
         )
 
