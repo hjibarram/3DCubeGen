@@ -2121,12 +2121,12 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
     wcs0 = WCS(hdr0).celestial
 
     # Determine input-reference pixel area.
-        dx = np.sqrt(hdr0['CD1_1']**2.0 +
-                     hdr0['CD1_2']**2.0) * 3600.0
-        dy = np.sqrt(hdr0['CD2_1']**2.0 +
-                     hdr0['CD2_2']**2.0) * 3600.0
+    dx = np.sqrt(hdr0['CD1_1']**2.0 +
+                 hdr0['CD1_2']**2.0) * 3600.0
+    dy = np.sqrt(hdr0['CD2_1']**2.0 +
+                 hdr0['CD2_2']**2.0) * 3600.0
 
-        A0 = dx * dy
+    A0 = dx * dy
 
     # ---------------------------------------------------------
     # Read input cube
