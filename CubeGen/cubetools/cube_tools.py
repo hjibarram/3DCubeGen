@@ -2099,7 +2099,7 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
     try:
         cube0, hdr0 = fits.getdata(
             file0, 0, header=True)
-    except
+    except:
         cube0, hdr0 = fits.getdata(
             file0, 1, header=True)
 
