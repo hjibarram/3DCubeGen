@@ -2435,8 +2435,8 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
 
                 # Output pixel -> sky.
                 sky = pixel_to_skycoord(
-                    j,
-                    i,
+                    j + dx,
+                    i + dy,
                     wcs_out
                 )
 
