@@ -2172,9 +2172,6 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
     dyt = np.sqrt(hdr1['CD2_1']**2.0 +
                  hdr1['CD2_2']**2.0) * 3600.0
     A1 = dxt * dyt
-
-    cube1 = cube1 / A1 * A0
-    cube1E = cube1E / A1 * A0
     
 
     # ---------------------------------------------------------
@@ -2313,6 +2310,9 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
     # =========================================================
 
     else:
+
+        cube1 = cube1 / A1 * A0
+        cube1E = cube1E / A1 * A0
 
         # Number of output pixels.
         ny_out = max(

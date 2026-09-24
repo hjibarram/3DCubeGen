@@ -515,43 +515,187 @@ def extract_spec1d(filename,outname,dir_cube='',out_dir='',sig=10,smoth=False,av
     hlist.writeto(file_out, overwrite=True)
     sycall('gzip -f '+file_out)         
 
-def extract_spec(spec,hdr,ra='',dec='',rad=1.5,pix=0.35,avgra=False):
-    sky1=SkyCoord(ra+' '+dec,frame=FK5, unit=(u.hourangle,u.deg))
-    val1=sky1.ra.deg
-    val2=sky1.dec.deg
+def extract_spec(spec, hdr, ra='', dec='', rad=1.5, pix=0.35, avgra=False):
+    """
+    Extract a 1D spectrum from a circular aperture in a 3D datacube.
+
+    The function converts a sky position given by right ascension and
+    declination into pixel coordinates using the celestial WCS stored in
+    the FITS header. It then defines a circular aperture centered on that
+    position and extracts either the summed or averaged spectrum inside
+    the aperture.
+
+    The wavelength array is reconstructed from the spectral WCS
+    information contained in the FITS header.
+
+    Parameters
+    ----------
+    spec : numpy.ndarray
+        Three-dimensional spectral datacube with shape
+        ``(nz, nx, ny)``, where ``nz`` is the number of spectral channels
+        and ``nx`` and ``ny`` are the spatial dimensions.
+
+    hdr : astropy.io.fits.Header
+        FITS header associated with ``spec``. The header must contain
+        celestial WCS information and the spectral-axis keywords
+        ``CRPIX3``, ``CRVAL3``, and either ``CD3_3`` or ``CDELT3``.
+
+    ra : str, optional
+        Right ascension of the center of the extraction aperture.
+        The value must be provided in hour-angle notation, for example
+        ``'12:34:56.7'``. Default is ``''``.
+
+    dec : str, optional
+        Declination of the center of the extraction aperture, in degrees,
+        for example ``'+12:34:56.0'``. Default is ``''``.
+
+    rad : float, optional
+        Radius of the circular extraction aperture, in arcseconds.
+        Default is ``1.5``.
+
+    pix : float, optional
+        Spatial pixel scale of the datacube, in arcseconds per pixel.
+        Default is ``0.35``.
+
+    avgra : bool, optional
+        Determines how the spectrum inside the aperture is combined.
+
+        If ``False``, the spectrum is obtained by summing all valid
+        spatial pixels inside the aperture.
+
+        If ``True``, the mean value of all valid spatial pixels inside
+        the aperture is calculated.
+
+        Default is ``False``.
+
+    Returns
+    -------
+    wave_f : numpy.ndarray
+        One-dimensional wavelength array containing ``nz`` elements.
+        The wavelength axis is reconstructed from ``CRVAL3``, ``CRPIX3``
+        and ``CD3_3`` or ``CDELT3``. The resulting values are multiplied
+        by ``1e10``, assuming that the original spectral WCS is expressed
+        in meters, so that the returned wavelength is in Angstroms.
+
+    single_T : numpy.ndarray
+        Extracted one-dimensional spectrum. Depending on ``avgra``, this
+        corresponds either to the sum or the mean of the spatial pixels
+        contained within the circular aperture.
+
+    xpos : float
+        Pixel coordinate of the aperture center along the first spatial
+        dimension used by the function.
+
+    ypos : float
+        Pixel coordinate of the aperture center along the second spatial
+        dimension used by the function.
+
+    Notes
+    -----
+    Pixels with values less than or equal to zero are replaced by
+    ``NaN`` in a temporary copy of each wavelength plane. Therefore,
+    invalid pixels do not contribute to the extracted spectrum and the
+    input datacube is not modified.
+
+    The sky coordinates are interpreted in the FK5 reference frame:
+
+    ``SkyCoord(ra + ' ' + dec, frame=FK5,
+    unit=(u.hourangle, u.deg))``.
+
+    The aperture distance is calculated assuming a constant spatial
+    sampling given by ``pix``. Therefore, this function assumes square
+    spatial pixels and does not derive the pixel scale directly from
+    the WCS.
+
+    The input datacube is assumed to follow the axis ordering
+    ``(spectral, spatial_x, spatial_y)``.
+
+    Examples
+    --------
+    Extract the integrated spectrum within a 1.5 arcsec aperture:
+
+    >>> wave, flux, xpos, ypos = extract_spec(
+    ...     cube,
+    ...     header,
+    ...     ra='12:34:56.7',
+    ...     dec='+12:34:56.0',
+    ...     rad=1.5,
+    ...     pix=0.35
+    ... )
+
+    Extract the spatially averaged spectrum instead:
+
+    >>> wave, flux, xpos, ypos = extract_spec(
+    ...     cube,
+    ...     header,
+    ...     ra='12:34:56.7',
+    ...     dec='+12:34:56.0',
+    ...     rad=1.5,
+    ...     pix=0.35,
+    ...     avgra=True
+    ... )
+    """
+
+    sky1 = SkyCoord(
+        ra + ' ' + dec,
+        frame=FK5,
+        unit=(u.hourangle, u.deg)
+    )
+
     wcs = WCS(hdr)
-    wcs=wcs.celestial
-    ypos,xpos=skycoord_to_pixel(sky1,wcs)
-    print(xpos,ypos,'POS Pixel')
-    val1=sky1.to_string('hmsdms')
-    print(val1,'RA1,DEC1')
-        
-    nz,nx,ny=spec.shape
-    radis=np.zeros([nx,ny])
-    for i in range(0, nx):
-        for j in range(0, ny):
-            x_n=i-xpos
-            y_n=j-ypos
-            r_n=np.sqrt((y_n)**2.0+(x_n)**2.0)*pix
-            radis[i,j]=r_n
-    single_T=np.zeros(nz)
-    nt=np.where(radis <= rad)
-    for i in range(0, nz):
-        tmp=spec[i,:,:]
-        tmp[np.where(tmp <= 0)]=np.nan
+    wcs = wcs.celestial
+
+    ypos, xpos = skycoord_to_pixel(sky1, wcs)
+
+    print(xpos, ypos, 'POS Pixel')
+    print(sky1.to_string('hmsdms'), 'RA1,DEC1')
+
+    nz, nx, ny = spec.shape
+
+    radis = np.zeros([nx, ny])
+
+    for i in range(nx):
+        for j in range(ny):
+            x_n = i - xpos
+            y_n = j - ypos
+
+            r_n = np.sqrt(
+                y_n**2.0 + x_n**2.0
+            ) * pix
+
+            radis[i, j] = r_n
+
+    single_T = np.zeros(nz)
+
+    nt = np.where(radis <= rad)
+
+    for i in range(nz):
+
+        # Work on a copy to avoid modifying the original datacube.
+        tmp = spec[i, :, :].copy()
+
+        tmp[tmp <= 0] = np.nan
+
         if avgra:
-            single_T[i]=np.nanmean(tmp[nt])
+            single_T[i] = np.nanmean(tmp[nt])
         else:
-            single_T[i]=np.nansum(tmp[nt])
-        
-    crpix=hdr["CRPIX3"]
+            single_T[i] = np.nansum(tmp[nt])
+
+    crpix = hdr["CRPIX3"]
+
     try:
-        cdelt=hdr["CD3_3"]
-    except:
-        cdelt=hdr["CDELT3"]
-    crval=hdr["CRVAL3"]
-    wave_f=(crval+cdelt*(np.arange(nz)+1-crpix))*1e10
-    return wave_f,single_T,xpos,ypos
+        cdelt = hdr["CD3_3"]
+    except KeyError:
+        cdelt = hdr["CDELT3"]
+
+    crval = hdr["CRVAL3"]
+
+    wave_f = (
+        crval
+        + cdelt * (np.arange(nz) + 1 - crpix)
+    ) * 1e10
+
+    return wave_f, single_T, xpos, ypos
 
 def sycall(comand):
     linp=comand
