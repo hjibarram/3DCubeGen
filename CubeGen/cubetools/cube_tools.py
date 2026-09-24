@@ -2173,6 +2173,10 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
                  hdr1['CD2_2']**2.0) * 3600.0
     A1 = dxt * dyt
 
+    cube1 = cube1 / A1 * A0
+    cube1E = cube1E / A1 * A0
+    
+
     # ---------------------------------------------------------
     # Define reference FoV
     # ---------------------------------------------------------
@@ -2461,14 +2465,14 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
                             cube1,
                             ypos,
                             xpos
-                        ) * A1 / A0
+                        )
 
                     cube_outE[:, i, j] = \
                         tools.cube_interpolB(
                             cube1E,
                             ypos,
                             xpos
-                        ) * A1 / A0
+                        )
 
                     cube_outB[:, i, j] = 1
             if pbars:
