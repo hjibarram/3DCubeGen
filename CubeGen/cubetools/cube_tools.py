@@ -9,7 +9,7 @@ from tqdm import tqdm as tqdmT
 from PIL import Image
 
 
-def astromatch(file0,file1,sig=2,plotview=False):
+def astromatch(file0,file1,sig=2,plotview=False,hdu0=0,hdu1=0):
     """
     Compare the astrometric registration of two reconstructed data cubes.
 
@@ -43,6 +43,12 @@ def astromatch(file0,file1,sig=2,plotview=False):
 
     plotview : bool, optional
         If True, display the integrated images and fitted PSF models.
+
+    hdu0 : int, optional
+        Gives the hdu for the first cube
+
+    hdu1 : int, optional
+        Gives the hdu for the second cube
 
     Returns
     -------
@@ -117,9 +123,9 @@ def astromatch(file0,file1,sig=2,plotview=False):
     CubeGen.megaratools.megtools.evaluate_2dPSF
         Fits a two-dimensional PSF model and determines its centroid.
     """
-    [spec0, hdr0]=fits.getdata(file0, 0, header=True)
+    [spec0, hdr0]=fits.getdata(file0, hdu0, header=True)
     
-    [spec1, hdr1]=fits.getdata(file1, 0, header=True)
+    [spec1, hdr1]=fits.getdata(file1, hdu1, header=True)
 
     # Collapse the cubes along the spectral axis.
     try:
