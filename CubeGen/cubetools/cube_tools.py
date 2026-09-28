@@ -2969,8 +2969,9 @@ def extract_cube_region(file0, file2, file1=None, reg_file='Reg.reg',
                 seg_B[:, ii, jj] = 0
 
             zpix=np.where((seg[:, ii, jj] == 0) | (np.isfinite(seg[:, ii, jj]) == False))[0]
-             
+
             if len(zpix) > 0:
+                print(zpix)
                 seg_B[zpix, ii, jj] = 0
 
     # ---------------------------------------------------------
