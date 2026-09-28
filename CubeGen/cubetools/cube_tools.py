@@ -2546,7 +2546,7 @@ def crop_cube(file0, file1, file2, spsample_copy=False,
 
 def extract_cube_region(file0, file2, file1=None, reg_file='Reg.reg',
                         dir_reg='./', mask=False, pbar=True,
-                        notebook=True):
+                        notebook=True, hdu0=0, hdu2=0):
     """
     Extract a spatial subcube from an IFU datacube using a DS9 region.
 
@@ -2609,6 +2609,12 @@ def extract_cube_region(file0, file2, file1=None, reg_file='Reg.reg',
     notebook : bool, optional
         If True, use the Jupyter notebook version of the tqdm progress
         bar. If False, use the terminal version. Default is True.
+
+    hdu0 : int, optional
+        HDU index of the flux datacube in ``file0``. Default is 0.
+
+    hdu2 : int, optional
+        HDU index of the flux datacube in ``file2``. Default is 0.
 
     Returns
     -------
@@ -2717,11 +2723,11 @@ def extract_cube_region(file0, file2, file1=None, reg_file='Reg.reg',
     print("Reading cube:", file0)
 
     pdl_cube0, hdr0 = fits.getdata(
-        file0, 0, header=True
+        file0, hdu0, header=True
     )
 
     pdl_cube0E = fits.getdata(
-        file0, 1, header=False
+        file0, hdu0+1, header=False
     )
 
     if pdl_cube0.ndim != 3:
