@@ -2973,6 +2973,7 @@ def extract_cube_region(file0, file2, file1=None, reg_file='Reg.reg',
             if len(zpix) > 0:
                 print(zpix)
                 seg_B[zpix, ii, jj] = 0
+                print(seg_B[zpix, ii, jj])
 
     # ---------------------------------------------------------
     # Construct FITS output
